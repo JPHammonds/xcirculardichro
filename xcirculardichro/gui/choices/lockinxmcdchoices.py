@@ -44,7 +44,9 @@ class LockinXMCDChoices(AbstractChoices):
         return retData
         
     def getPlotAxisLabels(self):
-        return ["Energy",].extend(str(self.plotSelector.currentText()).split('/'))
+        labels = ["Energy",]
+        labels.extend(str(self.plotSelector.currentText()).split('/'))
+        return labels
     
     def getPlotSelections(self):
         selections = self.plotSelections[0]
