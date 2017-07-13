@@ -2,7 +2,7 @@
  Copyright (c) 2017, UChicago Argonne, LLC
  See LICENSE file.
 '''
-LOGGER_NAME = "xcircularchiro"
+LOGGER_NAME = "xcirculardichro"
 METHOD_ENTER_STR = "Enter %s\n-------------------"
 METHOD_EXIT_STR = "Exit %s\n---------------------"
 LOGGER_DEFAULT = {
@@ -17,9 +17,9 @@ LOGGER_DEFAULT = {
     'loggers' : {'root' :{'level' : 'INFO',
                         'handlers' : ['consoleHandler',],
                       },
-               'xcircularchiro' : {'level' : 'INFO',
+               'xcirculardichro' : {'level' : 'INFO',
                             'handlers' : ['consoleHandler',],
-                            'qualname' : 'xcircularchiro'
+                            'qualname' : 'xcirculardichro'
                             }
                },
    }
