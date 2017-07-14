@@ -22,7 +22,7 @@ class NonLockinXMCDChoices(AbstractChoices):
     def __init__(self, parent=None):
         super(NonLockinXMCDChoices, self).__init__(parent)
         logger.debug ("Entering")
-        layout = qtGui.QVBoxLayout()        
+        layout = self.layout()     
 
         choiceLayout = qtGui.QHBoxLayout()
         label = qtGui.QLabel("Data Type: ")

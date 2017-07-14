@@ -17,7 +17,7 @@ class LockinXMCDChoices(AbstractChoices):
 
     def __init__(self, parent=None):
         super(LockinXMCDChoices, self).__init__(parent)
-        layout = qtGui.QVBoxLayout()        
+        layout = self.layout()        
 
         plotLayout = qtGui.QHBoxLayout()
 

@@ -17,7 +17,7 @@ class UndefinedChoices(AbstractChoices):
     
     def __init__(self, parent=None):
         super(UndefinedChoices, self).__init__(parent)
-        layout = qtGui.QVBoxLayout()        
+        layout = self.layout()        
         
         plotLayout = qtGui.QHBoxLayout()
         label = qtGui.QLabel("Plot Type: ")

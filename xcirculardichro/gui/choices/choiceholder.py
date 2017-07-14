@@ -17,6 +17,7 @@ class ChoiceHolder(qtGui.QDialog):
     
     subTypeChanged = qtCore.pyqtSignal(int, name='subTypeChanged')
     plotTypeChanged = qtCore.pyqtSignal(int, name='plotTypeChanged')
+    plotOptionChanged = qtCore.pyqtSignal(name="plotOptionChanged")
     
     
     def __init__(self, parent=None):
@@ -27,13 +28,20 @@ class ChoiceHolder(qtGui.QDialog):
         layout.addWidget(self.choiceWidget)
         self.choiceWidget.subTypeChanged[int].connect(self.choiceSelectionChanged)
         self.choiceWidget.plotTypeChanged[int].connect(self.plotSelectionChanged)
+        self.choiceWidget.plotOptionChanged.connect(self.handlePlotOptionChanged)
         self.setLayout(layout)
         self.show()
+    
+    @qtCore.pyqtSlot()    
+    def handlePlotOptionChanged(self):
+        logger.debug("Enter")
+        self.plotOptionChanged.emit()
         
     def setChoiceWidget(self, choiceWidget):
         layout = self.layout()
         self.choiceWidget.subTypeChanged[int].disconnect(self.choiceSelectionChanged)
         self.choiceWidget.plotTypeChanged[int].disconnect(self.plotSelectionChanged)
+        self.choiceWidget.plotOptionChanged.disconnect(self.handlePlotOptionChanged)
         layout.removeWidget(self.choiceWidget)
         self.choiceWidget.deleteLater()
         self.choiceWidget = None
@@ -41,6 +49,7 @@ class ChoiceHolder(qtGui.QDialog):
         layout.addWidget(self.choiceWidget)
         self.choiceWidget.subTypeChanged[int].connect(self.choiceSelectionChanged)
         self.choiceWidget.plotTypeChanged[int].connect(self.plotSelectionChanged)
+        self.choiceWidget.plotOptionChanged.connect(self.handlePlotOptionChanged)
         self.choiceWidget.show()
         self.adjustSize()
         self.update()
