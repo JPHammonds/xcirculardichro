@@ -54,11 +54,23 @@ class PlotWidget(qtGui.QDialog):
         
         self.ax.plot(x, y)
         
+    def plotAx1Average(self, x, y):
+        logger.debug("Entering %s" % ((x,y),))
+        
+        line, = self.ax.plot(x, y)
+        plt.setp(line, linewidth=2)
+        
     def plotAx2(self, x, y):
         logger.debug("Entering %s" % ((x,y),))
         
         self.ax2.plot(x, y)
 
+    def plotAx2Average(self, x, y):
+        logger.debug("Entering %s" % ((x,y),))
+        
+        line, = self.ax.plot(x, y)
+        plt.setp(line, linewidth=2)
+        
     def plotDraw(self):
         self.canvas.draw()
 
