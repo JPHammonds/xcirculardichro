@@ -75,6 +75,7 @@ class MainWindow(qtGui.QMainWindow):
         self.typeSelector.scanTypeChanged[int].connect(self.scanTypeSelected)
         self.subChoices.subTypeChanged[int].connect(self.handleSubTypeChanged)
         self.subChoices.plotTypeChanged[int].connect(self.handlePlotTypeChanged)
+        self.subChoices.plotOptionChanged.connect(self.handlePlotOptionChanged)
         self.dataNavigator.specDataSelectionChanged[SpecDataFileItem].connect( \
             self.handleSpecDataSelectionChanged)
         specWidget.setLayout(specLayout)
@@ -175,6 +176,11 @@ class MainWindow(qtGui.QMainWindow):
             #logger.debug ("data %s" % data)
             self.plotWidget.plot(energyData, data)
         
+    @qtCore.pyqtSlot()
+    def handlePlotOptionChanged(self):
+        logger.debug("METHOD_ENTER_STR")
+        self.updatePlotData()
+
     '''
     Update the scan plots when the plot type has changed in the Choice Holder/
     ChoiceWidget
@@ -331,6 +337,8 @@ class MainWindow(qtGui.QMainWindow):
         dataOut = {}
         self.plotWidget.clear()
         
+        dataSum = []
+        dataAverage = []
         for scan in self.selectedScans:
             data[scan] = []
             dataOut[scan] = []
@@ -354,10 +362,22 @@ class MainWindow(qtGui.QMainWindow):
             countIndex = range(1, len(dataOut[scan]))   #start at 1 since 0 is x axis
             plotAxisLabels = self.subChoices.choiceWidget.getPlotAxisLabels()
             #axisLabelIndex = self.subChoices.getPlotAxisLabelsIndex()
+            if self.subChoices.choiceWidget.plotIndividualData():
+                for index in countIndex:
+                    self.plotWidget.plotAx1(dataOut[scan][0], dataOut[scan][index])
+                    self.plotWidget.setXLabel(plotAxisLabels[0])
+                    self.plotWidget.setYLabel(plotAxisLabels[index])
+            if scan == self.selectedScans[0]:
+                dataSum = dataOut[scan] 
+            else:
+                for index in countIndex:
+                    logger.debug("dataSum[index].shape %s" % dataSum[index].shape)
+                    logger.debug("dataOut[scan][index].shape %s" % dataOut[scan][index].shape)
+                    dataSum[index] += dataOut[scan][index]
+        if self.subChoices.choiceWidget.plotAverageData():
             for index in countIndex:
-                self.plotWidget.plotAx1(dataOut[scan][0], dataOut[scan][index])
-                self.plotWidget.setXLabel(plotAxisLabels[0])
-                self.plotWidget.setYLabel(plotAxisLabels[index])
+                dataAverage = dataSum[index]/len(self.selectedScans)
+                self.plotWidget.plotAx1Average(dataOut[scan][0], dataAverage)
         self.plotWidget.plotDraw()                            
     '''
     Handle updating the plot window when only one scan is selected
