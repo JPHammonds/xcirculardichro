@@ -9,6 +9,7 @@ import PyQt4.QtCore as qtCore
 from PyQt4.QtCore import pyqtSignal as Signal
 from PyQt4.QtCore import pyqtSlot as Slot
 
+from PyQt4.QtGui import QAbstractItemView
 
 import sys
 import logging
@@ -24,6 +25,8 @@ from specguiutils.counterselector import CounterSelector
 from specguiutils.scantypeselector import ScanTypeSelector, SCAN_TYPES
 from xcirculardichro.gui.plotwidget import PlotWidget
 from xcirculardichro.gui.choices.choiceholder import ChoiceHolder
+from xcirculardichro.gui.datanavigator import DataNavigator
+from specguiutils.view.specdatafileitem import SpecDataFileItem
 
 
 #configure message logging
@@ -35,17 +38,6 @@ except NoSectionError:
     logging.config.dictConfig(LOGGER_DEFAULT)
 logger = logging.getLogger(LOGGER_NAME)
 APP_NAME = "XCircularDichro"
-# DEF_COUNTER_OPTS = ["X", "Y", "Mon"]
-# NON_LOCK_IN_COUNTER_OPTS = ["Energy", "D+", "D-", "M+", "M-"]
-# LOCK_IN_COUNTER_OPTS = ["Energy","XAS", "XMCD"]
-#SELECTION_TYPES = ['None', 'lockin', 'Flourecence', 'Transmission']
-#SCAN_TYPES_FOR_SELECTION = [(), ('qxscan',), ('qxdichro',), ('qxdichro',)]
-# QXDICHRO = 'qxdichro'
-# QXSCAN = 'qxscan'
-# COUNTER_OPTS_FOR_SELECTION= [DEF_COUNTER_OPTS, \
-#                              LOCK_IN_COUNTER_OPTS, \
-#                              NON_LOCK_IN_COUNTER_OPTS, \
-#                              NON_LOCK_IN_COUNTER_OPTS]
 
 class MainWindow(qtGui.QMainWindow):
     '''
@@ -62,17 +54,19 @@ class MainWindow(qtGui.QMainWindow):
         self.splitter = qtGui.QSplitter()
         specWidget = qtGui.QWidget()
         specLayout = qtGui.QVBoxLayout()
+        self.dataNavigator = DataNavigator()
         self.typeSelector = ScanTypeSelector()
         self.scanBrowser = ScanBrowser()
+        self.scanBrowser.scanList.setSelectionMode(QAbstractItemView.SingleSelection)
         self.subChoices = ChoiceHolder()
         self.typeSelector.setCurrentType(0)
-        self.counterSelector = \
-            CounterSelector(counterOpts=self.subChoices.choiceWidget.COUNTER_OPTS)
+        self.counterSelector = CounterSelector(
+            counterOpts=self.subChoices.choiceWidget.COUNTER_OPTS)
         specLayout.addWidget(self.typeSelector)
         specLayout.addWidget(self.scanBrowser)
         specLayout.addWidget(self.subChoices)
         specLayout.addWidget(self.counterSelector)
-        self.scanBrowser.scanSelected[str].connect(self.handleScanSelection)
+        self.scanBrowser.scanSelected[list].connect(self.handleScanSelection)
         self.scanBrowser.scanLoaded[bool].connect(self.handleScanLoaded)
         self.counterSelector.counterOptChanged[str, int, bool] \
             .connect(self.handleCounterOptChanged)
@@ -81,8 +75,10 @@ class MainWindow(qtGui.QMainWindow):
         self.typeSelector.scanTypeChanged[int].connect(self.scanTypeSelected)
         self.subChoices.subTypeChanged[int].connect(self.handleSubTypeChanged)
         self.subChoices.plotTypeChanged[int].connect(self.handlePlotTypeChanged)
+        self.dataNavigator.specDataSelectionChanged[SpecDataFileItem].connect( \
+            self.handleSpecDataSelectionChanged)
         specWidget.setLayout(specLayout)
-        #layout.addLayout(specLayout)
+        self.splitter.addWidget(self.dataNavigator)
         self.splitter.addWidget(specWidget)
         self.plotWidget = PlotWidget()
         self.splitter.addWidget(self.plotWidget)
@@ -98,21 +94,50 @@ class MainWindow(qtGui.QMainWindow):
         menuBar = self.menuBar()
         menuBar.setNativeMenuBar(False)
         fileMenu = menuBar.addMenu('File')
+        dataMenu = menuBar.addMenu('Data')
         
         openAction = qtGui.QAction("Open", self)
         openAction.triggered.connect(self.openFile)
+        
+        saveAction = qtGui.QAction("Save", self)
+        saveAction.triggered.connect(self.saveFile)
 
+        saveAsAction = qtGui.QAction("Save As", self)
+        saveAsAction.triggered.connect(self.saveAsFile)
+        
+        exportAction = qtGui.QAction("Export", self)
+        exportAction.triggered.connect(self.export)
+        
+        closeAction = qtGui.QAction("Close", self)
+        closeAction.triggered.connect(self.closeFile)
+
+        
         exitAction = qtGui.QAction("Exit", self)
         exitAction.setShortcut('Ctrl+Q')
         exitAction.triggered.connect(self.close)
         
         fileMenu.addAction(openAction)
+        fileMenu.addAction(saveAction)
+        fileMenu.addAction(saveAsAction)
+        fileMenu.addAction(closeAction)
+        fileMenu.addSeparator()
+        fileMenu.addAction(exportAction)
+        fileMenu.addSeparator()
         fileMenu.addAction(exitAction)
-        
-    def getScanTypes(self):
+    
+    def closeFile(self):
+        logger.debug(METHOD_ENTER_STR)
+        index = self.dataNavigator.dataNavigatorView.currentIndex()
+        logger.debug("Index %s " % index) 
+        self.dataNavigator.dataNavigatorModel.removeRows(index.row(), 1)
+        #self.dataNavigator.dataNavigatorView.setCurrentSelection()
+    def export(self):
+        logger.debug(METHOD_ENTER_STR)    
+
+    def getScanTypes(self, specFile):
         scanTypes = set()
-        for scan in self.specFile.scans:
-            scanTypes.add(self.specFile.scans[scan].scanCmd.split()[0])
+        for scan in specFile.scans:
+            scanTypes.add(specFile.scans[scan].scanCmd.split()[0])
         return list(scanTypes)
         
     
@@ -145,8 +170,8 @@ class MainWindow(qtGui.QMainWindow):
 #                 (counterName, LOCK_IN_COUNTER_OPTS[optIndex], value))
         
         if (optIndex == 1 and value ==True):
-            energyData = self.specFile.scans[self.selectedScans].data['Energy']
-            data = self.specFile.scans[self.selectedScans].data[str(counterName)]
+            energyData = self.specFile.scans[self.selectedScans[0]].data['Energy']
+            data = self.specFile.scans[self.selectedScans[0]].data[str(counterName)]
             #logger.debug ("data %s" % data)
             self.plotWidget.plot(energyData, data)
         
@@ -166,7 +191,7 @@ class MainWindow(qtGui.QMainWindow):
     ''' 
     @qtCore.pyqtSlot(bool)
     def handleScanLoaded(self, newFile):
-        scanTypes = self.getScanTypes()
+        scanTypes = self.getScanTypes(self.specFile)
         logger.debug("scanTypes: %s" % scanTypes)
         if newFile:
             self.typeSelector.loadScans(scanTypes)
@@ -187,17 +212,21 @@ class MainWindow(qtGui.QMainWindow):
     individual scans will also be plotted.  The sum will be bolder than the 
     individual scans.
     '''
-    @qtCore.pyqtSlot(str)
-    def handleScanSelection(self, newScan):
-        logger.debug ("handling selection of scan %s" %newScan)
-        self.selectedScans = str(newScan)
+#    @qtCore.pyqtSlot(str)
+    def handleScanSelection(self, selectedScans):
+        logger.debug ("handling selection of scans %s" %selectedScans)
+        self.selectedScans = selectedScans
+        newScan = self.selectedScans[0]
+        logger.debug("newScan %s" % newScan)
         newScanType = self.specFile.scans[str(newScan)].scanCmd.split()[0]
-
+        logger.debug("newScanType %s" % newScanType)
+        
         self.subChoices.setChoiceWidgetByScanType(newScanType)
         self.counterSelector.counterModel \
             .setCounterOptions(self.subChoices.choiceWidget.COUNTER_OPTS)
 
-        self.counterSelector.counterModel.initializeDataRows(self.specFile.scans[str(newScan)].L)
+        self.counterSelector.counterModel. \
+            initializeDataRows(self.specFile.scans[str(newScan)].L)
         typeIndex = self.typeSelector.getTypeIndexFromName(newScanType)
         logger.debug("currentselection %s" % self.currentSelections.keys())
         self.counterSelector.counterModel \
@@ -205,16 +234,29 @@ class MainWindow(qtGui.QMainWindow):
         
         self.storePlotSelections(newScanType)
         
-        self.counterSelector.setSelectedCounters(self.currentSelections[newScanType])
-#        self.scanTypeSelected(typeIndex, suppressFilter=True)
+        self.counterSelector.setSelectedCounters(
+            self.currentSelections[newScanType])
         self.updatePlotData()
 
     
-        
+    @qtCore.pyqtSlot(SpecDataFileItem)
+    def handleSpecDataSelectionChanged(self, dataItem):
+        selectedSpecFile = dataItem.getSpecDataFile()
+        self.specFile = selectedSpecFile
+        logger.debug("Selected File Name %s" % selectedSpecFile.fileName)
+        self.setWindowTitle(APP_NAME + " - " + selectedSpecFile.fileName)
+        self.scanBrowser.loadScans(selectedSpecFile.scans, newFile=True)
+        self.typeSelector.loadScans(self.getScanTypes(selectedSpecFile))
+
     @qtCore.pyqtSlot(int)
     def handleSubTypeChanged(self, newType):
-        
         logger.debug("newType %s" % newType)
+        
+    def saveFile(self):
+        logger.debug(METHOD_ENTER_STR)
+        
+    def saveAsFile(self):
+        logger.debug(METHOD_ENTER_STR)
         
     def openFile(self):
         logger.debug(METHOD_ENTER_STR)
@@ -223,7 +265,10 @@ class MainWindow(qtGui.QMainWindow):
             self.specFile = SpecDataFile(fileName)
             self.setWindowTitle(APP_NAME + " - " + str(fileName))
             self.scanBrowser.loadScans(self.specFile.scans, newFile=True)
-            self.typeSelector.loadScans(self.getScanTypes())
+            self.typeSelector.loadScans(self.getScanTypes(self.specFile))
+            dataItem = SpecDataFileItem(self.specFile.fileName, self.specFile)
+            self.dataNavigator.dataNavigatorModel.appendRow(dataItem)
+            
         logger.debug(METHOD_EXIT_STR)
         
     '''
@@ -236,27 +281,32 @@ class MainWindow(qtGui.QMainWindow):
     @qtCore.pyqtSlot(int)
     def scanTypeSelected(self, newType, suppressFilter=False):
         names = self.typeSelector.getTypeNames()
-        logger.debug ("filter for type %d from scan types %s" % (newType, str(names)))
+        logger.debug ("filter for type %d from scan types %s" % \
+                      (newType, str(names)))
         if names[newType] == SCAN_TYPES[0]:  # all types
             types = names[1:]
+            self.scanBrowser.scanList. \
+                setSelectionMode(qtGui.QAbstractItemView.SingleSelection)
         else:
             types = (names[newType],)
-        logger.debug ("filter for type %d from scan types %s" % (newType, str(types)))
+            self.scanBrowser.scanList. \
+                setSelectionMode(qtGui.QAbstractItemView.ExtendedSelection)
+        logger.debug ("filter for type %d from scan types %s" % \
+                      (newType, str(types)))
         if not suppressFilter:
             self.scanBrowser.filterByScanTypes(self.specFile.scans, types)
-#        self.subChoices.setChoiceWidgetByScanType(names[newType])
         currentScan = self.scanBrowser.getCurrentScan()
         logger.debug("current scan %s" %currentScan)
-        #newScanType = self.specFile.scans[str(currentScan)].scanCmd.split()[0]
-#        newScanType = names[newType]
         self.scanBrowser.scanList.setCurrentCell(0, 0)            
 
     def storePlotSelections(self, typeName):
         if not (typeName in self.currentSelections.keys()):
             logger.debug("dealing with new scan type %s" %typeName)
-            logger.debug("subChoices.choiceWidget %s" % self.subChoices.choiceWidget)
-            self.currentSelections[typeName] = self.subChoices.getPlotSelections()
-        logger.debug("currentSelections %s"   % self.currentSelections[typeName]) 
+            logger.debug("subChoices.choiceWidget %s" % 
+                         self.subChoices.choiceWidget)
+            self.currentSelections[typeName] = \
+                self.subChoices.getPlotSelections()
+        logger.debug("currentSelections %s" % self.currentSelections[typeName]) 
         
         
     '''
@@ -266,9 +316,57 @@ class MainWindow(qtGui.QMainWindow):
         counters = self.counterSelector.getSelectedCounters()
         counterNames = self.counterSelector.getSelectedCounterNames(counters)
         logger.debug("Data selected for this plot %s" % counters)
+        if len(self.selectedScans) == 1:
+            self.updatePlotDataSingle(counters, counterNames)
+        elif len(self.selectedScans) > 1:
+            self.updatePlotDataMultiple(counters, counterNames)
+            
+    '''
+    Handle updating the plot window when multiple scans are selected
+    '''
+    def updatePlotDataMultiple(self, counters, counterNames, 
+                               displayAverage=True, displayEach=True):
+        logger.debug("Enter")
+        data = {}
+        dataOut = {}
+        self.plotWidget.clear()
+        
+        for scan in self.selectedScans:
+            data[scan] = []
+            dataOut[scan] = []
+            thisScan = self.specFile.scans[scan]
+            for counter in counterNames:
+                try:
+                    
+                    data[scan].append(thisScan.data[counter])
+                except KeyError as ie:
+                    logger.exception("Tried to load data which does" +
+                                     " not have counters selected."  +
+                                     "Multiple scans are selected and some" +
+                                     "may not have the selected counters " +
+                                     "Scan %s \n %s" % (str(scan), str(ie)))
+            try:
+                dataOut[scan] = self.subChoices.choiceWidget.calcPlotData(data[scan])
+                 
+            except IndexError:
+                qtGui.QMessageBox.warning(self, "No Data Warning", 
+                                          "No Data Was Selected")
+            countIndex = range(1, len(dataOut[scan]))   #start at 1 since 0 is x axis
+            plotAxisLabels = self.subChoices.choiceWidget.getPlotAxisLabels()
+            #axisLabelIndex = self.subChoices.getPlotAxisLabelsIndex()
+            for index in countIndex:
+                self.plotWidget.plotAx1(dataOut[scan][0], dataOut[scan][index])
+                self.plotWidget.setXLabel(plotAxisLabels[0])
+                self.plotWidget.setYLabel(plotAxisLabels[index])
+        self.plotWidget.plotDraw()                            
+    '''
+    Handle updating the plot window when only one scan is selected
+    '''        
+    def updatePlotDataSingle(self, counters, counterNames):
+        logger.debug("Enter")
         data = []
         dataOut = []
-        scans = self.specFile.scans[self.selectedScans]
+        scans = self.specFile.scans[self.selectedScans[0]]
         
         for counter in counterNames:
             try:
@@ -289,11 +387,11 @@ class MainWindow(qtGui.QMainWindow):
         for index in countIndex:
             logger.debug("index, counters %s %s" % (index, counters))
             logger.debug("index, len(counters)-1 %s, %s" % (index, len(counters)-1 ))
-            self.plotWidget.switchPlot(index, len(counters)-1)
-            self.plotWidget.plot(dataOut[0], dataOut[index])
-            self.plotWidget.setXlabel(plotAxisLabels[0])
-            self.plotWidget.setYlabel(plotAxisLabels[index])
-            
+            self.plotWidget.plotAx1(dataOut[0], dataOut[index])
+            logger.debug("plotAxisLabels: %s" % plotAxisLabels)
+            self.plotWidget.setXLabel(plotAxisLabels[0])
+            self.plotWidget.setYLabel(plotAxisLabels[index])
+        self.plotWidget.plotDraw()
         
 if __name__ == '__main__':
     app = qtGui.QApplication(sys.argv)
