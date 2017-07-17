@@ -27,7 +27,7 @@ class PlotWidget(qtGui.QDialog):
         self.canvas = FigureCanvas(self.figure)
         #self.switchPlot(1,1)
         self.clear()
-        self.plotAx1(range(10), range(10))
+        self.plotAx1(range(10), range(10), "line")
         self.ax = None
         self.ax2 = None
         layout.addWidget(self.canvas)
@@ -40,7 +40,7 @@ class PlotWidget(qtGui.QDialog):
         plt.clf()
         self.ax = plt.subplot(1, 1, 1)
         self.ax2 = self.ax.twinx()
-        self.ax2 = plt.subplot(1, 1, 1)
+        #self.ax2 = plt.subplot(1, 1, 1)
         
 #     def switchPlot(self, plotNum, numOfPlots):
 #         logger.debug("Entering %d, %d" % (plotNum, numOfPlots))
@@ -49,29 +49,31 @@ class PlotWidget(qtGui.QDialog):
 #         self.ax = plt.subplot(1, 1, 1)
         
     
-    def plotAx1(self, x, y):
+    def plotAx1(self, x, y, label):
         logger.debug("Entering %s" % ((x,y),))
         
-        self.ax.plot(x, y)
+        self.ax.plot(x, y, label=label)
         
-    def plotAx1Average(self, x, y):
+    def plotAx1Average(self, x, y, label):
         logger.debug("Entering %s" % ((x,y),))
         
-        line, = self.ax.plot(x, y)
+        line, = self.ax.plot(x, y, label=label)
         plt.setp(line, linewidth=2)
         
-    def plotAx2(self, x, y):
+    def plotAx2(self, x, y, label):
         logger.debug("Entering %s" % ((x,y),))
         
-        self.ax2.plot(x, y)
+        self.ax2.plot(x, y, label=label)
 
-    def plotAx2Average(self, x, y):
+    def plotAx2Average(self, x, y, label):
         logger.debug("Entering %s" % ((x,y),))
         
-        line, = self.ax.plot(x, y)
+        line, = self.ax2.plot(x, y, label=label)
         plt.setp(line, linewidth=2)
         
     def plotDraw(self):
+        self.ax.legend(loc=2)
+        self.ax2.legend(loc=1)
         self.canvas.draw()
 
                 
