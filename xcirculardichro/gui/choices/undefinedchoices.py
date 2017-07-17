@@ -10,10 +10,10 @@ import logging
 logger = logging.getLogger(__name__)
 
 DEFAULT_SELECTIONS = [["", "", ""],]
-PLOT_CHOICES = ["Y vs X",]
+PLOT_CHOICES = ["Y1/Y2",]
 
 class UndefinedChoices(AbstractChoices):
-    COUNTER_OPTS = ["X", "Y", "Mon"]
+    COUNTER_OPTS = ["X", "Y1", "Y2"]
     
     def __init__(self, parent=None):
         super(UndefinedChoices, self).__init__(parent)
@@ -55,8 +55,6 @@ class UndefinedChoices(AbstractChoices):
         axisIndex.append(0)    #x axis, kQTExifUserDataFlashEnergy
         for pType in plotTypes:
             axisIndex.append(1)
-        for pType in plotTypes:
-            axisIndex.append(1)
             
             
         return axisIndex
@@ -64,6 +62,5 @@ class UndefinedChoices(AbstractChoices):
     def getDataLabels(self):
         plotTypes = self.plotSelector.currentText().split("/")
         labels = ['E', ]
-        labels.extend(plotTypes)
         labels.extend(plotTypes)
         return labels
