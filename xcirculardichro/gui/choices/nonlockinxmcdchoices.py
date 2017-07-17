@@ -8,6 +8,7 @@ import PyQt4.QtGui as qtGui
 import PyQt4.QtCore as qtCore
 from xcirculardichro.gui.choices.abstractchoices import AbstractChoices
 import logging
+from Carbon.QuickTime import kQTExifUserDataFlashEnergy
 logger = logging.getLogger(__name__)
 
 CHOICES = ['Flourescence', 'Transmission']
@@ -108,3 +109,29 @@ class NonLockinXMCDChoices(AbstractChoices):
             self.plotSelections[0] = selections
         elif str(self.choiceSelector.currentText()) == CHOICES[1]:
             self.plotSelections[1] = selections
+
+    #Assign an output to Y-axis 1 or 2 to 
+    def getPlotAxisLabelsIndex(self):
+        plotTypes = self.plotSelector.currentText().split("/")
+        axisIndex = []
+        axisIndex.append(0)    #x axis, kQTExifUserDataFlashEnergy
+        for pType in plotTypes:
+            if pType.startsWith("XAS"):
+                axisIndex.append(1)
+            elif pType.startsWith("XMCD"):
+                axisIndex.append(2)
+            elif pType.startsWith('D+') or pType.startsWith('D-'):
+                axisIndex.append(1)
+            elif pType.startsWith('M+') or pType.startsWith('M-'):
+                axisIndex.append(2)
+            else:
+                axisIndex.append(1)
+        logger.debug("axisIndexes %s" % axisIndex)
+        return axisIndex
+    
+    def getDataLabels(self):
+        plotTypes = self.plotSelector.currentText().split("/")
+        labels = ['E', ]
+        labels.extend(plotTypes)
+        logger.debug("labels %s" % labels)
+        return labels

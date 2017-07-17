@@ -60,3 +60,16 @@ class LockinXMCDChoices(AbstractChoices):
     def plotSelectorChanged(self, newType):
         self.plotTypeChanged[int].emit(newType)
         
+    def getPlotAxisLabelsIndex(self):
+        plotTypes = self.plotSelector.currentText().split("/")
+        axisIndex = []
+        axisIndex.append(0)    #x axis, kQTExifUserDataFlashEnergy
+        for pType in plotTypes:
+            axisIndex.append(1)
+        return axisIndex
+
+    def getDataLabels(self):
+        plotTypes = self.plotSelector.currentText().split("/")
+        labels = ['E', ]
+        labels.extend(plotTypes)
+        return labels        

@@ -53,3 +53,12 @@ class AbstractChoices(qtGui.QDialog):
     def handlePlotChoiceChanged(self, index):
         logger.debug("Enter")
         self.plotOptionChanged.emit()
+        
+        
+    def getPlotAxisLabelsIndex(self):
+        raise Exception("Abstract method called")
+    
+    def getDataLabels(self):
+        raise Exception("Abstract method called")
+    
+    
