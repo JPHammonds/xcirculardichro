@@ -361,12 +361,20 @@ class MainWindow(qtGui.QMainWindow):
                                           "No Data Was Selected")
             countIndex = range(1, len(dataOut[scan]))   #start at 1 since 0 is x axis
             plotAxisLabels = self.subChoices.choiceWidget.getPlotAxisLabels()
-            #axisLabelIndex = self.subChoices.getPlotAxisLabelsIndex()
+            plotDataLabel = self.subChoices.choiceWidget.getDataLabels()
+            axisLabelIndex = self.subChoices.choiceWidget.getPlotAxisLabelsIndex()
             if self.subChoices.choiceWidget.plotIndividualData():
                 for index in countIndex:
-                    self.plotWidget.plotAx1(dataOut[scan][0], dataOut[scan][index])
-                    self.plotWidget.setXLabel(plotAxisLabels[0])
-                    self.plotWidget.setYLabel(plotAxisLabels[index])
+                    dataLabel = "%s - Scan %s" % (plotDataLabel[index], scan) 
+                    if axisLabelIndex[index] == 1:
+                        self.plotWidget.plotAx1(dataOut[scan][0], dataOut[scan][index], dataLabel)
+                        self.plotWidget.setXLabel(plotAxisLabels[0])
+                        self.plotWidget.setYLabel(plotAxisLabels[index])
+                    elif axisLabelIndex[index] == 2:
+                        self.plotWidget.plotAx2(dataOut[scan][0], dataOut[scan][index], dataLabel)
+                        self.plotWidget.setXLabel(plotAxisLabels[0])
+                        self.plotWidget.setY2Label(plotAxisLabels[index])
+                        
             if scan == self.selectedScans[0]:
                 dataSum = dataOut[scan] 
             else:
@@ -377,7 +385,12 @@ class MainWindow(qtGui.QMainWindow):
         if self.subChoices.choiceWidget.plotAverageData():
             for index in countIndex:
                 dataAverage = dataSum[index]/len(self.selectedScans)
-                self.plotWidget.plotAx1Average(dataOut[scan][0], dataAverage)
+                plotDataLabel = self.subChoices.choiceWidget.getDataLabels()
+                dataLabel = "%s - Avg" % plotDataLabel[index] 
+                if axisLabelIndex[index] == 1:
+                    self.plotWidget.plotAx1Average(dataOut[scan][0], dataAverage, dataLabel)
+                if axisLabelIndex[index] == 2:
+                    self.plotWidget.plotAx2Average(dataOut[scan][0], dataAverage, dataLabel)
         self.plotWidget.plotDraw()                            
     '''
     Handle updating the plot window when only one scan is selected
@@ -403,14 +416,23 @@ class MainWindow(qtGui.QMainWindow):
         countIndex = range(1, len(dataOut))
         self.plotWidget.clear()
         plotAxisLabels = self.subChoices.choiceWidget.getPlotAxisLabels()
+        plotDataLabel = self.subChoices.choiceWidget.getDataLabels()
+        axisLabelIndex = self.subChoices.choiceWidget.getPlotAxisLabelsIndex()
         logger.debug("plotAxesLabels %s", plotAxisLabels)
         for index in countIndex:
             logger.debug("index, counters %s %s" % (index, counters))
             logger.debug("index, len(counters)-1 %s, %s" % (index, len(counters)-1 ))
-            self.plotWidget.plotAx1(dataOut[0], dataOut[index])
-            logger.debug("plotAxisLabels: %s" % plotAxisLabels)
-            self.plotWidget.setXLabel(plotAxisLabels[0])
-            self.plotWidget.setYLabel(plotAxisLabels[index])
+            if axisLabelIndex[index] == 1:
+                self.plotWidget.plotAx1(dataOut[0], dataOut[index], plotDataLabel[index])
+                logger.debug("plotAxisLabels: %s" % plotAxisLabels)
+                self.plotWidget.setXLabel(plotAxisLabels[0])
+                self.plotWidget.setYLabel(plotAxisLabels[index])
+            if axisLabelIndex[index] == 2:
+                self.plotWidget.plotAx2(dataOut[0], dataOut[index], plotDataLabel[index])
+                logger.debug("plotAxisLabels: %s" % plotAxisLabels)
+                self.plotWidget.setXLabel(plotAxisLabels[0])
+                self.plotWidget.setY2Label(plotAxisLabels[index])
+        
         self.plotWidget.plotDraw()
         
 if __name__ == '__main__':
