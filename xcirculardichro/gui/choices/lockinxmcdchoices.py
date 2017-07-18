@@ -3,6 +3,7 @@
  See LICENSE file.
 '''
 
+import numpy as np
 import PyQt4.QtGui as qtGui
 import PyQt4.QtCore as qtCore
 from xcirculardichro.gui.choices.abstractchoices import AbstractChoices
@@ -34,9 +35,9 @@ class LockinXMCDChoices(AbstractChoices):
         self.plotSelections = DEFAULT_SELECTIONS
 
     def calcPlotData(self, data):
-        energy = data[0]
-        xas = data[1]
-        xmcd = data[2]
+        energy = np.array(data[0])
+        xas = np.array(data[1])
+        xmcd = np.array(data[2])
         
         retData = None
         if str(self.plotSelector.currentText()) == PLOT_CHOICES[0]:
@@ -65,11 +66,17 @@ class LockinXMCDChoices(AbstractChoices):
         axisIndex = []
         axisIndex.append(0)    #x axis, kQTExifUserDataFlashEnergy
         for pType in plotTypes:
-            axisIndex.append(1)
+            if pType.startsWith("XAS"):
+                axisIndex.append(1)
+            elif pType.startsWith("XMCD"):
+                axisIndex.append(2)
+            else:
+                axisIndex.append(1)
         return axisIndex
 
     def getDataLabels(self):
         plotTypes = self.plotSelector.currentText().split("/")
         labels = ['E', ]
         labels.extend(plotTypes)
+        logger.debug("labels %s" % labels)
         return labels        
