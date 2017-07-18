@@ -13,17 +13,3 @@ class DataNavigatorModel(qtGui.QStandardItemModel):
         super(DataNavigatorModel, self).__init__(parent)
         self.data = []
                
-#     def addItem(self, item):
-#         logger.debug("Enter")
-#         self.beginInsertRows(qtCore.QModelIndex(), self.rowCount(), self.rowCount() + 1)
-#         self.appendRow(item)
-#         self.data.append(item)
-#         logger.debug("Data %s " % self.data)
-#         self.endInsertRows()
-#         
-#     def removeItemAt(self, index):
-#         logger.debug("Enter %d " % index.row())
-#         logger.debug("Data %s " % self.data)
-#         self.beginRemoveRows(index, index.row(), index.row())
-#         self.data.pop(index.row())
-#         self.endInsertRows()

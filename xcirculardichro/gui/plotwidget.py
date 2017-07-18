@@ -1,7 +1,6 @@
 '''
-Created on May 17, 2017
-
-@author: hammonds
+ Copyright (c) 2017, UChicago Argonne, LLC
+ See LICENSE file.
 '''
 
 import PyQt4.QtGui as qtGui
