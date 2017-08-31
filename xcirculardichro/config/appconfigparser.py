@@ -3,8 +3,7 @@
  See LICENSE file.
 '''
 
-from ConfigParser import ConfigParser
-from Canvas import Line
+from configparser import ConfigParser
 from os.path import expanduser
 
 CONFIG_FILENAME_DEFAULT = 'XCircularChiro.ini'
