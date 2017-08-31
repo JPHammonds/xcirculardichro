@@ -3,13 +3,13 @@
  See LICENSE file.
 '''
 
-import PyQt4.QtGui as qtGui
+import PyQt5.QtWidgets as qtWidgets
 import logging
 logger = logging.getLogger(__name__)
 
 # import matplotlib
 # matplotlib.use('Qt4Agg')
-from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
+from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 #from matplotlib.backends.backend_qt4agg import NavigationToolbar2QTAgg as NavigationToolbar
 import matplotlib.pyplot as plt
 import math
@@ -17,11 +17,11 @@ import math
 Start from http://stackoverflow.com/questions/12459811/how-to-embed-matplotib-in-pyqt-for-dummies
 '''
 
-class PlotWidget(qtGui.QDialog):
+class PlotWidget(qtWidgets.QDialog):
     def __init__(self, parent=None):
         super(PlotWidget, self).__init__(parent)
         logger.debug("Entering")
-        layout = qtGui.QVBoxLayout()
+        layout = qtWidgets.QVBoxLayout()
         self.figure = plt.figure()
         self.canvas = FigureCanvas(self.figure)
         #self.switchPlot(1,1)
@@ -62,13 +62,13 @@ class PlotWidget(qtGui.QDialog):
     def plotAx2(self, x, y, label):
         logger.debug("Entering %s" % ((x,y),))
         
-        self.ax2.plot(x, y, label=label)
+        self.ax2.plot(x, y, label=label, linestyle=":")
 
     def plotAx2Average(self, x, y, label):
         logger.debug("Entering %s" % ((x,y),))
         
-        line, = self.ax2.plot(x, y, label=label)
-        plt.setp(line, linewidth=2)
+        line, = self.ax2.plot(x, y, label=label, linestyle=":", linewidth=2)
+        #plt.setp(line, linewidth=2)
         
     def plotDraw(self):
         self.ax.legend(loc=2)

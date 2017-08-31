@@ -3,21 +3,21 @@
  See LICENSE file.
 '''
 
-import PyQt4.QtGui as qtGui
-import PyQt4.QtCore as qtCore
+import PyQt5.QtWidgets as qtWidgets
+import PyQt5.QtCore as qtCore
 
 DATA_TYPES = ['None', ]
 
-class DataType(qtGui.QDialog):
+class DataType(qtWidgets.QDialog):
     dataTypeChanged = qtCore.pyqtSignal(int, name='dataTypeChanged')
     
     def __init__(self, parent=None, dataTypes=DATA_TYPES):
         super(DataType, self).__init__(parent)
         self.dataTypes = dataTypes
-        layout = qtGui.QHBoxLayout()
+        layout = qtWidgets.QHBoxLayout()
         
-        label = qtGui.QLabel("Select Type:")
-        self.typeSelector = qtGui.QComboBox()
+        label = qtWidgets.QLabel("Select Type:")
+        self.typeSelector = qtWidgets.QComboBox()
         self.typeSelector.insertItems(0, self.dataTypes)
         layout.addWidget(label)
         layout.addWidget(self.typeSelector)
