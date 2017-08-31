@@ -4,11 +4,10 @@
 '''
 
 import numpy as np
-import PyQt4.QtGui as qtGui
-import PyQt4.QtCore as qtCore
+import PyQt5.QtWidgets as qtWidgets
+import PyQt5.QtCore as qtCore
 from xcirculardichro.gui.choices.abstractchoices import AbstractChoices
 import logging
-from Carbon.QuickTime import kQTExifUserDataFlashEnergy
 logger = logging.getLogger(__name__)
 
 CHOICES = ['Flourescence', 'Transmission']
@@ -25,17 +24,18 @@ class NonLockinXMCDChoices(AbstractChoices):
         logger.debug ("Entering")
         layout = self.layout()     
 
-        choiceLayout = qtGui.QHBoxLayout()
-        label = qtGui.QLabel("Data Type: ")
-        self.choiceSelector = qtGui.QComboBox()
+        choiceLayout = qtWidgets.QHBoxLayout()
+        label = qtWidgets.QLabel("Data Type: ")
+        self.choiceSelector = qtWidgets.QComboBox()
         self.choiceSelector.insertItems(0, CHOICES)
         choiceLayout.addWidget(label)
         choiceLayout.addWidget(self.choiceSelector)
         
-        plotLayout = qtGui.QHBoxLayout()
-        label = qtGui.QLabel("Plot Type: ")
-        self.plotSelector = qtGui.QComboBox()
+        plotLayout = qtWidgets.QHBoxLayout()
+        label = qtWidgets.QLabel("Plot Type: ")
+        self.plotSelector = qtWidgets.QComboBox()
         self.plotSelector.insertItems(0, PLOT_CHOICES)
+        self.plotSelector.setCurrentIndex(0)
         plotLayout.addWidget(label)
         plotLayout.addWidget(self.plotSelector)
         
@@ -116,13 +116,13 @@ class NonLockinXMCDChoices(AbstractChoices):
         axisIndex = []
         axisIndex.append(0)    #x axis, kQTExifUserDataFlashEnergy
         for pType in plotTypes:
-            if pType.startsWith("XAS"):
+            if pType.startswith("XAS"):
                 axisIndex.append(1)
-            elif pType.startsWith("XMCD"):
+            elif pType.startswith("XMCD"):
                 axisIndex.append(2)
-            elif pType.startsWith('D+') or pType.startsWith('D-'):
+            elif pType.startswith('D+') or pType.startswith('w-'):
                 axisIndex.append(1)
-            elif pType.startsWith('M+') or pType.startsWith('M-'):
+            elif pType.startswith('M+') or pType.startswith('w-'):
                 axisIndex.append(2)
             else:
                 axisIndex.append(1)

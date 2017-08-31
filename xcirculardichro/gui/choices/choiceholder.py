@@ -3,8 +3,8 @@
  See LICENSE file.
 '''
 
-import PyQt4.QtGui as qtGui
-import PyQt4.QtCore as qtCore
+import PyQt5.QtWidgets as qtWidgets
+import PyQt5.QtCore as qtCore
 from xcirculardichro.gui.choices.undefinedchoices import UndefinedChoices
 import logging
 from xcirculardichro.gui.choices.nonlockinxmcdchoices import NonLockinXMCDChoices
@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 QXDICHRO = 'qxdichro'
 QXSCAN = 'qxscan'
 
-class ChoiceHolder(qtGui.QDialog):
+class ChoiceHolder(qtWidgets.QDialog):
     
     subTypeChanged = qtCore.pyqtSignal(int, name='subTypeChanged')
     plotTypeChanged = qtCore.pyqtSignal(int, name='plotTypeChanged')
@@ -22,7 +22,7 @@ class ChoiceHolder(qtGui.QDialog):
     
     def __init__(self, parent=None):
         super(ChoiceHolder, self).__init__(parent)
-        layout = qtGui.QHBoxLayout()
+        layout = qtWidgets.QHBoxLayout()
         self.choiceWidget = UndefinedChoices()
         self.lastChoiceType = "undefined"
         layout.addWidget(self.choiceWidget)
@@ -38,6 +38,7 @@ class ChoiceHolder(qtGui.QDialog):
         self.plotOptionChanged.emit()
         
     def setChoiceWidget(self, choiceWidget):
+        logger.debug("Enter")
         layout = self.layout()
         self.choiceWidget.subTypeChanged[int].disconnect(self.choiceSelectionChanged)
         self.choiceWidget.plotTypeChanged[int].disconnect(self.plotSelectionChanged)
@@ -67,6 +68,7 @@ class ChoiceHolder(qtGui.QDialog):
         self.plotTypeChanged[int].emit(typeStr)
         
     def setChoiceWidgetByScanType(self, typeName):
+        logger.debug("Enter")
         if self.lastChoiceType == typeName:        # done change anything
             return
         if typeName == QXDICHRO:

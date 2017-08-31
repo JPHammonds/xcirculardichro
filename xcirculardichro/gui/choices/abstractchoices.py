@@ -3,12 +3,12 @@
  See LICENSE file.
 '''
 
-import PyQt4.QtGui as qtGui
-import PyQt4.QtCore as qtCore
+import PyQt5.QtWidgets as qtWidgets
+import PyQt5.QtCore as qtCore
 import logging
 logger = logging.getLogger(__name__)
 
-class AbstractChoices(qtGui.QDialog):
+class AbstractChoices(qtWidgets.QDialog):
     
     subTypeChanged = qtCore.pyqtSignal(int, name='subTypeChanged')
     plotTypeChanged = qtCore.pyqtSignal(int, name='plotTypeChanged')
@@ -20,11 +20,11 @@ class AbstractChoices(qtGui.QDialog):
     
     def __init__(self, parent=None):
         super(AbstractChoices, self).__init__(parent)
-        layout = qtGui.QVBoxLayout()        
+        layout = qtWidgets.QVBoxLayout()        
         
-        optionLayout = qtGui.QHBoxLayout()
-        label = qtGui.QLabel("Plot Data")
-        self.plotDataChoice = qtGui.QComboBox()
+        optionLayout = qtWidgets.QHBoxLayout()
+        label = qtWidgets.QLabel("Plot Data")
+        self.plotDataChoice = qtWidgets.QComboBox()
         self.plotDataChoice.insertItems(0,self.PLOT_OPTIONS)
         optionLayout.addWidget(label)
         optionLayout.addWidget(self.plotDataChoice)

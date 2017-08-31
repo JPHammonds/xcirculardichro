@@ -4,8 +4,8 @@
 '''
 
 import numpy as np
-import PyQt4.QtGui as qtGui
-import PyQt4.QtCore as qtCore
+import PyQt5.QtWidgets as qtWidgets
+import PyQt5.QtCore as qtCore
 from xcirculardichro.gui.choices.abstractchoices import AbstractChoices
 import logging
 logger = logging.getLogger(__name__)
@@ -20,10 +20,10 @@ class LockinXMCDChoices(AbstractChoices):
         super(LockinXMCDChoices, self).__init__(parent)
         layout = self.layout()        
 
-        plotLayout = qtGui.QHBoxLayout()
+        plotLayout = qtWidgets.QHBoxLayout()
 
-        label = qtGui.QLabel("Plot Type: ")
-        self.plotSelector = qtGui.QComboBox()
+        label = qtWidgets.QLabel("Plot Type: ")
+        self.plotSelector = qtWidgets.QComboBox()
         self.plotSelector.insertItems(0, PLOT_CHOICES)
         plotLayout.addWidget(label)
         plotLayout.addWidget(self.plotSelector)
@@ -66,9 +66,9 @@ class LockinXMCDChoices(AbstractChoices):
         axisIndex = []
         axisIndex.append(0)    #x axis, kQTExifUserDataFlashEnergy
         for pType in plotTypes:
-            if pType.startsWith("XAS"):
+            if pType.startswith("XAS"):
                 axisIndex.append(1)
-            elif pType.startsWith("XMCD"):
+            elif pType.startswith("XMCD"):
                 axisIndex.append(2)
             else:
                 axisIndex.append(1)
