@@ -3,21 +3,20 @@
  See LICENSE file.
 '''
 import os
-import PyQt4.QtGui as qtGui
-import PyQt4.QtCore as qtCore
+import PyQt5.QtWidgets as qtWidgets
+import PyQt5.QtCore as qtCore
 
-from PyQt4.QtCore import pyqtSignal as Signal
-from PyQt4.QtCore import pyqtSlot as Slot
+from PyQt5.QtCore import pyqtSignal as Signal
+from PyQt5.QtCore import pyqtSlot as Slot
 
-from PyQt4.QtGui import QAbstractItemView
+from PyQt5.QtWidgets import QAbstractItemView
 
 import sys
 import logging
-import logging.config
-from xcirculardichro.config.loggingConfig import LOGGER_NAME, LOGGER_DEFAULT,\
+# import logging.config
+from xcirculardichro.config.loggingConfig import LOGGER_NAME, \
     METHOD_ENTER_STR, METHOD_EXIT_STR
-from ConfigParser import NoSectionError
-from spec2nexus.spec import SpecDataFile
+from spec2nexus.spec import SpecDataFile, NotASpecDataFile
 #import specguiutils
 #from xcirculardichro.gui.datatype import DataType
 from specguiutils.scanbrowser import ScanBrowser
@@ -26,34 +25,29 @@ from specguiutils.scantypeselector import ScanTypeSelector, SCAN_TYPES
 from xcirculardichro.gui.plotwidget import PlotWidget
 from xcirculardichro.gui.choices.choiceholder import ChoiceHolder
 from xcirculardichro.gui.datanavigator import DataNavigator
-from specguiutils.view.specdatafileitem import SpecDataFileItem
+from xcirculardichro.gui.view.specdatafileitem import SpecDataFileItem
 
-
-#configure message logging
-userDir = os.path.expanduser('~')
-logConfigFile = os.path.join(userDir, LOGGER_NAME + 'Log.config')
-try:
-    logging.config.fileConfig(logConfigFile)
-except NoSectionError:
-    logging.config.dictConfig(LOGGER_DEFAULT)
 logger = logging.getLogger(LOGGER_NAME)
+
 APP_NAME = "XCircularDichro"
 
-class MainWindow(qtGui.QMainWindow):
+class MainWindow(qtWidgets.QMainWindow):
     '''
     Create a main dialog for the application
     '''
 
     def __init__(self,parent=None):
         super(MainWindow, self).__init__(parent)
+#        logger = logging.getLogger(LOGGER_NAME)
+
         logger.debug(METHOD_ENTER_STR)
         self._createMenuBar()
-        mainWidget = qtGui.QWidget()
-        layout = qtGui.QHBoxLayout()
+        mainWidget = qtWidgets.QWidget()
+        layout = qtWidgets.QHBoxLayout()
         self.currentSelections = {}
-        self.splitter = qtGui.QSplitter()
-        specWidget = qtGui.QWidget()
-        specLayout = qtGui.QVBoxLayout()
+        self.splitter = qtWidgets.QSplitter()
+        specWidget = qtWidgets.QWidget()
+        specLayout = qtWidgets.QVBoxLayout()
         self.dataNavigator = DataNavigator()
         self.typeSelector = ScanTypeSelector()
         self.scanBrowser = ScanBrowser()
@@ -97,23 +91,23 @@ class MainWindow(qtGui.QMainWindow):
         fileMenu = menuBar.addMenu('File')
         dataMenu = menuBar.addMenu('Data')
         
-        openAction = qtGui.QAction("Open", self)
+        openAction = qtWidgets.QAction("Open", self)
         openAction.triggered.connect(self.openFile)
         
-        saveAction = qtGui.QAction("Save", self)
+        saveAction = qtWidgets.QAction("Save", self)
         saveAction.triggered.connect(self.saveFile)
 
-        saveAsAction = qtGui.QAction("Save As", self)
+        saveAsAction = qtWidgets.QAction("Save As", self)
         saveAsAction.triggered.connect(self.saveAsFile)
         
-        exportAction = qtGui.QAction("Export", self)
+        exportAction = qtWidgets.QAction("Export", self)
         exportAction.triggered.connect(self.export)
         
-        closeAction = qtGui.QAction("Close", self)
+        closeAction = qtWidgets.QAction("Close", self)
         closeAction.triggered.connect(self.closeFile)
 
         
-        exitAction = qtGui.QAction("Exit", self)
+        exitAction = qtWidgets.QAction("Exit", self)
         exitAction.setShortcut('Ctrl+Q')
         exitAction.triggered.connect(self.close)
         
@@ -228,11 +222,12 @@ class MainWindow(qtGui.QMainWindow):
         logger.debug("newScanType %s" % newScanType)
         
         self.subChoices.setChoiceWidgetByScanType(newScanType)
+        self.counterSelector.counterModel. \
+            initializeDataRows(self.subChoices.choiceWidget.COUNTER_OPTS,
+                               self.specFile.scans[str(newScan)].L)
         self.counterSelector.counterModel \
             .setCounterOptions(self.subChoices.choiceWidget.COUNTER_OPTS)
 
-        self.counterSelector.counterModel. \
-            initializeDataRows(self.specFile.scans[str(newScan)].L)
         typeIndex = self.typeSelector.getTypeIndexFromName(newScanType)
         logger.debug("currentselection %s" % self.currentSelections.keys())
         self.counterSelector.counterModel \
@@ -266,9 +261,15 @@ class MainWindow(qtGui.QMainWindow):
         
     def openFile(self):
         logger.debug(METHOD_ENTER_STR)
-        fileName = qtGui.QFileDialog.getOpenFileName(None, "Open Spec File")
+        fileName = qtWidgets.QFileDialog.getOpenFileName(None, "Open Spec File")[0]
         if fileName != "":
-            self.specFile = SpecDataFile(fileName)
+            try:
+                self.specFile = SpecDataFile(fileName)
+            except NotASpecDataFile as ex:
+                qtWidgets.QMessageBox.warning(self, "Not a Spec File", 
+                              "The file %s does not seem to be a spec file" %
+                              fileName)
+                return
             self.setWindowTitle(APP_NAME + " - " + str(fileName))
             self.scanBrowser.loadScans(self.specFile.scans, newFile=True)
             self.typeSelector.loadScans(self.getScanTypes(self.specFile))
@@ -277,13 +278,6 @@ class MainWindow(qtGui.QMainWindow):
             
         logger.debug(METHOD_EXIT_STR)
         
-    '''
-    Called when the user selects a scan type from the ScanTypeSelector
-    This should should modify the list shown in the ScanBrowser so that 
-    only that type of scan is shown in the browser.  This user should be 
-    able to change between specific types or all types.  This should also
-    switch the browser in/out of multi selection mode.
-    '''
     @qtCore.pyqtSlot(int)
     def scanTypeSelected(self, newType, suppressFilter=False):
         names = self.typeSelector.getTypeNames()
@@ -292,11 +286,11 @@ class MainWindow(qtGui.QMainWindow):
         if names[newType] == SCAN_TYPES[0]:  # all types
             types = names[1:]
             self.scanBrowser.scanList. \
-                setSelectionMode(qtGui.QAbstractItemView.SingleSelection)
+                setSelectionMode(qtWidgets.QAbstractItemView.SingleSelection)
         else:
             types = (names[newType],)
             self.scanBrowser.scanList. \
-                setSelectionMode(qtGui.QAbstractItemView.ExtendedSelection)
+                setSelectionMode(qtWidgets.QAbstractItemView.ExtendedSelection)
         logger.debug ("filter for type %d from scan types %s" % \
                       (newType, str(types)))
         if not suppressFilter:
@@ -357,7 +351,7 @@ class MainWindow(qtGui.QMainWindow):
                 dataOut[scan] = self.subChoices.choiceWidget.calcPlotData(data[scan])
                  
             except IndexError:
-                qtGui.QMessageBox.warning(self, "No Data Warning", 
+                qtWidgets.QMessageBox.warning(self, "No Data Warning", 
                                           "No Data Was Selected")
             countIndex = range(1, len(dataOut[scan]))   #start at 1 since 0 is x axis
             plotAxisLabels = self.subChoices.choiceWidget.getPlotAxisLabels()
@@ -367,11 +361,15 @@ class MainWindow(qtGui.QMainWindow):
                 for index in countIndex:
                     dataLabel = "%s - Scan %s" % (plotDataLabel[index], scan) 
                     if axisLabelIndex[index] == 1:
-                        self.plotWidget.plotAx1(dataOut[scan][0], dataOut[scan][index], dataLabel)
+                        self.plotWidget.plotAx1(dataOut[scan][0], 
+                                                dataOut[scan][index], 
+                                                dataLabel)
                         self.plotWidget.setXLabel(plotAxisLabels[0])
                         self.plotWidget.setYLabel(plotAxisLabels[index])
                     elif axisLabelIndex[index] == 2:
-                        self.plotWidget.plotAx2(dataOut[scan][0], dataOut[scan][index], dataLabel)
+                        self.plotWidget.plotAx2(dataOut[scan][0], 
+                                                dataOut[scan][index], 
+                                                dataLabel)
                         self.plotWidget.setXLabel(plotAxisLabels[0])
                         self.plotWidget.setY2Label(plotAxisLabels[index])
                         
@@ -379,9 +377,21 @@ class MainWindow(qtGui.QMainWindow):
                 dataSum = dataOut[scan] 
             else:
                 for index in countIndex:
-                    logger.debug("dataSum[index].shape %s" % dataSum[index].shape)
-                    logger.debug("dataOut[scan][index].shape %s" % dataOut[scan][index].shape)
-                    dataSum[index] += dataOut[scan][index]
+                    logger.debug("dataSum[index].shape %s" % 
+                                 dataSum[index].shape)
+                    logger.debug("dataOut[scan][index].shape %s" % 
+                                 dataOut[scan][index].shape)
+                    try:
+                        dataSum[index] += dataOut[scan][index]
+                    except ValueError as ve:
+                        qtWidgets.QMessageBox.warning(self, "Data Error", 
+                                                   "Trouble mixing" +
+                                                   "data from different scans." +
+                                                   "Common cause is scans " +
+                                                   "have different number of " +
+                                                   "data points\n %s" %
+                                                   str(ve))
+                       
         if self.subChoices.choiceWidget.plotAverageData():
             for index in countIndex:
                 dataAverage = dataSum[index]/len(self.selectedScans)
@@ -412,7 +422,7 @@ class MainWindow(qtGui.QMainWindow):
         try:
             dataOut = self.subChoices.choiceWidget.calcPlotData(data)
         except IndexError:
-            qtGui.QMessageBox.warning(self, "No Data Warning", "NoData was selected")
+            qtWidgets.QMessageBox.warning(self, "No Data Warning", "NoData was selected")
         countIndex = range(1, len(dataOut))
         self.plotWidget.clear()
         plotAxisLabels = self.subChoices.choiceWidget.getPlotAxisLabels()
@@ -436,7 +446,7 @@ class MainWindow(qtGui.QMainWindow):
         self.plotWidget.plotDraw()
         
 if __name__ == '__main__':
-    app = qtGui.QApplication(sys.argv)
+    app = qtWidgets.QApplication(sys.argv)
     mainWindow = MainWindow()
-    mainWindow.show()
+#     mainWindow.show()
     sys.exit(app.exec_())
