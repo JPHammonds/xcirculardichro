@@ -53,7 +53,7 @@ class XMCDMainWindow(qtWidgets.QMainWindow):
         menuBar = self.menuBar()
         menuBar.setNativeMenuBar(False)
         fileMenu = menuBar.addMenu('File')
-#        dataMenu = menuBar.addMenu('Data')
+        dataMenu = menuBar.addMenu('Data')
         
         openAction = qtWidgets.QAction("Open", self)
         openAction.triggered.connect(self.openFile)
@@ -70,6 +70,8 @@ class XMCDMainWindow(qtWidgets.QMainWindow):
         closeAction = qtWidgets.QAction("Close", self)
         closeAction.triggered.connect(self.closeFile)
 
+        captureCurrentAction = qtWidgets.QAction("CaptureCurrent", self)
+        captureCurrentAction.triggered.connect(self.captureCurrent)
         
         exitAction = qtWidgets.QAction("Exit", self)
         exitAction.setShortcut('Ctrl+Q')
@@ -83,6 +85,12 @@ class XMCDMainWindow(qtWidgets.QMainWindow):
         fileMenu.addAction(exportAction)
         fileMenu.addSeparator()
         fileMenu.addAction(exitAction)
+
+        dataMenu.addAction(captureCurrentAction)
+        
+    @qtCore.pyqtSlot() 
+    def captureCurrent(self):
+        logger.debug(METHOD_ENTER_STR)
     
     @qtCore.pyqtSlot()
     def closeFile(self):
