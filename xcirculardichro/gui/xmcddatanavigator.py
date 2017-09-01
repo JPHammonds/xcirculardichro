@@ -26,6 +26,7 @@ class XMCDDataNavigator(qtWidgets.QDialog):
         self._rootNode = DataNode("/")
         self._model = XMCDDataNavigatorModel(self._rootNode)
         self._view = qtWidgets.QTreeView()
+        self._view.setHeaderHidden(True)
         self._view.setModel(self._model)
         self._view.setSelectionMode(qtWidgets.QAbstractItemView.SingleSelection)
         self._view.setMinimumWidth(200)
