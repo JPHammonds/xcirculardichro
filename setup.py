@@ -2,3 +2,23 @@
  Copyright (c) 2017, UChicago Argonne, LLC
  See LICENSE file.
 '''
+from setuptools import setup
+from setuptools import find_packages
+PACKAGE_NAME = 'xcirculardichro'
+setup(name=PACKAGE_NAME,
+      version='0.2',
+      description='Library to provide PyQt5 widgets to display spec file information read using ' +
+                   'spec2nexus.spec file library',
+      author = 'John Hammonds',
+      author_email = 'JPHammonds@anl.gov',
+      url = '',
+      packages = find_packages(exclude=["*.test", "*.test.*", "test.*", "test"]),
+      install_requires = ['spec2nexus>=2017.901.4',
+                          'matplotlib>=2.0',
+                          'specguiutils>=0.1',
+                          'pyqt5>=5.6',],
+      python_requires = ">=3.5, <4",
+      license = 'See LICENSE File',
+      platforms = 'any',
+      
+)
