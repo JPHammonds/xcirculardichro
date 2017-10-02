@@ -281,6 +281,30 @@ class PlotWidget(qtWidgets.QDialog):
         self.ax2.legend(loc=1)
         self.canvas.draw()
         
+    @qtCore.pyqtSlot(int)
+    def setPointSelectionAxis(self, axis):
+        logger.debug(METHOD_ENTER_STR % axis)
+        if axis == 0:
+            logger.debug("Setting for axis 1")
+            self.ax.set_zorder(0.1)
+            self.ax.patch.set_visible(False)
+            self.ax2.set_zorder(0)
+            self.ax2.patch.set_visible(True)
+        elif axis == 1:
+            logger.debug("Setting for axis 2")
+            self.ax.set_zorder(0)
+            self.ax.patch.set_visible(True)
+            self.ax2.set_zorder(0.1)
+            self.ax2.patch.set_visible(False)
+            
+    @qtCore.pyqtSlot(int)
+    def setPointSelectionType(self, selectionType):
+        logger.debug(METHOD_ENTER_STR % selectionType)
+        if selectionType == 0:
+            HighlightSelected.setSelectLeft()
+        else:
+            HighlightSelected.setSelectRight()
+            
     def setXLabel(self, label):
         logger.debug("Entering %s" % label)
         self.ax.set_xlabel(label)

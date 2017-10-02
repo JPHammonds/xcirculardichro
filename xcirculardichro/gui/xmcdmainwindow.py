@@ -48,7 +48,8 @@ class XMCDMainWindow(qtWidgets.QMainWindow):
         self._dataSelections.plotOptionChanged.connect(self.updatePlotData)
         self._plotWidget.leftSelectionChanged[str].connect(self.handleLeftDataSelectionChanged)
         self._plotWidget.rightSelectionChanged[str].connect(self.handleRightDataSelectionChanged)
-        
+        self._dataSelections.pointSelectionAxisChanged[int].connect(self._plotWidget.setPointSelectionAxis)
+        self._dataSelections.pointSelectionTypeChanged[int].connect(self._plotWidget.setPointSelectionType)
         logger.debug(METHOD_EXIT_STR)
         
     def _createMenuBar(self):
