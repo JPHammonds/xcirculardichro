@@ -122,7 +122,6 @@ class SpecDisplay(AbstractSelectionDisplay):
         
     @qtCore.pyqtSlot(int)
     def handlePlotTypeChanged(self, newType, suppressFilter=False):
-        
         logger.debug(METHOD_ENTER_STR)
 
     '''
