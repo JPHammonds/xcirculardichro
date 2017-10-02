@@ -19,4 +19,9 @@ class DummySelectionDisplay(AbstractSelectionDisplay):
         self.setLayout(layout)
         self.show()
         
-        
+    def setLeftDataSelection(self, label, selection, average):
+        pass
+    
+    def setRightDataSelection(self, label, selection, average):
+        pass
+    
