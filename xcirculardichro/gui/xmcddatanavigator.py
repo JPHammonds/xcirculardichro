@@ -10,7 +10,10 @@ from xcirculardichro.config.loggingConfig import METHOD_ENTER_STR,\
 from xcirculardichro.gui.model.xmcddatanavigatormodel import XMCDDataNavigatorModel
 from xcirculardichro.gui.datanavigator import DataNavigator
 from xcirculardichro.data.datanode import DataNode
-from xcirculardichro.data.specdatafilenode import SpecFileDataNode
+from xcirculardichro.data.specfiledatanode import SpecFileDataNode
+from xcirculardichro.gui.dataselection.specdisplay import SpecDisplay
+from xcirculardichro.data.intermediatedatanode import IntermediateDataNode,\
+    SELECTED_NODES, DATA_SELECTION
 
 logger = logging.getLogger(__name__)
 
@@ -52,6 +55,22 @@ class XMCDDataNavigator(qtWidgets.QDialog):
         self._model.insertRows(numCurrentNodes, 1)
         
         logger.debug
+        
+    def addIntermediateDataNode(self, dataSelection):
+        logger.debug(METHOD_ENTER_STR % dataSelection)
+        dataInfo = {SELECTED_NODES: self.getSelectedNodes(), 
+                    DATA_SELECTION: dataSelection}
+        node = IntermediateDataNode(dataInfo, parent = self._rootNode)
+        numCurrentNodes = self._rootNode.childCount()
+        self._model.insertRows(numCurrentNodes, 1)
+        
+    def getSelectedNodes(self):
+        root = self._rootNode
+        selectedNodes = []
+        for node in root._children:
+            if node.isChecked():
+                selectedNodes.append(node)
+        return selectedNodes
         
     def model(self):
         '''
