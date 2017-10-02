@@ -52,7 +52,8 @@ class SpecDisplay(AbstractSelectionDisplay):
         self.subChoices.subTypeChanged[int].connect(self.handleSubTypeChanged)
         self.subChoices.plotTypeChanged[int].connect(self.handlePlotTypeChanged)
         self.subChoices.plotOptionChanged.connect(self.handlePlotOptionChanged)
-        
+        self.pointSelectionInfo.selectorTypeChanged[int].connect(self.handleSelectorTypeChanged)
+        self.pointSelectionInfo.selectorAxisChanged[int].connect(self.handleSelectorAxisChanged)
         self.show()
         
     
@@ -201,6 +202,8 @@ class SpecDisplay(AbstractSelectionDisplay):
     @qtCore.pyqtSlot(int)
     def handleSubTypeChanged(self, newType):
         logger.debug(METHOD_ENTER_STR % newType)
+
+        
 
     def isMultipleScansSelected(self):
         logger.debug(METHOD_ENTER_STR % self.selectedNodes)

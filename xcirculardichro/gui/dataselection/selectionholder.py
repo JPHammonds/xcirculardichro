@@ -23,6 +23,9 @@ class SelectionHolder(qtWidgets.QDialog):
     '''
     dataSelectionsChanged = qtCore.pyqtSignal(name="dataSelectionsChanged")
     plotOptionChanged = qtCore.pyqtSignal(name="plotOptionChanged")
+    pointSelectionAxisChanged = qtCore.pyqtSignal(int, name="pointSelectionAxisChanged")
+    pointSelectionTypeChanged = qtCore.pyqtSignal(int, name="pointSelectionTypeChanged")
+    
     def __init__(self, parent=None):
         super(SelectionHolder, self).__init__(parent=parent)
         logger.debug(METHOD_ENTER_STR)
@@ -35,7 +38,8 @@ class SelectionHolder(qtWidgets.QDialog):
         self.show()
         self._selectionWidget.dataSelectionsChanged.connect(self.handleDataSelectionsChanged)
         self._selectionWidget.plotOptionChanged.connect(self.handlePlotOptionChanged)
-        
+        self._selectionWidget.pointSelectionAxisChanged[int].connect(self.handlePointSelectionAxisChanged)
+        self._selectionWidget.pointSelectionTypeChanged[int].connect(self.handlePointSelectionTypeChanged)
     def calcPlotData(self, data):
         return self._selectionWidget.calcPlotData(data)
         
@@ -69,7 +73,15 @@ class SelectionHolder(qtWidgets.QDialog):
     @qtCore.pyqtSlot()
     def handlePlotOptionChanged(self):
         self.plotOptionChanged.emit()
-           
+    
+    @qtCore.pyqtSlot(int)   
+    def handlePointSelectionAxisChanged(self, index):
+        self.pointSelectionAxisChanged[int].emit(index)
+    
+    @qtCore.pyqtSlot(int)   
+    def handlePointSelectionTypeChanged(self, index):
+        self.pointSelectionTypeChanged[int].emit(index)
+        
     def plotIndividualData(self):
         return self._selectionWidget.plotIndividualData()
     
@@ -92,6 +104,8 @@ class SelectionHolder(qtWidgets.QDialog):
         else:
             self._selectionWidget.dataSelectionsChanged.disconnect(self.handleDataSelectionsChanged)
             self._selectionWidget.plotOptionChanged.disconnect(self.handlePlotOptionChanged)
+            self._selectionWidget.pointSelectionAxisChanged[int].disconnect(self.handlePointSelectionAxisChanged)
+            self._selectionWidget.pointSelectionTypeChanged[int].disconnect(self.handlePointSelectionTypeChanged)
             layout = self.layout()
             self._selectionWidget.hide()
             layout.removeWidget(self._selectionWidget)
@@ -99,6 +113,8 @@ class SelectionHolder(qtWidgets.QDialog):
             layout.addWidget(self._selectionWidget)
             self._selectionWidget.dataSelectionsChanged.connect(self.handleDataSelectionsChanged)
             self._selectionWidget.plotOptionChanged.connect(self.handlePlotOptionChanged)
+            self._selectionWidget.pointSelectionAxisChanged[int].connect(self.handlePointSelectionAxisChanged)
+            self._selectionWidget.pointSelectionTypeChanged[int].connect(self.handlePointSelectionTypeChanged)
             logger.debug(self._selectionWidget)
             
     def setSelectedNodes(self, selectedNodes):

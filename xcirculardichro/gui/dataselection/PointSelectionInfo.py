@@ -10,8 +10,9 @@ logger = logging.getLogger(__name__)
 
 class PointSelectionInfo(qtWidgets.QDialog):
     POINT_SELECTIONS = ["Pre-Edge", "Post-Edge"]
+    AXIS_SELECTIONS = ["Left", "Right"]
     selectorTypeChanged = qtCore.pyqtSignal(int)
-        
+    selectorAxisChanged = qtCore.pyqtSignal(int)        
     def __init__(self, parent=None):
         super(PointSelectionInfo, self).__init__(parent=parent)
         layout = qtWidgets.QVBoxLayout()
@@ -19,14 +20,23 @@ class PointSelectionInfo(qtWidgets.QDialog):
         self.pointSetSelector = qtWidgets.QComboBox()
         self.pointSetSelector.insertItems(0, self.POINT_SELECTIONS)
         layout.addWidget(self.pointSetSelector)
+        self.axisSelector = qtWidgets.QComboBox()
+        self.axisSelector.insertItems(0, self.AXIS_SELECTIONS)
+        layout.addWidget(self.axisSelector)
         self.pointSelections = {}
         for selection in self.POINT_SELECTIONS:
             self.pointSelections[selection] = PointSetInfo(selection)
             layout.addWidget(self.pointSelections[selection])
-            
+        
         self.setLayout(layout)
         self.pointSetSelector.currentIndexChanged[int].connect(self.handlePointSetSelectorTypeChanged)
+        self.axisSelector.currentIndexChanged[int].connect(self.handleAxisSelectionChanged)
+
+    @qtCore.pyqtSlot(int)
+    def handleAxisSelectionChanged(self, index):
+        self.selectorAxisChanged[int].emit(index)
         
+    @qtCore.pyqtSlot(int)
     def handlePointSetSelectorTypeChanged(self, index):
         self.selectorTypeChanged[int].emit(index)
         

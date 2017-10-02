@@ -15,10 +15,22 @@ class AbstractSelectionDisplay(QtWidgets.QDialog):
 
     dataSelectionsChanged = qtCore.pyqtSignal(name="dataSelectionsChanged")
     plotOptionChanged = qtCore.pyqtSignal(name="plotOptionChanged")    
+    pointSelectionTypeChanged = qtCore.pyqtSignal(int, name="pointSelectionTypeChanged")
+    pointSelectionAxisChanged = qtCore.pyqtSignal(int, name="pointSelectionAxisChanged")
     def __init__(self, parent=None):
         super(AbstractSelectionDisplay, self).__init__(parent=parent)
         self._selectedNodes = []
         
+    @qtCore.pyqtSlot(int)
+    def handleSelectorTypeChanged(self, index):
+        logger.debug(METHOD_ENTER_STR % index)
+        self.pointSelectionTypeChanged[int].emit(index)
+        
+    @qtCore.pyqtSlot(int)
+    def handleSelectorAxisChanged(self, index):
+        logger.debug(METHOD_ENTER_STR % index)
+        self.pointSelectionAxisChanged[int].emit(index)
+    
     @abstractmethod
     def isMultipleScansSelected(self):
         logger.debug(METHOD_ENTER_STR)

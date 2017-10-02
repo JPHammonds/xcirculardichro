@@ -35,6 +35,8 @@ class IntermediateDataSelection(AbstractSelectionDisplay):
         
         self.scanBrowser.scanSelected[list].connect(self.handleScanSelection)
         self.subChoices.plotOptionChanged.connect(self.plotOptionChanged)
+        self.pointSelectionInfo.selectorTypeChanged[int].connect(self.handleSelectorTypeChanged)
+        self.pointSelectionInfo.selectorAxisChanged[int].connect(self.handleSelectorAxisChanged)
         
     def isMultipleScansSelected(self):
         if len(self.selectedScans) > 1:
