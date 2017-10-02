@@ -10,6 +10,7 @@ from xcirculardichro.config.loggingConfig import METHOD_ENTER_STR,\
     METHOD_EXIT_STR
 from platform import node
 from xcirculardichro.data.datanode import DataNode
+from xcirculardichro.data.specscannode import SpecScanNode
 
 logger = logging.getLogger(__name__)
 
@@ -37,6 +38,7 @@ class XMCDDataNavigatorModel(qtCore.QAbstractItemModel):
         return node.childCount()
     
     def data(self, index, role=qtCore.Qt.DisplayRole):
+        logger.debug("index %s, role %s" %(index, role))
         if role <6:
             logger.debug(METHOD_ENTER_STR % self.roleNames()[role])
         if not index.isValid():
@@ -49,11 +51,11 @@ class XMCDDataNavigatorModel(qtCore.QAbstractItemModel):
             else:
                 return qtCore.Qt.Unchecked
         
-        if role == qtCore.Qt.DisplayRole or role == qtCore.Qt.EditRole or \
-            role == qtCore.Qt.ToolTipRole:
+        if role == qtCore.Qt.DisplayRole or role == qtCore.Qt.EditRole:
+            return qtCore.QVariant(node.shortName())
             
+        if role == qtCore.Qt.ToolTipRole:
             return qtCore.QVariant(node.name())
-            
             
         
         
@@ -84,9 +86,13 @@ class XMCDDataNavigatorModel(qtCore.QAbstractItemModel):
         
     def flags(self, index):
         logger.debug(METHOD_ENTER_STR)
-        return qtCore.Qt.ItemIsEnabled | qtCore.Qt.ItemIsSelectable | \
-            qtCore.Qt.ItemIsUserCheckable | qtCore.Qt.ItemIsTristate
-
+        node = index.internalPointer()
+        if not isinstance(node, SpecScanNode):
+            return qtCore.Qt.ItemIsEnabled | qtCore.Qt.ItemIsSelectable | \
+                qtCore.Qt.ItemIsUserCheckable | qtCore.Qt.ItemIsTristate
+        else:
+            return qtCore.Qt.NoItemFlags
+        
     def getNode(self, index):
         if index.isValid():
             node = index.internalPointer()
@@ -101,6 +107,7 @@ class XMCDDataNavigatorModel(qtCore.QAbstractItemModel):
         for node in topNodes:
             if node.isChecked():
                 checkedNodes.append(node)
+        logger.debug(METHOD_EXIT_STR % checkedNodes)
         return checkedNodes
         
         
