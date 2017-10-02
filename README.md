@@ -34,3 +34,6 @@ Version 0.5  2017-10-02
 Version 0.6  2017-10-02
    - Something wrong with 0.5
    
+Version 0.7 2017-10-02
+	- Set ScanBrowser in IntermediateDataSelexction so that the table is not editable.
+    - Add in singal handling so that point selection for pre/post peak levels can be adjusted to provide for normalization.
