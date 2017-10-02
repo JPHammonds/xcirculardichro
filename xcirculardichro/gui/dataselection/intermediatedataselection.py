@@ -87,12 +87,6 @@ class IntermediateDataSelection(AbstractSelectionDisplay):
             counterNames = nodeContainingScan.scans[self.selectedScans[0]].axisLabels
         return counters, counterNames
 
-    def setLeftDataSelection(self, label, selection, average):
-        pass
-    
-    def setRightDataSelection(self, label, selection, average):
-        pass
-
     def getSelectedScans(self):
         return self.selectedScans
         
@@ -109,10 +103,14 @@ class IntermediateDataSelection(AbstractSelectionDisplay):
         return self.subChoices.plotAverageData()
 
     def setLeftDataSelection(self, label, selection, average):
-        logger.debug(METHOD_ENTER_STR % (+label, selection, average))
+        logger.debug(METHOD_ENTER_STR % ((label, selection, average),))
+        self.pointSelectionInfo.setSelectionAverage(PointSelectionInfo.POINT_SELECTIONS[0], average)
+        self.pointSelectionInfo.setSelectionIndices(PointSelectionInfo.POINT_SELECTIONS[0], selection)
     
     def setRightDataSelection(self, label, selection, average):
-        logger.debug(METHOD_ENTER_STR % (label, selection, average))
+        logger.debug(METHOD_ENTER_STR % ((label, selection, average),))
+        self.pointSelectionInfo.setSelectionAverage(PointSelectionInfo.POINT_SELECTIONS[1], average)
+        self.pointSelectionInfo.setSelectionIndices(PointSelectionInfo.POINT_SELECTIONS[1], selection)
     
     def setupDisplayWithSelectedNodes(self):
         self.scanBrowser.clearBrowser()
@@ -129,6 +127,7 @@ class ScanBrowser(qtWidgets.QDialog):
         #
         self.scanList = qtWidgets.QTableWidget()
         self.scanList.setColumnCount(2)
+        self.scanList.setEditTriggers(qtWidgets.QAbstractItemView.NoEditTriggers)
         self.scanList.setSelectionBehavior(qtWidgets.QAbstractItemView.SelectRows)
         self.scanList.setHorizontalHeaderLabels(['S#', 'Command'])
         font = qtGui.QFont("Helvetica", pointSize=10)
