@@ -74,9 +74,9 @@ class LockinXMCDChoices(AbstractChoices):
                 axisIndex.append(1)
         return axisIndex
 
-    def getDataLabels(self):
-        plotTypes = self.plotSelector.currentText().split("/")
-        labels = ['E', ]
-        labels.extend(plotTypes)
-        logger.debug("labels %s" % labels)
-        return labels        
+#     def getDataLabels(self):
+#         plotTypes = self.plotSelector.currentText().split("/")
+#         labels = ['E', ]
+#         labels.extend(plotTypes)
+#         logger.debug("labels %s" % labels)
+#         return labels        

@@ -8,6 +8,8 @@ import PyQt5.QtWidgets as qtWidgets
 import PyQt5.QtCore as qtCore
 from xcirculardichro.gui.choices.abstractchoices import AbstractChoices
 import logging
+from xcirculardichro.config.loggingConfig import METHOD_ENTER_STR,\
+    METHOD_EXIT_STR
 logger = logging.getLogger(__name__)
 
 CHOICES = ['Flourescence', 'Transmission']
@@ -49,6 +51,7 @@ class NonLockinXMCDChoices(AbstractChoices):
 #         self.show()
         
     def calcPlotData(self, data):
+        logger.debug(METHOD_ENTER_STR % data)
         xasPlus = None
         xasMinus = None
         xas = None
@@ -80,6 +83,7 @@ class NonLockinXMCDChoices(AbstractChoices):
             retData = [energy, dPlus, dMinus]
         elif str(self.plotSelector.currentText()) == PLOT_CHOICES[4]:
             retData = [energy, mPlus, mMinus]
+        logger.debug(METHOD_EXIT_STR % retData)
         return retData
         
     def getPlotSelections(self):
@@ -129,9 +133,9 @@ class NonLockinXMCDChoices(AbstractChoices):
         logger.debug("axisIndexes %s" % axisIndex)
         return axisIndex
     
-    def getDataLabels(self):
-        plotTypes = self.plotSelector.currentText().split("/")
-        labels = ['E', ]
-        labels.extend(plotTypes)
-        logger.debug("labels %s" % labels)
-        return labels
+#     def getDataLabels(self):
+#         plotTypes = self.plotSelector.currentText().split("/")
+#         labels = ['E', ]
+#         labels.extend(plotTypes)
+#         logger.debug("labels %s" % labels)
+#         return labels

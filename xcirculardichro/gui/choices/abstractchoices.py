@@ -58,7 +58,7 @@ class AbstractChoices(qtWidgets.QDialog):
     def getPlotAxisLabelsIndex(self):
         raise Exception("Abstract method called")
     
-    def getDataLabels(self):
-        raise Exception("Abstract method called")
+#     def getDataLabels(self):
+#         raise Exception("Abstract method called")
     
     

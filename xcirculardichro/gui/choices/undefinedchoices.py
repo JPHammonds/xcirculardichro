@@ -47,20 +47,25 @@ class UndefinedChoices(AbstractChoices):
         self.plotSelections[0] = selections
         
     def getPlotAxisLabels(self):
-        return self.getPlotSelections()
+        labels = ["X",]
+        labels.extend(str(self.plotSelector.currentText()).split('/'))
+        return labels
 
     def getPlotAxisLabelsIndex(self):
         plotTypes = self.plotSelector.currentText().split("/")
         axisIndex = []
         axisIndex.append(0)    #x axis, kQTExifUserDataFlashEnergy
         for pType in plotTypes:
-            axisIndex.append(1)
+            if pType == "Y1":
+                axisIndex.append(1)
+            else: 
+                axisIndex.append(2)
             
             
         return axisIndex
 
-    def getDataLabels(self):
-        plotTypes = self.plotSelector.currentText().split("/")
-        labels = ['E', ]
-        labels.extend(plotTypes)
-        return labels
+#     def getDataLabels(self):
+#         plotTypes = self.plotSelector.currentText().split("/")
+#         labels = ['E', ]
+#         labels.extend(plotTypes)
+#         return labels
