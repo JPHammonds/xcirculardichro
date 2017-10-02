@@ -13,6 +13,7 @@ from xcirculardichro.gui.choices.choiceholder import ChoiceHolder
 from xcirculardichro.config.loggingConfig import METHOD_ENTER_STR
 from xcirculardichro.gui.dataselection.AbstractSelectionDisplay import AbstractSelectionDisplay
 from PyQt5.QtWidgets import QAbstractItemView
+from xcirculardichro.gui.dataselection.PointSelectionInfo import PointSelectionInfo
 
 logger = logging.getLogger(__name__)
 
@@ -22,6 +23,7 @@ class SpecDisplay(AbstractSelectionDisplay):
         super(SpecDisplay, self).__init__(parent)
         layout = qtWidgets.QVBoxLayout()
         
+        self.selectedScans = []
         self.currentSelections = {}
         self.typeSelector = ScanTypeSelector()
         self.scanBrowser = ScanBrowser()
@@ -30,11 +32,13 @@ class SpecDisplay(AbstractSelectionDisplay):
         self.counterSelector = CounterSelector(
             counterOpts = self.subChoices.choiceWidget.COUNTER_OPTS)
         self.scanBrowser.scanList.setSelectionMode(QAbstractItemView.SingleSelection)
+        self.pointSelectionInfo = PointSelectionInfo()
         
         layout.addWidget(self.typeSelector)
         layout.addWidget(self.scanBrowser)
         layout.addWidget(self.subChoices)
         layout.addWidget(self.counterSelector)
+        layout.addWidget(self.pointSelectionInfo)
         
         self.setLayout(layout)
         
@@ -47,6 +51,7 @@ class SpecDisplay(AbstractSelectionDisplay):
         self.typeSelector.scanTypeChanged[int].connect(self.scanTypeSelected)
         self.subChoices.subTypeChanged[int].connect(self.handleSubTypeChanged)
         self.subChoices.plotTypeChanged[int].connect(self.handlePlotTypeChanged)
+        self.subChoices.plotOptionChanged.connect(self.handlePlotOptionChanged)
         
         self.show()
         
@@ -57,8 +62,8 @@ class SpecDisplay(AbstractSelectionDisplay):
     def getPlotAxisLabels(self):
         return self.subChoices.choiceWidget.getPlotAxisLabels()
         
-    def getDataLabels(self):
-        return self.subChoices.choiceWidget.getDataLabels()
+#     def getDataLabels(self):
+#         return self.subChoices.choiceWidget.getDataLabels()
 
     def getPlotAxisLabelsIndex(self):
         return self.subChoices.choiceWidget.getPlotAxisLabelsIndex()
@@ -69,6 +74,11 @@ class SpecDisplay(AbstractSelectionDisplay):
             scanTypes.add(specFile.scans[scan].scanCmd.split()[0])
         return list(scanTypes)
         
+    def getSelectedCounterInfo(self):
+        counters = self.counterSelector.getSelectedCounters()
+        counterNames = self.counterSelector.getSelectedCounterNames(counters)
+        return counters, counterNames
+ 
     def getSelectedScans(self):
         return self.selectedScans
     
@@ -105,8 +115,14 @@ class SpecDisplay(AbstractSelectionDisplay):
             #TODO: plot widget is external to this.   Need to raise signal to main window
             self.plotWidget.plot(energyData, data)
         
+    @qtCore.pyqtSlot()
+    def handlePlotOptionChanged(self):
+        logger.debug(METHOD_ENTER_STR)
+        self.plotOptionChanged.emit()
+        
     @qtCore.pyqtSlot(int)
     def handlePlotTypeChanged(self, newType, suppressFilter=False):
+        
         logger.debug(METHOD_ENTER_STR)
 
     '''
@@ -188,10 +204,11 @@ class SpecDisplay(AbstractSelectionDisplay):
         logger.debug(METHOD_ENTER_STR % newType)
 
     def isMultipleScansSelected(self):
-        if len(self.selectedScans) == 1:
-            return False
-        elif len(self.selectedScans) > 1:
+        logger.debug(METHOD_ENTER_STR % self.selectedNodes)
+        if len(self.selectedScans) > 1:
             return True
+        else:
+            return False
 
     def setupDisplayWithSelectedNodes(self):
         logger.debug(METHOD_ENTER_STR)
@@ -203,10 +220,10 @@ class SpecDisplay(AbstractSelectionDisplay):
             
         
     def plotIndividualData(self):
-        return self.subChoices.choiceWidget.plotIndividualData()
+        return self.subChoices.plotIndividualData()
         
     def plotAverageData(self):
-        return self.subChoices.choiceWidget.plotAverageData()
+        return self.subChoices.plotAverageData()
             
     '''
     Called when the user selects a scan type from the ScanTypeSelector
@@ -242,6 +259,16 @@ class SpecDisplay(AbstractSelectionDisplay):
         self.scanBrowser.scanList.itemSelectionChanged.emit()
         self.dataSelectionsChanged.emit()            
         
+    def setLeftDataSelection(self, label, selection, average):
+        logger.debug(METHOD_ENTER_STR % ((label, selection, average),))
+        self.pointSelectionInfo.setSelectionAverage(PointSelectionInfo.POINT_SELECTIONS[0], average)
+        self.pointSelectionInfo.setSelectionIndices(PointSelectionInfo.POINT_SELECTIONS[0], selection)
+        
+    def setRightDataSelection(self, label, selection, average):
+        logger.debug(METHOD_ENTER_STR % ((label, selection, average),))
+        self.pointSelectionInfo.setSelectionAverage(PointSelectionInfo.POINT_SELECTIONS[1], average)
+        self.pointSelectionInfo.setSelectionIndices(PointSelectionInfo.POINT_SELECTIONS[1], selection)
+  
     def storePlotSelections(self, typeName):
         if not (typeName in self.currentSelections.keys()):
             logger.debug("dealing with new scan type %s" %typeName)
