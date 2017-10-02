@@ -63,6 +63,12 @@ class ChoiceHolder(qtWidgets.QDialog):
         logger.debug("Entering")
         return self.choiceWidget.getPlotSelections()
 
+    def plotAverageData(self):
+        return self.choiceWidget.plotAverageData()
+    
+    def plotIndividualData(self):
+        return self.choiceWidget.plotIndividualData()
+    
     @qtCore.pyqtSlot(int)
     def plotSelectionChanged(self, typeStr):
         self.plotTypeChanged[int].emit(typeStr)
@@ -81,4 +87,5 @@ class ChoiceHolder(qtWidgets.QDialog):
             logger.debug("setting choice to other")
             self.setChoiceWidget(UndefinedChoices())
         self.lastChoiceType = typeName
+        
         
