@@ -53,7 +53,7 @@ class PlotWidget(qtWidgets.QDialog):
 #         self.ax2 = None
         layout.addWidget(self.canvas)
         self.setLayout(layout)
-        self.setMinimumSize(800, 600)
+        self.setMinimumSize(400, 300)
         self.show()
         
     def clear(self):
@@ -317,7 +317,8 @@ class PlotWidget(qtWidgets.QDialog):
         logger.debug("Entering %s" % label)
         self.ax2.set_ylabel(label)
 
-
+    def sizeHint(self):
+        return qtCore.QSize(800, 600)
 # used code from https://matplotlib.org/api/lines_api.html
 import matplotlib.lines as lines
 class HighlightSelected(lines.VertexSelector, qtCore.QObject):
