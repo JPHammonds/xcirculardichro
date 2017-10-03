@@ -95,6 +95,8 @@ class IntermediateDataSelection(AbstractSelectionDisplay):
         logger.debug(METHOD_ENTER_STR % selectedScans)
         self.selectedScans = selectedScans
         self.dataSelectionsChanged.emit()
+        self.pointSelectionTypeChanged.emit(self.pointSelectionInfo.getPointSetType())
+        self.pointSelectionAxisChanged.emit(self.pointSelectionInfo.getAxisSelection())
         
     def plotIndividualData(self):
         return self.subChoices.plotIndividualData()
