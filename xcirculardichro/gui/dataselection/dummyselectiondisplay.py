@@ -12,11 +12,9 @@ class DummySelectionDisplay(AbstractSelectionDisplay):
     def __init__(self,parent=None):
         super(DummySelectionDisplay, self).__init__(parent=parent)
 
-        layout = qtWidget.QHBoxLayout()
         label = qtWidget.QLabel("No data is selected")
         
-        layout.addWidget(label)
-        self.setLayout(layout)
+        self.addWidget(label)
         self.show()
         
     def setLeftDataSelection(self, label, selection, average):

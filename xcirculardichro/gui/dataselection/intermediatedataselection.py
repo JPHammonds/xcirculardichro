@@ -21,16 +21,14 @@ class IntermediateDataSelection(AbstractSelectionDisplay):
     def __init__(self, parent=None):
         super(IntermediateDataSelection, self).__init__(parent=parent)
         self.selectedScans = []
-        layout = qtWidgets.QVBoxLayout()
         self.scanBrowser = ScanBrowser()
         self.subChoices = IntermediateChoices()
         self.pointSelectionInfo = PointSelectionInfo()
         
-        layout.addWidget(self.scanBrowser)
-        layout.addWidget(self.subChoices)
-        layout.addWidget(self.pointSelectionInfo)
+        self.addWidget(self.scanBrowser)
+        self.addWidget(self.subChoices)
+        self.addWidget(self.pointSelectionInfo)
         
-        self.setLayout(layout)
         self.show()
         
         self.scanBrowser.scanSelected[list].connect(self.handleScanSelection)
@@ -137,6 +135,7 @@ class ScanBrowser(qtWidgets.QDialog):
  
         layout.addWidget(self.scanList)
         self.setMinimumWidth(400)
+        self.setMinimumHeight(250)
         self.setMaximumWidth(600)
         
         self.setLayout(layout)

@@ -11,7 +11,7 @@ from xcirculardichro.config.loggingConfig import METHOD_ENTER_STR,\
 from specguiutils import XMCDException
 logger = logging.getLogger(__name__)
 
-class AbstractSelectionDisplay(QtWidgets.QDialog):
+class AbstractSelectionDisplay(QtWidgets.QSplitter):
 
     dataSelectionsChanged = qtCore.pyqtSignal(name="dataSelectionsChanged")
     plotOptionChanged = qtCore.pyqtSignal(name="plotOptionChanged")    
@@ -19,6 +19,7 @@ class AbstractSelectionDisplay(QtWidgets.QDialog):
     pointSelectionAxisChanged = qtCore.pyqtSignal(int, name="pointSelectionAxisChanged")
     def __init__(self, parent=None):
         super(AbstractSelectionDisplay, self).__init__(parent=parent)
+        self.setOrientation(qtCore.Qt.Vertical)
         self._selectedNodes = []
         
     @qtCore.pyqtSlot(int)

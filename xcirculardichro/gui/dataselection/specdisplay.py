@@ -21,7 +21,6 @@ class SpecDisplay(AbstractSelectionDisplay):
     
     def __init__(self, parent=None):
         super(SpecDisplay, self).__init__(parent)
-        layout = qtWidgets.QVBoxLayout()
         
         self.selectedScans = []
         self.currentSelections = {}
@@ -34,13 +33,12 @@ class SpecDisplay(AbstractSelectionDisplay):
         self.scanBrowser.scanList.setSelectionMode(QAbstractItemView.SingleSelection)
         self.pointSelectionInfo = PointSelectionInfo()
         
-        layout.addWidget(self.typeSelector)
-        layout.addWidget(self.scanBrowser)
-        layout.addWidget(self.subChoices)
-        layout.addWidget(self.counterSelector)
-        layout.addWidget(self.pointSelectionInfo)
+        self.addWidget(self.typeSelector)
+        self.addWidget(self.scanBrowser)
+        self.addWidget(self.subChoices)
+        self.addWidget(self.counterSelector)
+        self.addWidget(self.pointSelectionInfo)
         
-        self.setLayout(layout)
         
         self.scanBrowser.scanSelected[list].connect(self.handleScanSelection)
         self.scanBrowser.scanLoaded[bool].connect(self.handleScanLoaded)
@@ -181,7 +179,8 @@ class SpecDisplay(AbstractSelectionDisplay):
         self.counterSelector.setSelectedCounters(
             self.currentSelections[newScanType])
         self.dataSelectionsChanged.emit()
-        
+        self.pointSelectionTypeChanged.emit(self.pointSelectionInfo.getPointSetType())
+        self.pointSelectionAxisChanged.emit(self.pointSelectionInfo.getAxisSelection())
         
     '''
     Handle a sequence of operations when the contents of the scan browser 
