@@ -16,13 +16,23 @@ class PointSelectionInfo(qtWidgets.QDialog):
     def __init__(self, parent=None):
         super(PointSelectionInfo, self).__init__(parent=parent)
         layout = qtWidgets.QVBoxLayout()
-        
+        layout.setSpacing(5)
+        hLayout1 = qtWidgets.QHBoxLayout()
+        label = qtWidgets.QLabel("PointSet to Select: ")
+        hLayout1.addWidget(label)
         self.pointSetSelector = qtWidgets.QComboBox()
         self.pointSetSelector.insertItems(0, self.POINT_SELECTIONS)
-        layout.addWidget(self.pointSetSelector)
+        
+        hLayout1.addWidget(self.pointSetSelector)
+        layout.addLayout(hLayout1)
+        
+        hLayout2 = qtWidgets.QHBoxLayout()
+        label = qtWidgets.QLabel("PointSelect Axis: ")
+        hLayout2.addWidget(label)
         self.axisSelector = qtWidgets.QComboBox()
         self.axisSelector.insertItems(0, self.AXIS_SELECTIONS)
-        layout.addWidget(self.axisSelector)
+        hLayout2.addWidget(self.axisSelector)
+        layout.addLayout(hLayout2)
         self.pointSelections = {}
         for selection in self.POINT_SELECTIONS:
             self.pointSelections[selection] = PointSetInfo(selection)
@@ -32,6 +42,12 @@ class PointSelectionInfo(qtWidgets.QDialog):
         self.pointSetSelector.currentIndexChanged[int].connect(self.handlePointSetSelectorTypeChanged)
         self.axisSelector.currentIndexChanged[int].connect(self.handleAxisSelectionChanged)
 
+    def getAxisSelection(self):
+        return self.axisSelector.currentIndex()
+    
+    def getPointSetType(self):
+        return self.pointSetSelector.currentIndex()
+    
     @qtCore.pyqtSlot(int)
     def handleAxisSelectionChanged(self, index):
         self.selectorAxisChanged[int].emit(index)
@@ -40,6 +56,14 @@ class PointSelectionInfo(qtWidgets.QDialog):
     def handlePointSetSelectorTypeChanged(self, index):
         self.selectorTypeChanged[int].emit(index)
         
+    @qtCore.pyqtSlot(int)
+    def setAxisSelection(self, axis):
+        self.axisSelector.setCurrentIndex(axis)
+    
+    @qtCore.pyqtSlot(int)
+    def setPointSetType(self, setNum):
+        self.pointSetSelector.setCurrentIndex(setNum)
+    
     def setSelectionIndices(self, selectionType, indices):
         logger.debug(METHOD_ENTER_STR % ((selectionType,indices),))
         self.pointSelections[selectionType].setIndices(indices)
