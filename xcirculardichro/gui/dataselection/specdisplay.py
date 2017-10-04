@@ -13,7 +13,7 @@ from xcirculardichro.gui.choices.choiceholder import ChoiceHolder
 from xcirculardichro.config.loggingConfig import METHOD_ENTER_STR
 from xcirculardichro.gui.dataselection.AbstractSelectionDisplay import AbstractSelectionDisplay
 from PyQt5.QtWidgets import QAbstractItemView
-from xcirculardichro.gui.dataselection.PointSelectionInfo import PointSelectionInfo
+from xcirculardichro.gui.dataselection.pointselectioninfo import PointSelectionInfo
 
 logger = logging.getLogger(__name__)
 
@@ -162,6 +162,7 @@ class SpecDisplay(AbstractSelectionDisplay):
         logger.debug("newScanType %s" % newScanType)
         
         self.subChoices.setChoiceWidgetByScanType(newScanType)
+        self.subChoices.setDefaultSelectionsFromCounterNames(specFile.scans[str(newScan)].L)
         self.counterSelector.counterModel. \
             initializeDataRows(self.subChoices.choiceWidget.COUNTER_OPTS,
                                specFile.scans[str(newScan)].L)

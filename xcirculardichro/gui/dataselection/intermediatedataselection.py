@@ -10,7 +10,7 @@ import PyQt5.QtGui as qtGui
 import PyQt5.QtCore as qtCore
 from xcirculardichro.config.loggingConfig import METHOD_ENTER_STR
 from xcirculardichro.gui.choices.intermediatechoices import IntermediateChoices
-from xcirculardichro.gui.dataselection.PointSelectionInfo import PointSelectionInfo
+from xcirculardichro.gui.dataselection.pointselectioninfo import PointSelectionInfo
 
 SCAN_COL = 0
 CMD_COL = 1
