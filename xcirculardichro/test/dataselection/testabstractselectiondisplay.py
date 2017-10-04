@@ -10,7 +10,7 @@ import sys
 
 app = QApplication(sys.argv)
 
-class Test(unittest.TestCase):
+class TestWithAbstractClass(unittest.TestCase):
 
 
     def setUp(self):

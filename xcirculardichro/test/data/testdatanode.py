@@ -26,7 +26,7 @@ FOOT_LEFT = "LeftFoot"
 TORSO_CHILDREN = [NECK, SHOULDER_RIGHT, SHOULDER_LEFT, HIPS]
 HIPS_CHILDREN = [LEG_RIGHT, LEG_LEFT]
 
-class Test(unittest.TestCase):
+class TestDataNode(unittest.TestCase):
 
 
     def setUp(self):
