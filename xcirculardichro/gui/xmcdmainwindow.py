@@ -50,6 +50,7 @@ class XMCDMainWindow(qtWidgets.QMainWindow):
         self._plotWidget.rightSelectionChanged[str].connect(self.handleRightDataSelectionChanged)
         self._dataSelections.pointSelectionAxisChanged[int].connect(self._plotWidget.setPointSelectionAxis)
         self._dataSelections.pointSelectionTypeChanged[int].connect(self._plotWidget.setPointSelectionType)
+        self._dataSelections.pointSelectionReloadPicks.connect(self.handlePointSelectionReloadPicks)
         logger.debug(METHOD_EXIT_STR)
         
     def _createMenuBar(self):
@@ -152,6 +153,10 @@ class XMCDMainWindow(qtWidgets.QMainWindow):
         checkedNodes = self._dataNavigator.model().getTopDataSelectedNodes()
         self._dataSelections.setSelectedNodes(checkedNodes)
                 
+    def handlePointSelectionReloadPicks(self, preEdgePoints, postEdgePoints):
+        logger.debug(METHOD_ENTER_STR % ((preEdgePoints, postEdgePoints, "a"),))
+        self._plotWidget.applyPickPoints(preEdgePoints, postEdgePoints)     
+        logger.debug(METHOD_EXIT_STR)
         
     @qtCore.pyqtSlot()
     def openFile(self):

@@ -8,14 +8,15 @@ import PyQt5.QtCore as qtCore
 import PyQt5.QtGui as qtGui
 import logging
 import numpy as np
-from xcirculardichro.config.loggingConfig import METHOD_ENTER_STR
-from matplotlib.streamplot import InvalidIndexError
+from xcirculardichro.config.loggingConfig import METHOD_ENTER_STR,\
+    METHOD_EXIT_STR
 
 logger = logging.getLogger(__name__)
 
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 import matplotlib.pyplot as plt
 import math
+logger.setLevel(logging.DEBUG)
 '''
 Start from http://stackoverflow.com/questions/12459811/how-to-embed-matplotib-in-pyqt-for-dummies
 '''
@@ -56,6 +57,24 @@ class PlotWidget(qtWidgets.QDialog):
         self.setMinimumSize(400, 300)
         self.show()
         
+    def applyPickPoints(self, preEdgePoints, postEdgePoints):
+        logger.debug(METHOD_ENTER_STR %((preEdgePoints, postEdgePoints),))
+        print (METHOD_ENTER_STR % ((preEdgePoints, postEdgePoints),))
+        currentAxis = self.currentPlotAxis()
+        key1List = list(self.selector1.keys())
+        key2List = list(self.selector2.keys())
+        if currentAxis == 0:
+            print("Axis = 0")
+            if len(key1List)>0:
+                key = key1List[-1]
+                self.selector1[key].applyPickPoints(preEdgePoints, postEdgePoints)
+        else:
+            print("Axis = 0")
+            if len(key2List)>0:
+                key = key2List[-1]
+                self.selector2[key].applyPickPoints(preEdgePoints, postEdgePoints)
+        logger.debug(METHOD_EXIT_STR)
+        
     def clear(self):
         logger.debug("Entering")
         plt.clf()
@@ -80,6 +99,15 @@ class PlotWidget(qtWidgets.QDialog):
 #         self.axesEnterId = self.canvas.mpl_connect('axes_enter_event', self.onAxesEnter)
 #         self.axesLeaveId = self.canvas.mpl_connect('axes_leave_event', self.onAxesLeave)
         
+    def currentPlotAxis(self):
+        logger.debug(METHOD_ENTER_STR)
+        currentAxis = 0
+        if self.ax2.get_zorder() > self.ax.get_zorder():
+            currentAxis = 1
+        else:
+            currentAxis = 0
+        return currentAxis
+    
     def disconnectSignals(self):
         self.canvas.mpl_disconnect(self.buttonPressId)
         self.canvas.mpl_disconnect(self.buttonReleaseId)
@@ -149,7 +177,8 @@ class PlotWidget(qtWidgets.QDialog):
         elif key in selector2Keys:
             return self.selector2[key]
         else:
-            raise InvalidIndexError(key)
+            raise IndexError(key)
+        
     def handleLeftSelectionChanged(self, label):
         '''
         Catch when a highlight selection changes and emit a signal from this 
@@ -332,14 +361,51 @@ class HighlightSelected(lines.VertexSelector, qtCore.QObject):
         logger.debug(METHOD_ENTER_STR % "HighlightSelected.__init__")
         lines.VertexSelector.__init__(self,line, **kwargs)
         qtCore.QObject.__init__(self, parent=parent)
+        self.fmt = fmt
+        self.fmt2 = fmt2
         self.markersLeft, = self.axes.plot([], [], fmt, **kwargs)
         self.markersRight, = self.axes.plot([], [], fmt2, **kwargs)
         self.averageLeft, = self.axes.plot([], [], **kwargs)
         self.averageRight, = self.axes.plot([], [], **kwargs)
         self.indLeft = set()
         self.indRight = set()
+        self.leftAverageValue = 0.0
+        self.rightAverageValue = 0.0
         
     
+    def applyPickPoints(self, preEdgePoints, postEdgePoints):
+        logger.debug(METHOD_ENTER_STR)
+        print (METHOD_ENTER_STR % ((preEdgePoints, postEdgePoints, self.line._label),))
+        self.indLeft = preEdgePoints
+        self.indRight = postEdgePoints
+        xsAll, ysAll = self.line.get_data()
+
+        try:
+            xs = xsAll[preEdgePoints]
+            ys = ysAll[preEdgePoints]
+        except IndexError as ex:
+            return
+        print ((xs, ys))
+        if len(xs) > 1:
+            print("Setting left")
+            self.markersLeft.set_data(xs, ys)    
+            self.leftAverageValue = np.sum(ys)/len(ys)
+            yAverage = self.leftAverageValue * np.ones(len(ys))
+            self.averageLeft.set_data(xs, yAverage)
+            self.leftSelectionChanged.emit(str(self.line._label))
+        
+        xs = xsAll[postEdgePoints]
+        ys = ysAll[postEdgePoints]
+        print ((xs, ys))
+        if len(xs) > 1:
+            print("Setting right")
+            self.markersRight.set_data(xs, ys)
+            self.rightAverageValue = np.sum(ys)/len(ys)
+            yAverage = self.rightAverageValue * np.ones(len(ys))
+            self.averageRight.set_data(xs, yAverage)
+            self.rightSelectionChanged.emit(str(self.line._label))
+        self.canvas.draw()
+        
     def getLeftSelectionIndexes(self):
         '''
         retrieve array indices of the Highlighted Selection
