@@ -5,7 +5,8 @@
 import logging
 import PyQt5.QtWidgets as qtWidgets
 import PyQt5.QtCore as qtCore
-from xcirculardichro.config.loggingConfig import METHOD_ENTER_STR
+from xcirculardichro.config.loggingConfig import METHOD_ENTER_STR,\
+    METHOD_EXIT_STR
 logger = logging.getLogger(__name__)
 
 class PointSelectionInfo(qtWidgets.QDialog):
@@ -47,6 +48,14 @@ class PointSelectionInfo(qtWidgets.QDialog):
     
     def getPointSetType(self):
         return self.pointSetSelector.currentIndex()
+    
+    def getPointSetLeftPoints(self):
+        infoSet = self.pointSelections[self.POINT_SELECTIONS[0]]
+        return infoSet
+        
+    def getPointSetRightPoints(self):
+        infoSet = self.pointSelections[self.POINT_SELECTIONS[1]]
+        return infoSet
     
     @qtCore.pyqtSlot(int)
     def handleAxisSelectionChanged(self, index):
@@ -90,6 +99,19 @@ class PointSetInfo(qtWidgets.QDialog):
         
         self.setLayout(layout)
 
+    def getIndices(self):
+        indTxt = self.pointSetIndices.text()
+        logger.debug(METHOD_ENTER_STR % indTxt)
+        logger.debug("as a list of strings %s" % indTxt[1:-1])
+        indicesStr = indTxt[1:-1].split(',')
+        logger.debug("as a list of strings %s" % indicesStr)
+        indices = []
+        if len(indicesStr) > 0 and indicesStr[0] != '':
+            indices = list(map(int, indicesStr))
+            indices.sort()
+        logger.debug(METHOD_EXIT_STR %indices)
+        return indices
+        
     def setIndices(self, indices):
         logger.debug(METHOD_ENTER_STR % indices)
         self.pointSetIndices.setText(str(indices))

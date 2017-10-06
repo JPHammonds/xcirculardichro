@@ -17,6 +17,8 @@ class AbstractSelectionDisplay(QtWidgets.QSplitter):
     plotOptionChanged = qtCore.pyqtSignal(name="plotOptionChanged")    
     pointSelectionTypeChanged = qtCore.pyqtSignal(int, name="pointSelectionTypeChanged")
     pointSelectionAxisChanged = qtCore.pyqtSignal(int, name="pointSelectionAxisChanged")
+    pointSelectionReloadPicks = qtCore.pyqtSignal(list, list, name="pointSelectReloadPicks")
+
     def __init__(self, parent=None):
         super(AbstractSelectionDisplay, self).__init__(parent=parent)
         self.setOrientation(qtCore.Qt.Vertical)

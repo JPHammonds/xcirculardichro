@@ -58,6 +58,12 @@ class SpecDisplay(AbstractSelectionDisplay):
     def calcPlotData(self, data):
         return self.subChoices.choiceWidget.calcPlotData(data)
         
+    def copyPickedPointsToData(self):
+        leftIndices = self.pointSelectionInfo.pointSelections[PointSelectionInfo.POINT_SELECTIONS[0]].getIndices()
+        rightIndices = self.pointSelectionInfo.pointSelections[PointSelectionInfo.POINT_SELECTIONS[1]].getIndices()
+        logger.debug("Points to copy to another Left: %s Right: %s" % (leftIndices, rightIndices) )
+        self.pointSelectionReloadPicks.emit(leftIndices, rightIndices)
+        
     def getPlotAxisLabels(self):
         return self.subChoices.choiceWidget.getPlotAxisLabels()
         
@@ -173,13 +179,13 @@ class SpecDisplay(AbstractSelectionDisplay):
         logger.debug("currentselection %s" % self.currentSelections.keys())
         self.counterSelector.counterModel \
             .setCounterOptions(self.subChoices.choiceWidget.COUNTER_OPTS)
-        
         #TODO: may need to move out
         self.storePlotSelections(newScanType)
         
         self.counterSelector.setSelectedCounters(
             self.currentSelections[newScanType])
         self.dataSelectionsChanged.emit()
+        self.copyPickedPointsToData()
         self.pointSelectionTypeChanged.emit(self.pointSelectionInfo.getPointSetType())
         self.pointSelectionAxisChanged.emit(self.pointSelectionInfo.getAxisSelection())
         
