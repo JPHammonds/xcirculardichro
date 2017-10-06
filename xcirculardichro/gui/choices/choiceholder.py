@@ -9,6 +9,7 @@ from xcirculardichro.gui.choices.undefinedchoices import UndefinedChoices
 import logging
 from xcirculardichro.gui.choices.nonlockinxmcdchoices import NonLockinXMCDChoices
 from xcirculardichro.gui.choices.lockinxmcdchoices import LockinXMCDChoices
+from xcirculardichro.config.loggingConfig import METHOD_ENTER_STR
 logger = logging.getLogger(__name__)
 QXDICHRO = 'qxdichro'
 QXSCAN = 'qxscan'
@@ -34,11 +35,11 @@ class ChoiceHolder(qtWidgets.QDialog):
     
     @qtCore.pyqtSlot()    
     def handlePlotOptionChanged(self):
-        logger.debug("Enter")
+        logger.debug(METHOD_ENTER_STR)
         self.plotOptionChanged.emit()
         
     def setChoiceWidget(self, choiceWidget):
-        logger.debug("Enter")
+        logger.debug(METHOD_ENTER_STR)
         layout = self.layout()
         self.choiceWidget.subTypeChanged[int].disconnect(self.choiceSelectionChanged)
         self.choiceWidget.plotTypeChanged[int].disconnect(self.plotSelectionChanged)
@@ -60,7 +61,7 @@ class ChoiceHolder(qtWidgets.QDialog):
         self.subTypeChanged[int].emit(typeStr)
 
     def getPlotSelections(self):
-        logger.debug("Entering")
+        logger.debug(METHOD_ENTER_STR)
         return self.choiceWidget.getPlotSelections()
 
     def plotAverageData(self):
@@ -74,7 +75,7 @@ class ChoiceHolder(qtWidgets.QDialog):
         self.plotTypeChanged[int].emit(typeStr)
         
     def setChoiceWidgetByScanType(self, typeName):
-        logger.debug("Enter")
+        logger.debug(METHOD_ENTER_STR % typeName)
         if self.lastChoiceType == typeName:        # done change anything
             return
         if typeName == QXDICHRO:
@@ -88,4 +89,11 @@ class ChoiceHolder(qtWidgets.QDialog):
             self.setChoiceWidget(UndefinedChoices())
         self.lastChoiceType = typeName
         
+    def setDefaultSelectionsFromCounterNames(self, names):
+        '''
+        Pass this call down to the choiceWidget
+        '''
+        logger.debug(METHOD_ENTER_STR % names)
+        self.choiceWidget.setDefaultSelectionsFromCounterNames(names)
+
         

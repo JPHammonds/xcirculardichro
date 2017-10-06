@@ -8,10 +8,10 @@ import PyQt5.QtCore as qtCore
 from xcirculardichro.config.loggingConfig import METHOD_ENTER_STR,\
     METHOD_EXIT_STR
 from xcirculardichro.gui.model.xmcddatanavigatormodel import XMCDDataNavigatorModel
-from xcirculardichro.gui.datanavigator import DataNavigator
+#from xcirculardichro.gui.datanavigator import DataNavigator
 from xcirculardichro.data.datanode import DataNode
 from xcirculardichro.data.specfiledatanode import SpecFileDataNode
-from xcirculardichro.gui.dataselection.specdisplay import SpecDisplay
+#from xcirculardichro.gui.dataselection.specdisplay import SpecDisplay
 from xcirculardichro.data.intermediatedatanode import IntermediateDataNode,\
     SELECTED_NODES, DATA_SELECTION
 

@@ -6,6 +6,7 @@
 import PyQt5.QtWidgets as qtWidgets
 import PyQt5.QtCore as qtCore
 import logging
+from xcirculardichro.config.loggingConfig import METHOD_ENTER_STR
 logger = logging.getLogger(__name__)
 
 class AbstractChoices(qtWidgets.QDialog):
@@ -58,7 +59,9 @@ class AbstractChoices(qtWidgets.QDialog):
     def getPlotAxisLabelsIndex(self):
         raise Exception("Abstract method called")
     
-#     def getDataLabels(self):
-#         raise Exception("Abstract method called")
-    
+    def setDefaultSelectionsFromCounterNames(self, names):
+        '''
+        This method should be overridden by subclass
+        '''
+        logger.debug(METHOD_ENTER_STR % names)
     

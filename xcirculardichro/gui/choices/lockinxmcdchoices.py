@@ -8,6 +8,7 @@ import PyQt5.QtWidgets as qtWidgets
 import PyQt5.QtCore as qtCore
 from xcirculardichro.gui.choices.abstractchoices import AbstractChoices
 import logging
+from xcirculardichro.config.loggingConfig import METHOD_ENTER_STR
 logger = logging.getLogger(__name__)
 
 PLOT_CHOICES = ["XAS/XMCD", ]
@@ -74,9 +75,16 @@ class LockinXMCDChoices(AbstractChoices):
                 axisIndex.append(1)
         return axisIndex
 
-#     def getDataLabels(self):
-#         plotTypes = self.plotSelector.currentText().split("/")
-#         labels = ['E', ]
-#         labels.extend(plotTypes)
-#         logger.debug("labels %s" % labels)
-#         return labels        
+    def setDefaultSelectionsFromCounterNames(self, names):
+        '''
+        Override the default choices.  Should have been more like this in the 
+        begunning so may need to look at a way to get this up front.
+        For Sector 4-ID their lockin (scan type qxscan) data usually has the 
+        last column begin with [Lock].  If this is the case, then the last two 
+        columns are XAS and XMCD measured more directly.
+        '''
+        logger.debug(METHOD_ENTER_STR % names)
+        if names[-1].startswith('Lock'):
+            self.plotSelections=[['Energy', names[-2], names[-1]],]
+            logger.debug("New plotSelections %s" % self.plotSelections )
+    

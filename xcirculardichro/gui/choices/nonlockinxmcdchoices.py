@@ -23,7 +23,7 @@ class NonLockinXMCDChoices(AbstractChoices):
 
     def __init__(self, parent=None):
         super(NonLockinXMCDChoices, self).__init__(parent)
-        logger.debug ("Entering")
+        logger.debug (METHOD_ENTER_STR)
         layout = self.layout()     
 
         choiceLayout = qtWidgets.QHBoxLayout()
@@ -87,17 +87,30 @@ class NonLockinXMCDChoices(AbstractChoices):
         return retData
         
     def getPlotSelections(self):
-        retSelections = None
-#         if str(self.choiceSelector.itemText()) == CHOICES[0]:
         retSelections = self.plotSelections[self.choiceSelector.currentIndex()]
-#         elif str(self.choiceSelector.itemText()) == CHOICES[1]:
-#             retSelections = self.plotSelections[1]
+        logger.debug(METHOD_ENTER_STR % retSelections)
         return retSelections
 
     def getPlotAxisLabels(self):
         labels = ["Energy",]
         labels.extend(str(self.plotSelector.currentText()).split('/'))
         return labels
+    
+    def setDefaultSelectionsFromCounterNames(self, names):
+        '''
+        Override the default choices.  Should have been more like this in the 
+        begunning so may need to look at a way to get this up front.
+        For Sector 4-ID their non-lockin data usually has 3 columns labeled 
+        [sum, diff, flip].  If you find these at the bottom of the file than 
+        the two prior columns are D+/D- and the two before that are M
+        '''
+        logger.debug(METHOD_ENTER_STR % names)
+        END_NAMES = ['sum', 'diff', 'flip']
+        logger.debug("Names at end of list: %s"% names[-3:])
+        if names[-3:] == END_NAMES:
+            self.plotSelections=[['Energy', names[-5], names[-4], names[-7], names[-6]],
+                                 ['Energy', names[-5], names[-4], names[-7], names[-6]]]
+            logger.debug("New plotSelections %s" % self.plotSelections )
     
     @qtCore.pyqtSlot(int)
     def choiceSelectorChanged(self, newType):
@@ -133,9 +146,3 @@ class NonLockinXMCDChoices(AbstractChoices):
         logger.debug("axisIndexes %s" % axisIndex)
         return axisIndex
     
-#     def getDataLabels(self):
-#         plotTypes = self.plotSelector.currentText().split("/")
-#         labels = ['E', ]
-#         labels.extend(plotTypes)
-#         logger.debug("labels %s" % labels)
-#         return labels
