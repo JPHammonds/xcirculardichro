@@ -2,20 +2,26 @@
  Copyright (c) 2017, UChicago Argonne, LLC
  See LICENSE file.
 '''
-import logging
+import xcirculardichro
 from xcirculardichro.data.datanode import DataNode
 from xcirculardichro.data.intermediatescannode import IntermediateScanNode
 import PyQt5.QtWidgets as qtWidgets
 from xcirculardichro.data.filedatanode import FileDataNode
+from enum import Enum
+from xcirculardichro.config.loggingConfig import METHOD_ENTER_STR
 
+import logging
 logger = logging.getLogger(__name__)
 
 SELECTED_NODES = 'selectedNodes'
 DATA_SELECTION = 'dataSelection' 
+class DataSelectionTypes(Enum):
+    RAW, AVERAGED, STEP_NORMALIZED = range(3) 
 
 class IntermediateDataNode(FileDataNode):
     
-    def __init__(self, dataInfo, parent=None):
+
+    def __init__(self, dataInfo, parent=None, option=DataSelectionTypes.RAW):
 #         plotAxisLabels = self._dataSelections.getPlotAxisLabels()
 #         plotAxisLabelsIndex = self._dataSelections.getPlotAxisLabelsIndex()
         selectedNodes = dataInfo[SELECTED_NODES]
@@ -26,7 +32,7 @@ class IntermediateDataNode(FileDataNode):
         newNodeName = ""
         for node in selectedNodes:
             newNodeName += node.shortName()
-            newNodeName += (" - ")
+            newNodeName += (" - %s " % option.name)
             for scan in dataSelection.getSelectedScans():
                 newNodeName += scan + ", "
 
@@ -36,8 +42,98 @@ class IntermediateDataNode(FileDataNode):
 #         scanNodes = node.getScanNodes()
 #         scanNodeKeys = list(scanNodes.keys())
         logger.debug("selected nodes %s" % selectedNodes)
+        if option == DataSelectionTypes.RAW:
+            self.insertRawData(selectedNodes, dataSelection)
+        elif option == DataSelectionTypes.AVERAGED:
+            self.insertAveragedData(selectedNodes, dataSelection)
+        elif option == DataSelectionTypes.STEP_NORMALIZED:
+            self.insertStepNormalizedData(selectedNodes, dataSelection)
+    
+
+    def getAverageData(self, dataSelection):
+        counters, counterNames = dataSelection.getSelectedCounterInfo()
+        currentSelectedScans = dataSelection.getSelectedScans()
+        data = {}
+        scans = {}
+        dataOut = {}
+        dataSum = {}
+        dataAverage = []
+        for selectedScan in currentSelectedScans:
+            data[selectedScan] = []
+            dataOut[selectedScan] = {}
+        
+        for selectedScan in currentSelectedScans:
+            logger.debug("Adding scan %s type %s" % (selectedScan, type(selectedScan)))
+            node = dataSelection.getNodeContainingScan(selectedScan)
+            scans[selectedScan] = node.scans[selectedScan]
+            for counter in counterNames:
+                try:
+                    data[selectedScan].append(scans[selectedScan].data[counter][:])
+                except KeyError as ie:
+                    logger.exception("Tried to read data which does not have " + "counter %s. scan: %s Exception %s ", (counter, scans[selectedScan], ie))
+            
+            try:
+                dataOut[selectedScan] = dataSelection.calcPlotData(data[selectedScan])
+            except IndexError:
+                logger.warning("No data warning", "No data Was selected")
+            countIndex = range(1, len(dataOut[selectedScan]))
+            logger.debug("dataOut %s" % dataOut)
+            indices = range(len(dataOut))
+            logger.debug("Indices: %s " % indices)
+            for index in indices:
+                logger.debug("dataOut[%s]: %s, index: %s" % (selectedScan, dataOut, index))
+                if index == 0:
+                    dataSum[index] = dataOut[selectedScan][index][:]
+                else:
+                    try:
+                        if selectedScan == currentSelectedScans[0]:
+                            logger.debug("Adding index %s for scan %s" % (index, selectedScan))
+                            dataSum[index] = dataOut[selectedScan][index][:]
+                        else:
+                            logger.debug("Summing index %s for scan %s" % (index, selectedScan))
+                            dataSum[index] += dataOut[selectedScan][index][:]
+                    except ValueError as ve:
+                        logger.warning("Data Error", "Trouble mixing data " + "from differnet scans" + "Common Cause is scans " + "have different number " + "of data points\n %s, " + " data[%] %s\n dataSum %s" % (str(ve), selectedScan, dataOut[selectedScan], dataSum))
+                    except KeyError as ke:
+                        logger.warning("KeyError %s, data[%s] %s\n dataSum %s" % (str(ke), selectedScan, dataOut[selectedScan], dataSum))
+        
+        for index in indices:
+            if index == 0: #X Axis
+                dataAverage.append(dataSum[index])
+            else:
+                dataAverage.append(dataSum[index][:] / len(currentSelectedScans)) # Average the y axes
+        
+        return dataAverage
+
+    def insertAveragedData(self, selectedNodes, dataSelection):    
+        logger.debug(METHOD_ENTER_STR % selectedNodes)
+        
+#            logger.debug("Adding Node %s" % node)
+        dataAverage = self.getAverageData(dataSelection)
+        counters, counterNames = dataSelection.getSelectedCounterInfo()
+        currentSelectedScans = dataSelection.getSelectedScans()
+        self.scans["Average %s" % str(currentSelectedScans)] = \
+            IntermediateScanNode("Average %s" % str(currentSelectedScans), 
+                                 parent=self)
+        axisLabels = dataSelection.getPlotAxisLabels()
+        axisLabelIndex = dataSelection.getPlotAxisLabelsIndex()
+        logger.debug("AxisLabels %s" % axisLabels)
+        logger.debug("axisLabelsIndex %s" % axisLabelIndex)
+        logger.debug("counterNames %s" % counterNames )
+        self.scans["Average %s" % str(currentSelectedScans)] \
+            .addData("Average %s" % str(currentSelectedScans), 
+                     "shared", 
+                     axisLabels, 
+                     axisLabelIndex, 
+                     dataAverage, 
+                     counterNames)
+            
+            
+    def insertRawData(self, selectedNodes, dataSelection):
+        logger.debug(METHOD_ENTER_STR % selectedNodes)
         for node in selectedNodes:
             logger.debug("Adding Node %s" % node)
+    
             dataOut = []
             for selectedScan in dataSelection.getSelectedScans():
                 data = []
@@ -51,22 +147,46 @@ class IntermediateDataNode(FileDataNode):
                     try:
                         data.append(node.scans[selectedScan].data[counter])
                     except KeyError as ie:
-                        logger.exception("Tried to load data which does" +
-                                     " not have counters selected."  +
-                                     "Multiple scans are selected and some" +
-                                     "may not have the selected counters " +
-                                     "Scan %s \n %s" % (str(selectedScan), str(ie)))
-                        
+                        logger.exception("Tried to load data which does" + 
+                                         " not have counters selected." + 
+                                         "Multiple scans are selected and some" + 
+                                         "may not have the selected counters " + 
+                                         "Scan %s \n %s" % 
+                                         (str(selectedScan), str(ie)))
+                
+                
                 try:
                     logger.debug("scan %s data %s" % (selectedScan, data))
                     dataOut = dataSelection.calcPlotData(data)
                 except IndexError:
-                    qtWidgets.QMessageBox.warning(self, "No Data Warning", 
-                                                  "No Data WasSelected")
+                    qtWidgets.QMessageBox.warning(self, "No Data Warning", "No Data WasSelected")
                 axisLabels = dataSelection.getPlotAxisLabels()
                 axisLabelIndex = dataSelection.getPlotAxisLabelsIndex()
-                self.scans[selectedScan].addData(scan.scanNum,  scan.scanCmd, axisLabels, axisLabelIndex, dataOut, counterNames)
-                
-        
+                self.scans[selectedScan].addData(scan.scanNum, scan.scanCmd, axisLabels, axisLabelIndex, dataOut, counterNames)
+
+    def insertStepNormalizedData(self, selectedNodes, dataSelection):
+        logger.debug(METHOD_ENTER_STR % selectedNodes)
+        dataAverage = self.getAverageData(dataSelection)
+        correctedData = dataSelection.getCorrectedData(dataAverage[0], dataAverage[1:])
+        counters, counterNames = dataSelection.getSelectedCounterInfo()
+        currentSelectedScans = dataSelection.getSelectedScans()
+        self.scans["%s %s" % (DataSelectionTypes.STEP_NORMALIZED.name, str(currentSelectedScans))] = \
+            IntermediateScanNode("%s %s" % (DataSelectionTypes.STEP_NORMALIZED.name, str(currentSelectedScans)), 
+                                 parent=self)
+        axisLabels = dataSelection.getPlotAxisLabels()
+        axisLabelIndex = dataSelection.getPlotAxisLabelsIndex()
+        logger.debug("AxisLabels %s" % axisLabels)
+        logger.debug("axisLabelsIndex %s" % axisLabelIndex)
+        logger.debug("counterNames %s" % counterNames )
+        self.scans["%s %s" % (DataSelectionTypes.STEP_NORMALIZED.name, str(currentSelectedScans))] \
+            .addData("%s %s" % (DataSelectionTypes.STEP_NORMALIZED.name, str(currentSelectedScans)), 
+                     "shared", 
+                     axisLabels, 
+                     axisLabelIndex, 
+                     dataAverage, 
+                     counterNames)
+            
     def shortName(self):
         return self._name
+    
+
