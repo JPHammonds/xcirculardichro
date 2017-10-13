@@ -47,6 +47,9 @@ class SelectionHolder(qtWidgets.QDialog):
     def calcPlotData(self, data):
         return self._selectionWidget.calcPlotData(data)
         
+    def getCorrectedData(self, x, y):
+        return self._selectionWidget.getCorrectedData(x, y)
+        
     def getNodeContainingScan(self, scan):
         return self._selectionWidget.getNodeContainingScan(scan)
     
@@ -89,13 +92,27 @@ class SelectionHolder(qtWidgets.QDialog):
     def handlePointSelectionTypeChanged(self, index):
         self.pointSelectionTypeChanged[int].emit(index)
         
-    def plotIndividualData(self):
-        return self._selectionWidget.plotIndividualData()
-    
-        
     def plotAverageData(self):
+        '''
+        Logical to determine if the plot of this type should be done.  Pass 
+        along to the selection widget
+        '''
         return self._selectionWidget.plotAverageData()
             
+    def plotCorrectedData(self):
+        '''
+        Logical to determine if the plot of this type should be done.  Pass 
+        along to the selection widget
+        '''
+        return self._selectionWidget.plotCorrectedData()
+    
+    def plotIndividualData(self):
+        '''
+        Logical to determine if the plot of this type should be done.  Pass 
+        along to the selection widget
+        '''
+        return self._selectionWidget.plotIndividualData()
+    
     def setLeftDataSelection(self, label, selection, average):
         logger.debug(METHOD_ENTER_STR % ((label, selection, average),))
         self._selectionWidget.setLeftDataSelection(label, selection, average)
