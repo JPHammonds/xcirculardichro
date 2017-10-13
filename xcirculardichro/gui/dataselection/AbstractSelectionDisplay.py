@@ -6,8 +6,7 @@ import logging
 from abc import ABC, abstractmethod, ABCMeta
 from PyQt5 import QtWidgets
 import PyQt5.QtCore as qtCore
-from xcirculardichro.config.loggingConfig import METHOD_ENTER_STR,\
-    METHOD_EXIT_STR
+from xcirculardichro import METHOD_ENTER_STR, METHOD_EXIT_STR
 from specguiutils import XMCDException
 logger = logging.getLogger(__name__)
 

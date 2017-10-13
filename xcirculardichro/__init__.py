@@ -1,3 +1,7 @@
+'''
+ Copyright (c) 2017, UChicago Argonne, LLC
+ See LICENSE file.
+'''
 import logging
 import logging.config
 import os
@@ -5,6 +9,8 @@ import traceback
 from configparser import NoSectionError
 
 LOGGER_NAME="xcirculardichro"
+METHOD_ENTER_STR = "Enter %s\n-------------------"
+METHOD_EXIT_STR = "Exit %s\n---------------------"
 LOGGER_DEFAULT = {
     'version' : 1,
     'handlers' : {'consoleHandler' : {'class' : 'logging.StreamHandler',

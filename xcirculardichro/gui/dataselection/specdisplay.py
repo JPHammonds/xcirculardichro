@@ -10,7 +10,7 @@ from specguiutils.scantypeselector import ScanTypeSelector, SCAN_TYPES
 from specguiutils.scanbrowser import ScanBrowser
 from specguiutils.counterselector import CounterSelector
 from xcirculardichro.gui.choices.choiceholder import ChoiceHolder
-from xcirculardichro.config.loggingConfig import METHOD_ENTER_STR,\
+from xcirculardichro import METHOD_ENTER_STR,\
     METHOD_EXIT_STR
 from xcirculardichro.gui.dataselection.AbstractSelectionDisplay import AbstractSelectionDisplay
 from PyQt5.QtWidgets import QAbstractItemView
@@ -110,7 +110,8 @@ class SpecDisplay(AbstractSelectionDisplay):
         counters = self.counterSelector.getSelectedCounters()
         names = self.counterSelector.getSelectedCounterNames(counters)
         currentScan = self.scanBrowser.getCurrentScan()
-        currentType = self._selectedNodes[0].getSpecDataFile().scans[str(currentScan)].scanCmd.split()[0]
+        currentType = self._selectedNodes[0].getSpecDataFile(). \
+            scans[str(currentScan)].scanCmd.split()[0]
         
         self.storePlotSelections(currentType)
         
@@ -128,7 +129,8 @@ class SpecDisplay(AbstractSelectionDisplay):
         typeNames = self.typeSelector.getTypeNames()
         specFile = self._selectedNodes[0].getSpecDataFile()
         if (optIndex == 1 and value ==True):
-            energyData = specFile.getSpecDataFile().scans[self.selectedScans[0]].data['Energy']
+            energyData = specFile.getSpecDataFile(). \
+                scans[self.selectedScans[0]].data['Energy']
             data = specFile.scans[self.selectedScans[0]].data[str(counterName)]
             #TODO: plot widget is external to this.   Need to raise signal to main window
             self.plotWidget.plot(energyData, data)
@@ -181,7 +183,8 @@ class SpecDisplay(AbstractSelectionDisplay):
         logger.debug("newScanType %s" % newScanType)
         
         self.subChoices.setChoiceWidgetByScanType(newScanType)
-        self.subChoices.setDefaultSelectionsFromCounterNames(specFile.scans[str(newScan)].L)
+        self.subChoices.setDefaultSelectionsFromCounterNames(
+            specFile.scans[str(newScan)].L)
         self.counterSelector.counterModel. \
             initializeDataRows(self.subChoices.choiceWidget.COUNTER_OPTS,
                                specFile.scans[str(newScan)].L)
@@ -199,8 +202,10 @@ class SpecDisplay(AbstractSelectionDisplay):
             self.currentSelections[newScanType])
         self.dataSelectionsChanged.emit()
         self.copyPickedPointsToData()
-        self.pointSelectionTypeChanged.emit(self.pointSelectionInfo.getPointSetType())
-        self.pointSelectionAxisChanged.emit(self.pointSelectionInfo.getAxisSelection())
+        self.pointSelectionTypeChanged.emit(
+            self.pointSelectionInfo.getPointSetType())
+        self.pointSelectionAxisChanged.emit(
+            self.pointSelectionInfo.getAxisSelection())
         
     '''
     Handle a sequence of operations when the contents of the scan browser 

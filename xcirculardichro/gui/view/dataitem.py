@@ -7,7 +7,7 @@ import PyQt5.QtGui as qtGui
 import PyQt5.QtWidgets as qtWidgets
 import PyQt5.QtCore as qtCore
 import logging
-from xcirculardichro.config.loggingConfig import METHOD_ENTER_STR
+from xcirculardichro import METHOD_ENTER_STR
 logger = logging.getLogger(__name__)
 
 class DataItem(qtGui.QStandardItem):

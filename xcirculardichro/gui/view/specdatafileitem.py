@@ -5,7 +5,7 @@
 '''
 
 import logging
-from xcirculardichro.config.loggingConfig import METHOD_ENTER_STR
+from xcirculardichro import METHOD_ENTER_STR
 logger = logging.getLogger(__name__)
 from xcirculardichro.gui.view.dataitem import DataItem
 

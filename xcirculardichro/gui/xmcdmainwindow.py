@@ -8,8 +8,7 @@ import PyQt5.QtWidgets as qtWidgets
 import PyQt5.QtCore as qtCore
 
 from spec2nexus.spec import SpecDataFile
-from xcirculardichro.config.loggingConfig import METHOD_ENTER_STR,\
-    METHOD_EXIT_STR
+from xcirculardichro import METHOD_ENTER_STR, METHOD_EXIT_STR
 from xcirculardichro.gui.xmcddatanavigator import XMCDDataNavigator
 from xcirculardichro.gui.plotwidget import PlotWidget
 from xcirculardichro.gui.dataselection.selectionholder import SelectionHolder

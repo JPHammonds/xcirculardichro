@@ -8,7 +8,7 @@ from xcirculardichro.gui.dataselection.AbstractSelectionDisplay import AbstractS
 import PyQt5.QtWidgets as qtWidgets
 import PyQt5.QtGui as qtGui
 import PyQt5.QtCore as qtCore
-from xcirculardichro.config.loggingConfig import METHOD_ENTER_STR
+from xcirculardichro import METHOD_ENTER_STR
 from xcirculardichro.gui.choices.intermediatechoices import IntermediateChoices
 from xcirculardichro.gui.dataselection.pointselectioninfo import PointSelectionInfo
 

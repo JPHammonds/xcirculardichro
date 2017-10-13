@@ -9,7 +9,7 @@ from xcirculardichro.gui.choices.undefinedchoices import UndefinedChoices
 import logging
 from xcirculardichro.gui.choices.nonlockinxmcdchoices import NonLockinXMCDChoices
 from xcirculardichro.gui.choices.lockinxmcdchoices import LockinXMCDChoices
-from xcirculardichro.config.loggingConfig import METHOD_ENTER_STR
+from xcirculardichro import METHOD_ENTER_STR
 logger = logging.getLogger(__name__)
 QXDICHRO = 'qxdichro'
 QXSCAN = 'qxscan'

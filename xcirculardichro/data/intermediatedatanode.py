@@ -8,7 +8,7 @@ from xcirculardichro.data.intermediatescannode import IntermediateScanNode
 import PyQt5.QtWidgets as qtWidgets
 from xcirculardichro.data.filedatanode import FileDataNode
 from enum import Enum
-from xcirculardichro.config.loggingConfig import METHOD_ENTER_STR
+from xcirculardichro import METHOD_ENTER_STR
 
 import logging
 logger = logging.getLogger(__name__)

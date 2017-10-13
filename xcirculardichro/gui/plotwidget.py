@@ -8,14 +8,13 @@ import PyQt5.QtCore as qtCore
 import PyQt5.QtGui as qtGui
 import logging
 import numpy as np
-from xcirculardichro.config.loggingConfig import METHOD_ENTER_STR,\
-    METHOD_EXIT_STR
+from xcirculardichro import METHOD_ENTER_STR, METHOD_EXIT_STR
 
 logger = logging.getLogger(__name__)
 
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 import matplotlib.pyplot as plt
-import math
+
 logger.setLevel(logging.DEBUG)
 '''
 Start from http://stackoverflow.com/questions/12459811/how-to-embed-matplotib-in-pyqt-for-dummies

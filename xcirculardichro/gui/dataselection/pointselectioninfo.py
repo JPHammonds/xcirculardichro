@@ -5,8 +5,7 @@
 import logging
 import PyQt5.QtWidgets as qtWidgets
 import PyQt5.QtCore as qtCore
-from xcirculardichro.config.loggingConfig import METHOD_ENTER_STR,\
-    METHOD_EXIT_STR
+from xcirculardichro import METHOD_ENTER_STR, METHOD_EXIT_STR
 logger = logging.getLogger(__name__)
 
 class PointSelectionInfo(qtWidgets.QDialog):

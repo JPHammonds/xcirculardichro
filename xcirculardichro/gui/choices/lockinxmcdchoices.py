@@ -8,7 +8,7 @@ import PyQt5.QtWidgets as qtWidgets
 import PyQt5.QtCore as qtCore
 from xcirculardichro.gui.choices.abstractchoices import AbstractChoices
 import logging
-from xcirculardichro.config.loggingConfig import METHOD_ENTER_STR
+from xcirculardichro import METHOD_ENTER_STR
 logger = logging.getLogger(__name__)
 
 PLOT_CHOICES = ["XAS/XMCD", ]

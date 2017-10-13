@@ -6,7 +6,7 @@ import logging
 import PyQt5.QtWidgets as qtWidgets
 import PyQt5.QtCore as qtCore
 from xcirculardichro.gui.dataselection.dummyselectiondisplay import DummySelectionDisplay
-from xcirculardichro.config.loggingConfig import METHOD_ENTER_STR
+from xcirculardichro import METHOD_ENTER_STR
 from xcirculardichro.data.specfiledatanode import SpecFileDataNode
 from xcirculardichro.gui.dataselection.specdisplay import SpecDisplay
 from xcirculardichro.data.intermediatedatanode import IntermediateDataNode
