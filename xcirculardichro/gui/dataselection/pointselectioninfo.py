@@ -49,12 +49,18 @@ class PointSelectionInfo(qtWidgets.QDialog):
     def getPointSetType(self):
         return self.pointSetSelector.currentIndex()
     
+    def getPointSetAverageLeft(self):
+        return self.pointSelections[self.POINT_SELECTIONS[0]].getAverage()
+    
+    def getPointSetAverageRight(self):
+        return self.pointSelections[self.POINT_SELECTIONS[1]].getAverage()
+    
     def getPointSetLeftPoints(self):
-        infoSet = self.pointSelections[self.POINT_SELECTIONS[0]]
+        infoSet = self.pointSelections[self.POINT_SELECTIONS[0]].getIndices()
         return infoSet
         
     def getPointSetRightPoints(self):
-        infoSet = self.pointSelections[self.POINT_SELECTIONS[1]]
+        infoSet = self.pointSelections[self.POINT_SELECTIONS[1]].getIndices()
         return infoSet
     
     @qtCore.pyqtSlot(int)
@@ -111,6 +117,9 @@ class PointSetInfo(qtWidgets.QDialog):
             indices.sort()
         logger.debug(METHOD_EXIT_STR %indices)
         return indices
+    
+    def getAverage(self):
+        return float(str(self.pointSetAverage.text()))
         
     def setIndices(self, indices):
         logger.debug(METHOD_ENTER_STR % indices)
