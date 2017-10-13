@@ -44,6 +44,10 @@ class AbstractSelectionDisplay(QtWidgets.QSplitter):
         raise NotImplementedError("Must subclass this and override this method")
         
     @abstractmethod
+    def getCorrectedData(self, x, y):
+        raise NotImplementedError("Must subclass this and override this method")
+        
+    @abstractmethod
     def getPlotAxisLabels(self):
         raise NotImplementedError("Must subclass this and override this method")
         
@@ -69,13 +73,26 @@ class AbstractSelectionDisplay(QtWidgets.QSplitter):
         raise NotImplementedError("Must subclass this and override this method")
         
     @abstractmethod
-    def plotIndividualData(self):
-        raise NotImplementedError("Must subclass this and override this method")
-        
-    @abstractmethod
     def plotAverageData(self):
+        '''
+        Logical to determine if the plot of this type should be done. 
+        '''
         raise NotImplementedError("Must subclass this and override this method")
             
+    @abstractmethod
+    def plotCorrectedData(self):
+        '''
+        Logical to determine if the plot of this type should be done. 
+        '''
+        raise NotImplementedError("Must subclass this and override this method")
+
+    @abstractmethod
+    def plotIndividualData(self):
+        '''
+        Logical to determine if the plot of this type should be done. 
+        '''
+        raise NotImplementedError("Must subclass this and override this method")
+        
     def selectedNodes(self):
         return self._selectedNodes
     
