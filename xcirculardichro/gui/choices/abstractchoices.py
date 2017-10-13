@@ -50,6 +50,9 @@ class AbstractChoices(qtWidgets.QDialog):
         else:
             return False
         
+    def plotCorrectedData(self):
+        return False
+        
     @qtCore.pyqtSlot(int)
     def handlePlotChoiceChanged(self, index):
         logger.debug("Enter")

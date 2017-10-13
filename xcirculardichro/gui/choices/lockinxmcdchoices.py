@@ -36,6 +36,7 @@ class LockinXMCDChoices(AbstractChoices):
         self.plotSelections = DEFAULT_SELECTIONS
 
     def calcPlotData(self, data):
+        logger.debug(data)
         energy = np.array(data[0])
         xas = np.array(data[1])
         xmcd = np.array(data[2])
@@ -44,7 +45,14 @@ class LockinXMCDChoices(AbstractChoices):
         if str(self.plotSelector.currentText()) == PLOT_CHOICES[0]:
             retData = [energy, xas, xmcd] 
         return retData
-        
+
+    def calcCorrectedData(self, data, preEdge=None, postEdge=None):
+        xas = data[0]
+        xmcd = data[1]
+        xasCor = (xas-preEdge)/(postEdge-preEdge)
+        xmcdCor = (xmcd)/(postEdge-preEdge)
+        return [xasCor, xmcdCor]
+
     def getPlotAxisLabels(self):
         labels = ["Energy",]
         labels.extend(str(self.plotSelector.currentText()).split('/'))
@@ -55,6 +63,10 @@ class LockinXMCDChoices(AbstractChoices):
         logger.debug("selections %s " % selections )
         return selections
         
+    @qtCore.pyqtSlot(int)
+    def plotCorrectedData(self):
+        return True
+
     def setPlotSelections(self, selections):
         self.plotSelections[0] = selections
         
