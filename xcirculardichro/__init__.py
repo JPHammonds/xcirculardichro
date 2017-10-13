@@ -29,12 +29,14 @@ logConfigFile = os.path.join(userDir, LOGGER_NAME + 'Log.config')
 if os.path.exists(logConfigFile):
     print ("logConfigFile " + logConfigFile )
     try:
-        logging.config.fileConfig(logConfigFile, )
+        logging.config.fileConfig(logConfigFile, disable_existing_loggers=False)
+        print("Success Openning logfile")
     except (NoSectionError,TypeError):
         print ("In Exception to load dictConfig package %s" % LOGGER_NAME)
         logging.config.dictConfig(LOGGER_DEFAULT)
     except KeyError as ex:
         print ("logfile %s was missing or had errant sections %s" %(logConfigFile, ex.args))
+
 else:
     logging.config.dictConfig(LOGGER_DEFAULT)
         
