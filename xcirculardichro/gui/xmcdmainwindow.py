@@ -13,7 +13,8 @@ from xcirculardichro.config.loggingConfig import METHOD_ENTER_STR,\
 from xcirculardichro.gui.xmcddatanavigator import XMCDDataNavigator
 from xcirculardichro.gui.plotwidget import PlotWidget
 from xcirculardichro.gui.dataselection.selectionholder import SelectionHolder
-from xcirculardichro.data.intermediatedatanode import SELECTED_NODES
+from xcirculardichro.data.intermediatedatanode import SELECTED_NODES,\
+    DataSelectionTypes
 
 logger = logging.getLogger(__name__)
 
@@ -82,6 +83,9 @@ class XMCDMainWindow(qtWidgets.QMainWindow):
         
         captureCurrentAverageAction = qtWidgets.QAction("Capture Current Average", self)
         captureCurrentAverageAction.triggered.connect(self.captureCurrentAverage)
+
+        captureCurrentCorrectedAction = qtWidgets.QAction("Capture Current Corrected", self)
+        captureCurrentCorrectedAction.triggered.connect(self.captureCurrentCorrected)
         
         exitAction = qtWidgets.QAction("Exit", self)
         exitAction.setShortcut('Ctrl+Q')
@@ -97,18 +101,29 @@ class XMCDMainWindow(qtWidgets.QMainWindow):
         fileMenu.addAction(exitAction)
 
         dataMenu.addAction(captureCurrentAction)
+        dataMenu.addAction(captureCurrentAverageAction)
+        dataMenu.addAction(captureCurrentCorrectedAction)
         
     @qtCore.pyqtSlot() 
     def captureCurrent(self):
         logger.debug(METHOD_ENTER_STR)
         dataSelection = self._dataSelections._selectionWidget
-        self._dataNavigator.addIntermediateDataNode(dataSelection)
+        self._dataNavigator.addIntermediateDataNode(dataSelection, \
+                                                    option=DataSelectionTypes.RAW)
         
     @qtCore.pyqtSlot() 
     def captureCurrentAverage(self):
         logger.debug(METHOD_ENTER_STR)
         dataSelection = self._dataSelections._selectionWidget
-        self._dataNavigator.addIntermediateDataNode(dataSelection)
+        self._dataNavigator.addIntermediateDataNode(dataSelection, \
+                                                    option=DataSelectionTypes.AVERAGED)
+        
+    @qtCore.pyqtSlot() 
+    def captureCurrentCorrected(self):
+        logger.debug(METHOD_ENTER_STR)
+        dataSelection = self._dataSelections._selectionWidget
+        self._dataNavigator.addIntermediateDataNode(dataSelection, \
+                                                    option=DataSelectionTypes.STEP_NORMALIZED)
         
     @qtCore.pyqtSlot()
     def closeFile(self):
@@ -146,6 +161,7 @@ class XMCDMainWindow(qtWidgets.QMainWindow):
         average = self._plotWidget.getRightSelectionAverage(label)
         self._dataSelections.setRightDataSelection(label, selection, average)
         #self.updatePlotData()
+        
         
     @qtCore.pyqtSlot(qtCore.QModelIndex, qtCore.QModelIndex)
     def handleNavigatorDataChanged(self, beginIndex, endIndex):
@@ -187,10 +203,10 @@ class XMCDMainWindow(qtWidgets.QMainWindow):
     def saveAsFile(self):
         logger.debug(METHOD_ENTER_STR)
         
-    '''
-    Performs all updates to the plots given real data.
-    '''
     def updatePlotData(self):
+        '''
+        Performs all updates to the plots given real data.
+        '''
         counters, counterNames = self._dataSelections.getSelectedCounterInfo()
         logger.debug("Data selected for this plot %s" % counters)
         if not self._dataSelections.isMultipleScansSelected():
@@ -201,11 +217,11 @@ class XMCDMainWindow(qtWidgets.QMainWindow):
         else:
             self.updatePlotDataMultiple(counters, counterNames)
             
-    '''
-    Handle updating the plot window when multiple scans are selected
-    '''
     def updatePlotDataMultiple(self, counters, counterNames, 
                                displayAverage=True, displayEach=True):
+        '''
+        Handle updating the plot window when multiple scans are selected
+        '''
         logger.debug(METHOD_ENTER_STR % ((counters, counterNames),))
         data = {}
         dataOut = {}
@@ -263,10 +279,6 @@ class XMCDMainWindow(qtWidgets.QMainWindow):
             else:
                 for index in countIndex:
                     logger.debug("dataSum[%d] %s" % (index,dataSum[index]))
-#                     logger.debug("dataSum[index].shape %s" % 
-#                                  dataSum[index].shape)
-#                     logger.debug("dataOut[scan][index].shape %s" % 
-#                                  dataOut[scan][index].shape)
                     try:
                         dataSum[index] += dataOut[scan][index][:]
                     except ValueError as ve:
@@ -279,19 +291,45 @@ class XMCDMainWindow(qtWidgets.QMainWindow):
                                                    str(ve))
                        
         if self._dataSelections.plotAverageData():
+            dataAverageArray = []
             for index in countIndex:
                 dataAverage = dataSum[index][:]/len(selectedScans)
                 plotDataLabel = self._dataSelections.getPlotAxisLabels()
                 dataLabel = "%s - Avg" % plotDataLabel[index] 
                 if axisLabelIndex[index] == 1:
-                    self._plotWidget.plotAx1Average(dataOut[scan][0], dataAverage, dataLabel)
+                    self._plotWidget.plotAx1Average(dataOut[scan][0], 
+                                                    dataAverage, 
+                                                    dataLabel)
                 if axisLabelIndex[index] == 2:
-                    self._plotWidget.plotAx2Average(dataOut[scan][0], dataAverage, dataLabel)
+                    self._plotWidget.plotAx2Average(dataOut[scan][0], 
+                                                    dataAverage, 
+                                                    dataLabel)
+                dataAverageArray.append(dataAverage)
+            if self._dataSelections.plotCorrectedData():
+                correctedData = \
+                    self._dataSelections.getCorrectedData(dataOut[scan][0], \
+                                                          dataAverageArray)
+                logger.debug("Corrected Data: %s" % correctedData)
+                for index in countIndex:
+                    logger.debug("index %s " % index)
+                    dataLabel = "%s - Corrected" % plotDataLabel[index]
+                    
+                    if axisLabelIndex[index] == 1:
+                        self._plotWidget.plotAx3Corrected(dataOut[scan][0],
+                                                          correctedData[index-1],
+                                                          dataLabel)
+                    elif axisLabelIndex[index] == 2:
+                        self._plotWidget.plotAx4Corrected(dataOut[scan][0],
+                                                          correctedData[index-1],
+                                                          dataLabel)
+                        
+        
         self._plotWidget.plotDraw()                            
-    '''
-    Handle updating the plot window when only one scan is selected
-    '''        
+
     def updatePlotDataSingle(self, counters, counterNames):
+        '''
+        Handle updating the plot window when only one scan is selected
+        '''        
         logger.debug(METHOD_ENTER_STR % ((counters, counterNames), ))
         data = []
         dataOut = []
@@ -335,6 +373,25 @@ class XMCDMainWindow(qtWidgets.QMainWindow):
                 logger.debug("plotAxisLabels: %s" % plotAxisLabels)
                 self._plotWidget.setXLabel(plotAxisLabels[0])
                 self._plotWidget.setY2Label(plotAxisLabels[index])
+
+        if self._dataSelections.plotCorrectedData():
+            correctedData = \
+                self._dataSelections.getCorrectedData(dataOut[0], \
+                                                      dataOut[1:])
+            plotDataLabel = self._dataSelections.getPlotAxisLabels()
+            logger.debug("Corrected Data: %s" % correctedData)
+            for index in countIndex:
+                logger.debug("index %s " % index)
+                dataLabel = "%s - Corrected" % plotDataLabel[index]
+                
+                if axisLabelIndex[index] == 1:
+                    self._plotWidget.plotAx3Corrected(dataOut[0],
+                                                      correctedData[index-1],
+                                                      dataLabel)
+                elif axisLabelIndex[index] == 2:
+                    self._plotWidget.plotAx4Corrected(dataOut[0],
+                                                      correctedData[index-1],
+                                                      dataLabel)
         
         self._plotWidget.plotDraw()
                    
