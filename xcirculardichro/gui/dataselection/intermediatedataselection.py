@@ -104,6 +104,9 @@ class IntermediateDataSelection(AbstractSelectionDisplay):
     def plotAverageData(self):
         return self.subChoices.plotAverageData()
 
+    def plotCorrectedData(self):
+        return False
+        
     def setLeftDataSelection(self, label, selection, average):
         logger.debug(METHOD_ENTER_STR % ((label, selection, average),))
         self.pointSelectionInfo.setSelectionAverage(PointSelectionInfo.POINT_SELECTIONS[0], average)
