@@ -10,7 +10,8 @@ from specguiutils.scantypeselector import ScanTypeSelector, SCAN_TYPES
 from specguiutils.scanbrowser import ScanBrowser
 from specguiutils.counterselector import CounterSelector
 from xcirculardichro.gui.choices.choiceholder import ChoiceHolder
-from xcirculardichro.config.loggingConfig import METHOD_ENTER_STR
+from xcirculardichro.config.loggingConfig import METHOD_ENTER_STR,\
+    METHOD_EXIT_STR
 from xcirculardichro.gui.dataselection.AbstractSelectionDisplay import AbstractSelectionDisplay
 from PyQt5.QtWidgets import QAbstractItemView
 from xcirculardichro.gui.dataselection.pointselectioninfo import PointSelectionInfo
@@ -63,6 +64,16 @@ class SpecDisplay(AbstractSelectionDisplay):
         rightIndices = self.pointSelectionInfo.pointSelections[PointSelectionInfo.POINT_SELECTIONS[1]].getIndices()
         logger.debug("Points to copy to another Left: %s Right: %s" % (leftIndices, rightIndices) )
         self.pointSelectionReloadPicks.emit(leftIndices, rightIndices)
+
+    def getCorrectedData(self, x, y):
+        logger.debug(METHOD_ENTER_STR)
+        preEdge1 = self.pointSelectionInfo.getPointSetAverageLeft()
+        logger.debug("preEdge: %s" % preEdge1)
+        postEdge1 = self.pointSelectionInfo.getPointSetAverageRight()
+        logger.debug("postEdge: %s" % postEdge1)
+        return self.subChoices.calcCorrectedData(y, \
+                                                 preEdge=preEdge1, \
+                                                 postEdge=postEdge1)
         
     def getPlotAxisLabels(self):
         return self.subChoices.choiceWidget.getPlotAxisLabels()
@@ -77,7 +88,9 @@ class SpecDisplay(AbstractSelectionDisplay):
         scanTypes = set()
         for scan in specFile.scans:
             scanTypes.add(specFile.scans[scan].scanCmd.split()[0])
-        return list(scanTypes)
+        scanTypes = list(scanTypes)
+        scanTypes.sort()
+        return scanTypes
         
     def getSelectedCounterInfo(self):
         counters = self.counterSelector.getSelectedCounters()
@@ -232,18 +245,26 @@ class SpecDisplay(AbstractSelectionDisplay):
         
     def plotAverageData(self):
         return self.subChoices.plotAverageData()
-            
-    '''
-    Called when the user selects a scan type from the ScanTypeSelector
-    This should should modify the list shown in the ScanBrowser so that 
-    only that type of scan is shown in the browser.  This user should be 
-    able to change between specific types or all types.  This should also
-    switch the browser in/out of multi selection mode.
-    '''
+   
+    def plotCorrectedData(self):
+        logger.debug(METHOD_ENTER_STR)
+        decision = (len(self.pointSelectionInfo.getPointSetLeftPoints()) > 0) and \
+            (len(self.pointSelectionInfo.getPointSetRightPoints()) > 0) and \
+            self.subChoices.plotCorrectedData()
+        logger.debug(METHOD_EXIT_STR % decision)
+        return decision 
+        
     @qtCore.pyqtSlot(int)
     def scanTypeSelected(self, newType, suppressFilter=False):
-        logger.debug(METHOD_ENTER_STR)
+        '''
+        Called when the user selects a scan type from the ScanTypeSelector
+        This should should modify the list shown in the ScanBrowser so that 
+        only that type of scan is shown in the browser.  This user should be 
+        able to change between specific types or all types.  This should also
+        switch the browser in/out of multi selection mode.
+        '''
         names = self.typeSelector.getTypeNames()
+        logger.debug(METHOD_ENTER_STR % names[newType])
         specFile = self._selectedNodes[0].getSpecDataFile()
         logger.debug ("filter for type %d from scan types %s" % \
                       (newType, str(names)))
