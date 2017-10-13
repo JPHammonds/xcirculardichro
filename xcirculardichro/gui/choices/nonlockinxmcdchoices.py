@@ -51,7 +51,7 @@ class NonLockinXMCDChoices(AbstractChoices):
         self.plotSelections = DEFAULT_SELECTIONS
 #         self.show()
         
-    def calcPlotData(self, data ):
+    def calcPlotData(self, data):
         logger.debug(METHOD_ENTER_STR % data)
         xasPlus = None
         xasMinus = None
