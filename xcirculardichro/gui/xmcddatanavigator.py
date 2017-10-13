@@ -2,7 +2,6 @@
  Copyright (c) 2017, UChicago Argonne, LLC
  See LICENSE file.
 '''
-import logging
 import PyQt5.QtWidgets as qtWidgets
 import PyQt5.QtCore as qtCore
 from xcirculardichro.config.loggingConfig import METHOD_ENTER_STR,\
@@ -14,8 +13,9 @@ from xcirculardichro.data.specfiledatanode import SpecFileDataNode
 #from xcirculardichro.gui.dataselection.specdisplay import SpecDisplay
 from xcirculardichro.data.intermediatedatanode import IntermediateDataNode,\
     SELECTED_NODES, DATA_SELECTION
-
+import logging
 logger = logging.getLogger(__name__)
+
 
 class XMCDDataNavigator(qtWidgets.QDialog):
     
@@ -23,7 +23,7 @@ class XMCDDataNavigator(qtWidgets.QDialog):
 
     def __init__(self, parent=None):
         super(XMCDDataNavigator, self).__init__(parent=parent)
-        logging.debug(METHOD_ENTER_STR)
+        logger.debug(METHOD_ENTER_STR)
         layout = qtWidgets.QHBoxLayout()
 
         self._rootNode = DataNode("/")
@@ -56,11 +56,12 @@ class XMCDDataNavigator(qtWidgets.QDialog):
         
         logger.debug
         
-    def addIntermediateDataNode(self, dataSelection):
+    def addIntermediateDataNode(self, dataSelection, option=None):
         logger.debug(METHOD_ENTER_STR % dataSelection)
         dataInfo = {SELECTED_NODES: self.getSelectedNodes(), 
                     DATA_SELECTION: dataSelection}
-        node = IntermediateDataNode(dataInfo, parent = self._rootNode)
+        node = IntermediateDataNode(dataInfo, parent = self._rootNode, \
+                                    option=option)
         numCurrentNodes = self._rootNode.childCount()
         self._model.insertRows(numCurrentNodes, 1)
         
