@@ -10,6 +10,7 @@ import logging
 import numpy as np
 from xcirculardichro.config.loggingConfig import METHOD_ENTER_STR,\
     METHOD_EXIT_STR
+from cProfile import label
 
 logger = logging.getLogger(__name__)
 
@@ -82,8 +83,15 @@ class PlotWidget(qtWidgets.QDialog):
         self.disconnectSignals()
         self.ax = plt.subplot(1, 1, 1)
         self.ax2 = self.ax.twinx()
+        self.ax3 = self.ax.twinx()
+        self.ax4 = self.ax.twinx()
         self.ax.cla()
         self.ax2.cla()
+        self.ax3.cla()
+        self.ax4.cla()
+        self.figure.subplots_adjust(left=0.2,right=0.75)
+        self.ax3.spines['right'].set_position( ('axes',-0.2))
+        self.ax4.spines['right'].set_position(  ('axes',1.2))
         self.connectSignals()
         #self.ax2 = plt.subplot(1, 1, 1)
         
@@ -285,6 +293,10 @@ class PlotWidget(qtWidgets.QDialog):
         self.selector1[label].rightSelectionChanged[str].connect(self.handleRightSelectionChanged)
         self.selector1[label].leftSelectionChanged[str].connect(self.handleLeftSelectionChanged)
         
+    def plotAx3Corrected(self, x, y, label):
+        logger.debug(METHOD_ENTER_STR % ((x,y),))
+        line, = self.ax3.plot(x,y, label=label, linewidth=2)
+        #line.setp( line, linewidth = 2)
         
     def plotAx2(self, x, y, label):
         logger.debug(METHOD_ENTER_STR % ((x,y),))
@@ -294,7 +306,7 @@ class PlotWidget(qtWidgets.QDialog):
         self.selector2[label] = HighlightSelected(line, parent=self)
         self.selector2[label].rightSelectionChanged[str].connect(self.handleRightSelectionChanged)
         self.selector2[label].leftSelectionChanged[str].connect(self.handleLeftSelectionChanged)
-
+        
     def plotAx2Average(self, x, y, label):
         logger.debug(METHOD_ENTER_STR % ((x,y),))
         
@@ -305,9 +317,15 @@ class PlotWidget(qtWidgets.QDialog):
         self.selector2[label].rightSelectionChanged[str].connect(self.handleRightSelectionChanged)
         self.selector2[label].leftSelectionChanged[str].connect(self.handleLeftSelectionChanged)
         
+    def plotAx4Corrected(self, x, y, label):
+        logger.debug(METHOD_ENTER_STR % ((x,y),))
+        line, = self.ax4.plot(x,y, label=label, linestyle=":", linewidth=2)
+        
     def plotDraw(self):
         self.ax.legend(loc=2)
         self.ax2.legend(loc=1)
+        self.ax3.legend(loc=3)
+        self.ax4.legend(loc=4)
         self.canvas.draw()
         
     @qtCore.pyqtSlot(int)
@@ -376,8 +394,8 @@ class HighlightSelected(lines.VertexSelector, qtCore.QObject):
     def applyPickPoints(self, preEdgePoints, postEdgePoints):
         logger.debug(METHOD_ENTER_STR)
         print (METHOD_ENTER_STR % ((preEdgePoints, postEdgePoints, self.line._label),))
-        self.indLeft = preEdgePoints
-        self.indRight = postEdgePoints
+        self.indLeft = set(preEdgePoints)
+        self.indRight = set(postEdgePoints)
         xsAll, ysAll = self.line.get_data()
 
         try:
