@@ -13,6 +13,8 @@ from xcirculardichro.config.loggingConfig import METHOD_ENTER_STR
 logger = logging.getLogger(__name__)
 QXDICHRO = 'qxdichro'
 QXSCAN = 'qxscan'
+TEMPDICHRO = 'tempdichro'
+KEPDICHRO = 'kepdichro'
 
 class ChoiceHolder(qtWidgets.QDialog):
     
@@ -60,12 +62,21 @@ class ChoiceHolder(qtWidgets.QDialog):
     def choiceSelectionChanged(self, typeStr):
         self.subTypeChanged[int].emit(typeStr)
 
+    def calcCorrectedData(self, y, preEdge=None, postEdge=None):
+        logger.debug(METHOD_ENTER_STR % ((y,preEdge, postEdge),))
+        logger.debug("preEdge %s" % preEdge)
+        logger.debug("postEdge %s" % postEdge)
+        return self.choiceWidget.calcCorrectedData(y, preEdge = preEdge, postEdge = postEdge)
+        
     def getPlotSelections(self):
         logger.debug(METHOD_ENTER_STR)
         return self.choiceWidget.getPlotSelections()
 
     def plotAverageData(self):
         return self.choiceWidget.plotAverageData()
+    
+    def plotCorrectedData(self):
+        return self.choiceWidget.plotCorrectedData()
     
     def plotIndividualData(self):
         return self.choiceWidget.plotIndividualData()
@@ -81,6 +92,14 @@ class ChoiceHolder(qtWidgets.QDialog):
         if typeName == QXDICHRO:
             logger.debug("setting choice to non-lockin")
             self.setChoiceWidget(NonLockinXMCDChoices())
+        elif typeName == TEMPDICHRO:
+            logger.debug("setting choice to non-lockin tempdichro")
+            self.setChoiceWidget(NonLockinXMCDChoices())
+            self.choiceWidget.setDefaultSelectionsXName("Temperature")
+        elif typeName == KEPDICHRO:
+            logger.debug("setting choice to non-lockin kepdichro")
+            self.setChoiceWidget(NonLockinXMCDChoices())
+            self.choiceWidget.setDefaultSelectionsXName("KCurrVAL")
         elif typeName == QXSCAN:
             logger.debug("setting choice to lockin")
             self.setChoiceWidget(LockinXMCDChoices())
