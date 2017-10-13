@@ -16,7 +16,8 @@ CHOICES = ['Flourescence', 'Transmission']
 DEFAULT_SELECTIONS = [["Energy", "SCAtot2(+)", "SCAtot2(-)", "IC3(+)", "IC3(-)"], 
                       ["Energy", "IC5(+)", "IC5(-)", "IC4(+)", "IC5(-)"] ]
 PLOT_CHOICES = ["XAS/XMCD", "XAS+/XAS-/XAS/XMCD", "XAS+/XAS-", "D+/D-", "M+/M-"]
-    
+ZERO = 0.00000000
+ONE = 1.0000000
 
 class NonLockinXMCDChoices(AbstractChoices):
     COUNTER_OPTS = ["Energy", "D+", "D-", "M+", "M-"]
@@ -50,7 +51,7 @@ class NonLockinXMCDChoices(AbstractChoices):
         self.plotSelections = DEFAULT_SELECTIONS
 #         self.show()
         
-    def calcPlotData(self, data):
+    def calcPlotData(self, data ):
         logger.debug(METHOD_ENTER_STR % data)
         xasPlus = None
         xasMinus = None
@@ -85,6 +86,18 @@ class NonLockinXMCDChoices(AbstractChoices):
             retData = [energy, mPlus, mMinus]
         logger.debug(METHOD_EXIT_STR % retData)
         return retData
+
+    def calcCorrectedData(self, data, preEdge=None, postEdge=None):
+        logger.debug(METHOD_ENTER_STR, ((data,preEdge, postEdge),))
+        correctedData = []
+        xas = data[0]
+        xmcd = data[1]
+        correctedData.append((xas-preEdge)/(postEdge-preEdge))
+        correctedData.append((xmcd)/(postEdge-preEdge))
+#        correctedData = [xasCor, xmcdCor]
+        logger.debug(METHOD_EXIT_STR % correctedData)
+        return correctedData
+        
         
     def getPlotSelections(self):
         retSelections = self.plotSelections[self.choiceSelector.currentIndex()]
@@ -108,14 +121,18 @@ class NonLockinXMCDChoices(AbstractChoices):
         END_NAMES = ['sum', 'diff', 'flip']
         logger.debug("Names at end of list: %s"% names[-3:])
         if names[-3:] == END_NAMES:
-            self.plotSelections=[['Energy', names[-5], names[-4], names[-7], names[-6]],
-                                 ['Energy', names[-5], names[-4], names[-7], names[-6]]]
+            self.plotSelections=[[DEFAULT_SELECTIONS[0][0], names[-5], names[-4], names[-7], names[-6]],
+                                 [DEFAULT_SELECTIONS[1][0], names[-5], names[-4], names[-7], names[-6]]]
             logger.debug("New plotSelections %s" % self.plotSelections )
     
     @qtCore.pyqtSlot(int)
     def choiceSelectorChanged(self, newType):
         self.plotSelections = DEFAULT_SELECTIONS[newType]
         self.subTypeChanged[int].emit(newType)
+        
+    @qtCore.pyqtSlot(int)
+    def plotCorrectedData(self):
+        return True
         
     @qtCore.pyqtSlot(int)
     def plotSelectorChanged(self, newType):
@@ -145,4 +162,8 @@ class NonLockinXMCDChoices(AbstractChoices):
                 axisIndex.append(1)
         logger.debug("axisIndexes %s" % axisIndex)
         return axisIndex
-    
+        
+    def setDefaultSelectionsXName(self, xName):
+        DEFAULT_SELECTIONS[0][0] = xName
+        DEFAULT_SELECTIONS[1][0] = xName
+        
