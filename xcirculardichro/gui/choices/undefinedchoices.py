@@ -64,8 +64,6 @@ class UndefinedChoices(AbstractChoices):
             
         return axisIndex
 
-#     def getDataLabels(self):
-#         plotTypes = self.plotSelector.currentText().split("/")
-#         labels = ['E', ]
-#         labels.extend(plotTypes)
-#         return labels
+    def plotCorrectedData(self):
+        return False
+
