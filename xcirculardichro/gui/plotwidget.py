@@ -10,7 +10,6 @@ import logging
 import numpy as np
 from xcirculardichro.config.loggingConfig import METHOD_ENTER_STR,\
     METHOD_EXIT_STR
-from cProfile import label
 
 logger = logging.getLogger(__name__)
 
