@@ -259,6 +259,9 @@ class SpecDisplay(AbstractSelectionDisplay):
         logger.debug(METHOD_EXIT_STR % decision)
         return decision 
         
+    def plotNormalizedData(self):
+        return False
+
     @qtCore.pyqtSlot(int)
     def scanTypeSelected(self, newType, suppressFilter=False):
         '''

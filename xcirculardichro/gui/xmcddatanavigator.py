@@ -15,7 +15,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-class XMCDDataNavigator(qtWidgets.QDialog):
+class XMCDDataNavigator(qtWidgets.QWidget):
     
     dataSelectionChanged = qtCore.pyqtSignal(list, name="dataSelectionChanged")
 

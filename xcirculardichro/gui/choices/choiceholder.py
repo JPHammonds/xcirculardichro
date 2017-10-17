@@ -81,6 +81,9 @@ class ChoiceHolder(qtWidgets.QDialog):
     def plotIndividualData(self):
         return self.choiceWidget.plotIndividualData()
     
+    def plotNormalizedData(self):
+        return self.choiceWidget.plotNormalizedData()
+    
     @qtCore.pyqtSlot(int)
     def plotSelectionChanged(self, typeStr):
         self.plotTypeChanged[int].emit(typeStr)

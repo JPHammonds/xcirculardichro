@@ -37,6 +37,9 @@ class AbstractChoices(qtWidgets.QDialog):
         self.setLayout(layout)
 
     def plotIndividualData(self):
+        '''
+        Logical to return if individually selected data sets should be plotted
+        '''
         if (str(self.plotDataChoice.currentText()) == self.PLOT_OPTIONS[0]) or \
             (str(self.plotDataChoice.currentText()) == self.PLOT_OPTIONS[1]):
             return True
@@ -44,6 +47,10 @@ class AbstractChoices(qtWidgets.QDialog):
             return False
         
     def plotAverageData(self):
+        '''
+        Logical to return if simple average of selected data sets should be 
+        displayed
+        '''
         if (str(self.plotDataChoice.currentText()) == self.PLOT_OPTIONS[0]) or \
             (str(self.plotDataChoice.currentText()) == self.PLOT_OPTIONS[2]):
             return True
@@ -51,6 +58,18 @@ class AbstractChoices(qtWidgets.QDialog):
             return False
         
     def plotCorrectedData(self):
+        '''
+        Logical to return if This data type can return "Corrected" data such
+        as Step-Normalized data
+        '''
+        return False
+        
+    def plotNormalizedData(self):
+        '''
+        Logical to return if This data type can return "Normalized" should be 
+        returned (Average of 2 selected XAS & Difference of 2 XMCD) sets
+        return False
+        '''
         return False
         
     @qtCore.pyqtSlot(int)

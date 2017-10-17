@@ -92,6 +92,13 @@ class AbstractSelectionDisplay(QtWidgets.QSplitter):
         '''
         raise NotImplementedError("Must subclass this and override this method")
         
+    @abstractmethod
+    def plotNormalizedData(self):
+        '''
+        Logical to determine if the plot of this type should be done. 
+        '''
+        raise NotImplementedError("Must subclass this and override this method")
+        
     def selectedNodes(self):
         return self._selectedNodes
     

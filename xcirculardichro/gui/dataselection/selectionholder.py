@@ -14,7 +14,7 @@ from xcirculardichro.gui.dataselection.intermediatedataselection import Intermed
 from PyQt5.Qt import left
 logger = logging.getLogger(__name__)
 
-class SelectionHolder(qtWidgets.QDialog):
+class SelectionHolder(qtWidgets.QWidget):
     '''
     A place holder for holding options for selecting data to plot hand how to
     plot.  This class will pass along a list of selected data nodes to be 
@@ -113,6 +113,9 @@ class SelectionHolder(qtWidgets.QDialog):
         '''
         return self._selectionWidget.plotIndividualData()
     
+    def plotNormalizedData(self):
+        return self._selectionWidget.plotNormalizedData()
+        
     def setLeftDataSelection(self, label, selection, average):
         logger.debug(METHOD_ENTER_STR % ((label, selection, average),))
         self._selectionWidget.setLeftDataSelection(label, selection, average)
