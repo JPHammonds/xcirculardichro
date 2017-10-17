@@ -231,6 +231,8 @@ class XMCDMainWindow(qtWidgets.QMainWindow):
         selectedScans = self._dataSelections.getSelectedScans()
         logger.debug("SelectedScans %s" % selectedScans)
         
+        normalizedData = []
+
         for scan in selectedScans:
             data[scan] = []
             dataOut[scan] = []
@@ -289,6 +291,9 @@ class XMCDMainWindow(qtWidgets.QMainWindow):
                                                    "data points\n %s" %
                                                    str(ve))
                        
+        dataAverage = None
+        correctedData = None
+        
         if self._dataSelections.plotAverageData():
             dataAverageArray = []
             for index in countIndex:
@@ -321,7 +326,16 @@ class XMCDMainWindow(qtWidgets.QMainWindow):
                         self._plotWidget.plotAx4Corrected(dataOut[scan][0],
                                                           correctedData[index-1],
                                                           dataLabel)
-                        
+        if self._dataSelections.plotNormalizedData():
+            if len(selectedScans) == 2:
+                normalizedData.append(dataSum[1]/2)
+                normalizedData.append(data[selectedScans[0]][1] - data[selectedScans[1]][1])
+                self._plotWidget.plotAx1(dataOut[scan][0],
+                                         normalizedData[0],
+                                         "Normalized XAS")
+                self._plotWidget.plotAx2(dataOut[scan][0],
+                                         normalizedData[1],
+                                         "Normalized XMCD")
         
         self._plotWidget.plotDraw()                            
 
@@ -391,7 +405,7 @@ class XMCDMainWindow(qtWidgets.QMainWindow):
                     self._plotWidget.plotAx4Corrected(dataOut[0],
                                                       correctedData[index-1],
                                                       dataLabel)
-        
+                    
         self._plotWidget.plotDraw()
                    
         
