@@ -14,6 +14,7 @@ from xcirculardichro.gui.plotwidget import PlotWidget
 from xcirculardichro.gui.dataselection.selectionholder import SelectionHolder
 from xcirculardichro.data.intermediatedatanode import SELECTED_NODES,\
     DataSelectionTypes
+import os
 
 logger = logging.getLogger(__name__)
 
@@ -197,6 +198,16 @@ class XMCDMainWindow(qtWidgets.QMainWindow):
     @qtCore.pyqtSlot()
     def saveFile(self):
         logger.debug(METHOD_ENTER_STR)
+        selectedScan = self._dataSelections.getSelectedScans()[0]
+        logger.debug("First Selected Node %s" % selectedScan)
+        selectedName = self._dataSelections.getNodeContainingScan(selectedScan).getFileName()
+        logger.debug("selectedName %s" % selectedName)
+        folderOfSelected = os.path.dirname(str(selectedName))
+        logger.debug("First Selected File %s" % folderOfSelected)
+        
+        fileName = qtWidgets.QFileDialog.getSaveFileName(None, 'Save Selected Nodes', folderOfSelected)
+        
+        
         
     @qtCore.pyqtSlot()
     def saveAsFile(self):
@@ -329,11 +340,11 @@ class XMCDMainWindow(qtWidgets.QMainWindow):
         if self._dataSelections.plotNormalizedData():
             if len(selectedScans) == 2:
                 normalizedData.append(dataSum[1]/2)
-                normalizedData.append(data[selectedScans[0]][1] - data[selectedScans[1]][1])
-                self._plotWidget.plotAx1(dataOut[scan][0],
+                normalizedData.append(data[selectedScans[0]][2] - data[selectedScans[1]][2])
+                self._plotWidget.plotAx3Corrected(dataOut[scan][0],
                                          normalizedData[0],
                                          "Normalized XAS")
-                self._plotWidget.plotAx2(dataOut[scan][0],
+                self._plotWidget.plotAx4Corrected(dataOut[scan][0],
                                          normalizedData[1],
                                          "Normalized XMCD")
         
