@@ -6,10 +6,8 @@ import logging
 import PyQt5.QtWidgets as qtWidgets
 import PyQt5.QtGui as qtGui
 import PyQt5.QtCore as qtCore
-from xcirculardichro.config.loggingConfig import METHOD_ENTER_STR,\
-    METHOD_EXIT_STR
+from xcirculardichro import METHOD_ENTER_STR, METHOD_EXIT_STR
 from platform import node
-from xcirculardichro.data.datanode import DataNode
 from xcirculardichro.data.specscannode import SpecScanNode
 
 logger = logging.getLogger(__name__)
@@ -25,20 +23,20 @@ class XMCDDataNavigatorModel(qtCore.QAbstractItemModel):
         self._rootNode = root
 
     def columnCount(self, parent=qtCore.QModelIndex()):
-        logger.debug(METHOD_ENTER_STR)
+        #logger.debug(METHOD_ENTER_STR)
         return 1
     
     def rowCount(self, parent=qtCore.QModelIndex()):
-        logger.debug(METHOD_ENTER_STR)
+        #logger.debug(METHOD_ENTER_STR)
         if not parent.isValid():
             node = self._rootNode
         else:
             node = parent.internalPointer()
-        logger.debug(METHOD_EXIT_STR % node.childCount())
+        #logger.debug(METHOD_EXIT_STR % node.childCount())
         return node.childCount()
     
     def data(self, index, role=qtCore.Qt.DisplayRole):
-        logger.debug("index %s, role %s" %(index, role))
+        #logger.debug("index %s, role %s" %(index, role))
         if role <6:
             logger.debug(METHOD_ENTER_STR % self.roleNames()[role])
         if not index.isValid():
@@ -75,9 +73,9 @@ class XMCDDataNavigatorModel(qtCore.QAbstractItemModel):
         logger.debug(METHOD_ENTER_STR)
         
     def parent(self, index):
-        logger.debug(METHOD_ENTER_STR)
+        #logger.debug(METHOD_ENTER_STR)
         node = self.getNode(index)
-        logger.debug("Getting parent for node %s" % node)
+        #logger.debug("Getting parent for node %s" % node)
         parentNode = node.parent()
         if parentNode == self._rootNode:
             return qtCore.QModelIndex()
