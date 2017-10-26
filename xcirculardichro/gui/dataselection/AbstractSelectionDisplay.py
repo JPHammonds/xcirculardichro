@@ -55,6 +55,7 @@ class AbstractSelectionDisplay(QtWidgets.QSplitter):
 #         raise NotImplementedError("Must subclass this and override this method")
 
     def getNodeContainingScan(self, scan):
+        logging.debug(METHOD_EXIT_STR % scan)
         nodeContainingScan = self._selectedNodes[0]
         for node in self._selectedNodes:
             for scanInNode in node.scans:
