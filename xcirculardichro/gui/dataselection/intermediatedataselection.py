@@ -14,6 +14,7 @@ from xcirculardichro.gui.dataselection.pointselectioninfo import PointSelectionI
 
 SCAN_COL = 0
 CMD_COL = 1
+INVERT_COL = 2
 logger = logging.getLogger(__name__)
 
 class IntermediateDataSelection(AbstractSelectionDisplay):
@@ -49,13 +50,6 @@ class IntermediateDataSelection(AbstractSelectionDisplay):
         return retData
 #         return self._selectedNodes[0].scans[self.selectedScans[0]].data
         
-#     def getNodeContainingScan(self, scan):
-#         nodeContainingScan = self._selectedNodes[0]
-#         for node in self._selectedNodes:
-#             for scan in node.scans:
-#                 if self.selectedScans[0] == scan:
-#                     nodeContainingScan = node
-#         return nodeContainingScan
         
     def getPlotAxisLabels(self):
         logger.debug(METHOD_ENTER_STR)
@@ -124,6 +118,7 @@ class IntermediateDataSelection(AbstractSelectionDisplay):
         self.scanBrowser.clearBrowser()
         for node in self._selectedNodes:
             self.scanBrowser.appendNode(node)
+        self.scanBrowser.scanList.selectRow(0)
     
 
 class ScanBrowser(qtWidgets.QDialog):
@@ -134,10 +129,10 @@ class ScanBrowser(qtWidgets.QDialog):
         layout = qtWidgets.QHBoxLayout()
         #
         self.scanList = qtWidgets.QTableWidget()
-        self.scanList.setColumnCount(2)
+        self.scanList.setColumnCount(3)
         self.scanList.setEditTriggers(qtWidgets.QAbstractItemView.NoEditTriggers)
         self.scanList.setSelectionBehavior(qtWidgets.QAbstractItemView.SelectRows)
-        self.scanList.setHorizontalHeaderLabels(['S#', 'Command'])
+        self.scanList.setHorizontalHeaderLabels(['S#', 'Command', 'Invert'])
         font = qtGui.QFont("Helvetica", pointSize=10)
         self.scanList.setFont(font)
  
@@ -164,6 +159,9 @@ class ScanBrowser(qtWidgets.QDialog):
             self.scanList.setItem(row, 
                                   CMD_COL, 
                                   qtWidgets.QTableWidgetItem(str(node.scans[scanItem].scanCmd)))
+            self.scanList.setCellWidget(row,
+                                  INVERT_COL,
+                                  qtWidgets.QCheckBox())
         
     def clearBrowser(self):
         for row in range(self.scanList.rowCount()):
