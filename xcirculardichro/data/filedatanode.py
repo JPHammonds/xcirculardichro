@@ -13,4 +13,6 @@ class FileDataNode(DataNode):
     def getScanNodes(self):
         return self.scans
     
-    
+    def getFileName(self):
+        raise NotImplementedError("This method must be implemented in the " +
+                                  "subclass")

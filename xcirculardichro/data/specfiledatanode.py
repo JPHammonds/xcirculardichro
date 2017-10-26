@@ -38,3 +38,6 @@ class SpecFileDataNode(FileDataNode):
     def shortName(self):
         return os.path.split(self._specDataFile.fileName)[1]
     
+    def getFileName(self):
+        return self.getSpecDataFile().fileName
+    

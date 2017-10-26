@@ -28,6 +28,8 @@ class IntermediateDataNode(FileDataNode):
         dataSelection = dataInfo[DATA_SELECTION]
         logger.debug("selected nodes %s" % selectedNodes)
         logger.debug("data selection %s" % dataSelection)
+        self.fileName  = \
+            dataSelection.getNodeContainingScan(selectedNodes[0]).getFileName()
         
         newNodeName = ""
         for node in selectedNodes:
@@ -51,8 +53,10 @@ class IntermediateDataNode(FileDataNode):
     
 
     def getAverageData(self, dataSelection):
+        logger.debug(METHOD_ENTER_STR % dataSelection)
         counters, counterNames = dataSelection.getSelectedCounterInfo()
         currentSelectedScans = dataSelection.getSelectedScans()
+        logger.debug("SelectedScans: %s" % currentSelectedScans)
         data = {}
         scans = {}
         dataOut = {}
@@ -78,10 +82,10 @@ class IntermediateDataNode(FileDataNode):
                 logger.warning("No data warning", "No data Was selected")
             countIndex = range(1, len(dataOut[selectedScan]))
             logger.debug("dataOut %s" % dataOut)
-            indices = range(len(dataOut))
+            indices = range(len(dataOut[selectedScan]))
             logger.debug("Indices: %s " % indices)
             for index in indices:
-                logger.debug("dataOut[%s]: %s, index: %s" % (selectedScan, dataOut, index))
+                logger.debug("dataOut[%s]: %s, index: %s" % (selectedScan, dataOut[selectedScan], index))
                 if index == 0:
                     dataSum[index] = dataOut[selectedScan][index][:]
                 else:
@@ -104,6 +108,9 @@ class IntermediateDataNode(FileDataNode):
                 dataAverage.append(dataSum[index][:] / len(currentSelectedScans)) # Average the y axes
         
         return dataAverage
+
+    def getFileName(self):
+        return self.fileName
 
     def insertAveragedData(self, selectedNodes, dataSelection):    
         logger.debug(METHOD_ENTER_STR % selectedNodes)
