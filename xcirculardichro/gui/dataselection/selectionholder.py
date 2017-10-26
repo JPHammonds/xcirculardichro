@@ -51,6 +51,8 @@ class SelectionHolder(qtWidgets.QWidget):
         return self._selectionWidget.getCorrectedData(x, y)
         
     def getNodeContainingScan(self, scan):
+        logger.debug(METHOD_ENTER_STR % scan)
+        logger.debug("SelectionWidget %s" % self._selectionWidget)
         return self._selectionWidget.getNodeContainingScan(scan)
     
     def getPlotAxisLabels(self):
@@ -91,7 +93,7 @@ class SelectionHolder(qtWidgets.QWidget):
     @qtCore.pyqtSlot(int)   
     def handlePointSelectionTypeChanged(self, index):
         self.pointSelectionTypeChanged[int].emit(index)
-        
+         
     def plotAverageData(self):
         '''
         Logical to determine if the plot of this type should be done.  Pass 
