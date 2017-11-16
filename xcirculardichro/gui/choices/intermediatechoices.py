@@ -16,6 +16,14 @@ class IntermediateChoices(AbstractChoices):
     def __init__(self, parent=None):
         super(IntermediateChoices, self).__init__(parent=parent)
     
+    def calcStepCorrectedData(self, data, preEdge=None, postEdge=None):
+        xas = data[0]
+        xmcd = data[1]
+        xasCor = (xas-preEdge)/(postEdge-preEdge)
+        xmcdCor = (xmcd)/(postEdge-preEdge)
+        return [xasCor, xmcdCor]
+        
+    
     def plotIndividualData(self):
         '''
         Logical to return if individually selected data sets should be plotted
@@ -32,4 +40,5 @@ class IntermediateChoices(AbstractChoices):
            (str(self.plotDataChoice.currentText()) == self.PLOT_OPTIONS[4]):
             return True
         else:
-            return False    
+            return False
+        
