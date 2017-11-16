@@ -48,8 +48,17 @@ class IntermediateDataSelection(AbstractSelectionDisplay):
         for index in range(len(data)):
             retData.append(np.array(data[index][:]))
         return retData
-#         return self._selectedNodes[0].scans[self.selectedScans[0]].data
         
+        
+    def getCorrectedData(self, x, y):
+        logger.debug(METHOD_ENTER_STR)
+        preEdge1 = self.pointSelectionInfo.getPointSetAverageLeft()
+        logger.debug("preEdge: %s" % preEdge1)
+        postEdge1 = self.pointSelectionInfo.getPointSetAverageRight()
+        logger.debug("postEdge: %s" % postEdge1)
+        return self.subChoices.calcStepCorrectedData(y, \
+                                                 preEdge=preEdge1, \
+                                                 postEdge=postEdge1)
         
     def getPlotAxisLabels(self):
         logger.debug(METHOD_ENTER_STR)
@@ -92,6 +101,12 @@ class IntermediateDataSelection(AbstractSelectionDisplay):
         self.pointSelectionTypeChanged.emit(self.pointSelectionInfo.getPointSetType())
         self.pointSelectionAxisChanged.emit(self.pointSelectionInfo.getAxisSelection())
         
+    def hasPointSelectionWidget(self):
+        return self.pointSelectionInfo.hasValidPointSelectionData()
+    
+    def hasValidPointSelectionData(self):
+        return self.pointSelectionInfo.hasValidPointSelectionData()
+    
     def plotIndividualData(self):
         return self.subChoices.plotIndividualData()
         

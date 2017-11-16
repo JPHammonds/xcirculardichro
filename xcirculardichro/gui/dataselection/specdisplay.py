@@ -227,7 +227,11 @@ class SpecDisplay(AbstractSelectionDisplay):
     def handleSubTypeChanged(self, newType):
         logger.debug(METHOD_ENTER_STR % newType)
 
-        
+    def hasPointSelectionWidget(self):
+        return True
+    
+    def hasValidPointSelectionData(self):
+        return self.pointSelectionInfo.hasValidPointSelectionData()
 
     def isMultipleScansSelected(self):
         logger.debug(METHOD_ENTER_STR % self.selectedNodes)
@@ -244,7 +248,6 @@ class SpecDisplay(AbstractSelectionDisplay):
             self.scanBrowser.loadScans(specFile.scans, newFile=True)
             self.typeSelector.loadScans(self.getScanTypes(specFile))
             
-        
     def plotIndividualData(self):
         return self.subChoices.plotIndividualData()
         

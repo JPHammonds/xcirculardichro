@@ -33,6 +33,12 @@ class AbstractSelectionDisplay(QtWidgets.QSplitter):
         logger.debug(METHOD_ENTER_STR % index)
         self.pointSelectionAxisChanged[int].emit(index)
     
+    def hasPointSelectionWidget(self):
+        return False
+    
+    def hasValidPointSelectionData(self):
+        return False
+    
     @abstractmethod
     def isMultipleScansSelected(self):
         logger.debug(METHOD_ENTER_STR)

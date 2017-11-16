@@ -6,7 +6,7 @@ import logging
 import PyQt5.QtWidgets as qtWidgets
 import PyQt5.QtCore as qtCore
 from xcirculardichro.gui.dataselection.dummyselectiondisplay import DummySelectionDisplay
-from xcirculardichro import METHOD_ENTER_STR
+from xcirculardichro import METHOD_ENTER_STR, METHOD_EXIT_STR
 from xcirculardichro.data.specfiledatanode import SpecFileDataNode
 from xcirculardichro.gui.dataselection.specdisplay import SpecDisplay
 from xcirculardichro.data.intermediatedatanode import IntermediateDataNode
@@ -93,7 +93,15 @@ class SelectionHolder(qtWidgets.QWidget):
     @qtCore.pyqtSlot(int)   
     def handlePointSelectionTypeChanged(self, index):
         self.pointSelectionTypeChanged[int].emit(index)
-         
+ 
+    def hasValidPointSelectionInfo(self):
+        retValue = False
+        if self._selectionWidget.hasPointSelectionWidget() and  \
+            self._selectionWidget.hasValidPointSelectionData():
+            retValue = True
+        logger.debug(METHOD_EXIT_STR % retValue)
+        return retValue
+                
     def plotAverageData(self):
         '''
         Logical to determine if the plot of this type should be done.  Pass 

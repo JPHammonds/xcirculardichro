@@ -62,6 +62,20 @@ class PointSelectionInfo(qtWidgets.QDialog):
         infoSet = self.pointSelections[self.POINT_SELECTIONS[1]].getIndices()
         return infoSet
     
+    def hasValidPointSelectionData(self):
+        logger.debug(METHOD_ENTER_STR, 
+                     ((self.getPointSetLeftPoints(),
+                       self.getPointSetRightPoints()),))
+        retValue = False
+        if (len(self.getPointSetLeftPoints()) == 0) or \
+            (len(self.getPointSetRightPoints()) == 0):
+            logger
+            retValue = False
+        else:
+            retValue = True
+        logger.debug(METHOD_EXIT_STR % retValue)
+        return retValue
+        
     @qtCore.pyqtSlot(int)
     def handleAxisSelectionChanged(self, index):
         self.selectorAxisChanged[int].emit(index)
@@ -119,6 +133,7 @@ class PointSetInfo(qtWidgets.QDialog):
     
     def getAverage(self):
         return float(str(self.pointSetAverage.text()))
+        
         
     def setIndices(self, indices):
         logger.debug(METHOD_ENTER_STR % indices)
