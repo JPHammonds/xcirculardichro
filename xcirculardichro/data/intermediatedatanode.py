@@ -2,8 +2,6 @@
  Copyright (c) 2017, UChicago Argonne, LLC
  See LICENSE file.
 '''
-import xcirculardichro
-from xcirculardichro.data.datanode import DataNode
 from xcirculardichro.data.intermediatescannode import IntermediateScanNode
 import PyQt5.QtWidgets as qtWidgets
 from xcirculardichro.data.filedatanode import FileDataNode
@@ -62,6 +60,8 @@ class IntermediateDataNode(FileDataNode):
         dataOut = {}
         dataSum = {}
         dataAverage = []
+        indices = []
+        
         for selectedScan in currentSelectedScans:
             data[selectedScan] = []
             dataOut[selectedScan] = {}
@@ -177,6 +177,8 @@ class IntermediateDataNode(FileDataNode):
         correctedData = dataSelection.getCorrectedData(dataAverage[0], dataAverage[1:])
         counters, counterNames = dataSelection.getSelectedCounterInfo()
         currentSelectedScans = dataSelection.getSelectedScans()
+        logger.debug("Average Data %s" % dataAverage)
+        logger.debug("CorrectedData %s" % correctedData) 
         self.scans["%s %s" % (DataSelectionTypes.STEP_NORMALIZED.name, str(currentSelectedScans))] = \
             IntermediateScanNode("%s %s" % (DataSelectionTypes.STEP_NORMALIZED.name, str(currentSelectedScans)), 
                                  parent=self)
@@ -185,12 +187,13 @@ class IntermediateDataNode(FileDataNode):
         logger.debug("AxisLabels %s" % axisLabels)
         logger.debug("axisLabelsIndex %s" % axisLabelIndex)
         logger.debug("counterNames %s" % counterNames )
+        correctedData.insert(0, dataAverage[0])
         self.scans["%s %s" % (DataSelectionTypes.STEP_NORMALIZED.name, str(currentSelectedScans))] \
             .addData("%s %s" % (DataSelectionTypes.STEP_NORMALIZED.name, str(currentSelectedScans)), 
                      "shared", 
                      axisLabels, 
                      axisLabelIndex, 
-                     dataAverage, 
+                     correctedData, 
                      counterNames)
             
     def shortName(self):
