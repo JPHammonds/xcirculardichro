@@ -15,3 +15,21 @@ class ScanDataNode(DataNode):
         self.axisLabelIndex = []
         self.counterNames = []
         self.scanCmd = None
+        
+    def getAxisLabels(self):
+        return self.axisLabels
+    
+    def getAxisLabelIndex(self):
+        return self.axisLabelIndex
+    
+    def getCounterNames(self):
+        return self.counterNames
+    
+    def getScanCommand(self):
+        return self.scanCmd
+    
+    def getScanNumber(self):
+        return self.scanNum
+    
+    def getData(self):
+        return self.data
