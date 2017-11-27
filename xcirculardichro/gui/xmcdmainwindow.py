@@ -7,7 +7,7 @@ import logging
 import PyQt5.QtWidgets as qtWidgets
 import PyQt5.QtCore as qtCore
 
-from spec2nexus.spec import SpecDataFile
+from spec2nexus.spec import SpecDataFile, NotASpecDataFile
 from xcirculardichro import METHOD_ENTER_STR, METHOD_EXIT_STR
 from xcirculardichro.gui.xmcddatanavigator import XMCDDataNavigator
 from xcirculardichro.gui.plotwidget import PlotWidget
@@ -15,6 +15,9 @@ from xcirculardichro.gui.dataselection.selectionholder import SelectionHolder
 from xcirculardichro.data.intermediatedatanode import SELECTED_NODES,\
     DataSelectionTypes
 import os
+from xcirculardichro.writer.intermediatecsvwriter import IntermediateCSVWriter
+from xcirculardichro.gui.dataselection.AbstractSelectionDisplay import SelectionTypeNames
+from specguiutils.positionerselector import PositionerSelector
 
 logger = logging.getLogger(__name__)
 
@@ -30,6 +33,7 @@ class XMCDMainWindow(qtWidgets.QMainWindow):
         logger.debug(METHOD_ENTER_STR)
         self.setAttribute(qtCore.Qt.WA_DeleteOnClose)
         self._createMenuBar()
+        self.positionersToDisplay = []
         splitter = qtWidgets.QSplitter()
         
         self._dataNavigator = XMCDDataNavigator()
@@ -61,6 +65,7 @@ class XMCDMainWindow(qtWidgets.QMainWindow):
         menuBar = self.menuBar()
         menuBar.setNativeMenuBar(False)
         fileMenu = menuBar.addMenu('File')
+        viewMenu = menuBar.addMenu('View')
         dataMenu = menuBar.addMenu('Data')
         
         openAction = qtWidgets.QAction("Open", self)
@@ -78,14 +83,20 @@ class XMCDMainWindow(qtWidgets.QMainWindow):
         closeAction = qtWidgets.QAction("Close", self)
         closeAction.triggered.connect(self.closeFile)
 
-        captureCurrentAction = qtWidgets.QAction("Capture Current", self)
-        captureCurrentAction.triggered.connect(self.captureCurrent)
-        
-        captureCurrentAverageAction = qtWidgets.QAction("Capture Current Average", self)
-        captureCurrentAverageAction.triggered.connect(self.captureCurrentAverage)
+        self.selectBrowserParams = \
+            qtWidgets.QAction("SelectBrowserParameters", self)
+        self.selectBrowserParams.triggered.connect(self._selectBrowserParameters)
 
-        captureCurrentCorrectedAction = qtWidgets.QAction("Capture Current Corrected", self)
-        captureCurrentCorrectedAction.triggered.connect(self.captureCurrentCorrected)
+        self.captureCurrentAction = \
+            qtWidgets.QAction("Capture Current", self)
+        self.captureCurrentAction.triggered.connect(self.captureCurrent)
+        
+        self.captureCurrentAverageAction = \
+            qtWidgets.QAction("Capture Current Average", self)
+        self.captureCurrentAverageAction.triggered.connect(self.captureCurrentAverage)
+
+        self.captureCurrentCorrectedAction = qtWidgets.QAction("Capture Current Corrected", self)
+        self.captureCurrentCorrectedAction.triggered.connect(self.captureCurrentCorrected)
         
         exitAction = qtWidgets.QAction("Exit", self)
         exitAction.setShortcut('Ctrl+Q')
@@ -93,16 +104,49 @@ class XMCDMainWindow(qtWidgets.QMainWindow):
         
         fileMenu.addAction(openAction)
         fileMenu.addAction(saveAction)
-        fileMenu.addAction(saveAsAction)
+#        fileMenu.addAction(saveAsAction)
         fileMenu.addAction(closeAction)
         fileMenu.addSeparator()
         fileMenu.addAction(exportAction)
         fileMenu.addSeparator()
         fileMenu.addAction(exitAction)
 
-        dataMenu.addAction(captureCurrentAction)
-        dataMenu.addAction(captureCurrentAverageAction)
-        dataMenu.addAction(captureCurrentCorrectedAction)
+        viewMenu.addAction(self.selectBrowserParams)
+
+        dataMenu.addAction(self.captureCurrentAction)
+        dataMenu.addAction(self.captureCurrentAverageAction)
+        dataMenu.addAction(self.captureCurrentCorrectedAction)
+        
+        viewMenu.aboutToShow.connect(self._configureViewMenuEnable)
+        dataMenu.aboutToShow.connect(self._configureDataMenuEnable)
+        
+    @qtCore.pyqtSlot()
+    def _configureDataMenuEnable(self):
+        logger.debug(METHOD_ENTER_STR)
+        self.captureCurrentAction.setEnabled(True)
+        self.captureCurrentAverageAction.setEnabled(True)
+        self.captureCurrentCorrectedAction.setEnabled(True)
+        try:
+            if self._dataSelections.getSelectedScans() is None:
+                self.captureCurrentAction.setEnabled(False)
+                self.captureCurrentAverageAction.setEnabled(False)
+                self.captureCurrentCorrectedAction.setEnabled(False)
+            elif not self._dataSelections.isMultipleScansSelected():
+                self.captureCurrentAverageAction.setEnabled(False)
+            if not self._dataSelections.hasValidPointSelectionInfo():
+                self.captureCurrentCorrectedAction.setEnabled(False)
+        except NotImplementedError as ex:
+            self.captureCurrentAction.setEnabled(False)
+            self.captureCurrentAverageAction.setEnabled(False)
+            self.captureCurrentCorrectedAction.setEnabled(False)
+            
+    @qtCore.pyqtSlot()
+    def _configureViewMenuEnable(self):
+        logger.debug(METHOD_ENTER_STR)
+        if self._dataSelections.isSelectionType(SelectionTypeNames.SPEC_SELECTION):
+            self.selectBrowserParams.setEnabled(True)
+        else:
+            self.selectBrowserParams.setEnabled(False)
         
     @qtCore.pyqtSlot() 
     def captureCurrent(self):
@@ -168,7 +212,9 @@ class XMCDMainWindow(qtWidgets.QMainWindow):
         logger.debug("begin Index %s, endIndex %s" % (beginIndex, endIndex))
         checkedNodes = self._dataNavigator.model().getTopDataSelectedNodes()
         self._dataSelections.setSelectedNodes(checkedNodes)
-                
+        self._dataSelections.setPostionersToDisplay(self.positionersToDisplay)
+        self._dataSelections.handleDataSelectionsChanged()
+              
     def handlePointSelectionReloadPicks(self, preEdgePoints, postEdgePoints):
         logger.debug(METHOD_ENTER_STR % ((preEdgePoints, postEdgePoints, "a"),))
         self._plotWidget.applyPickPoints(preEdgePoints, postEdgePoints)     
@@ -200,18 +246,37 @@ class XMCDMainWindow(qtWidgets.QMainWindow):
         logger.debug(METHOD_ENTER_STR)
         selectedScan = self._dataSelections.getSelectedScans()[0]
         logger.debug("First Selected Node %s" % selectedScan)
-        selectedName = self._dataSelections.getNodeContainingScan(selectedScan).getFileName()
+        selectedName = \
+            self._dataSelections.getNodeContainingScan(selectedScan).getFileName()
         logger.debug("selectedName %s" % selectedName)
         folderOfSelected = os.path.dirname(str(selectedName))
         logger.debug("First Selected File %s" % folderOfSelected)
         
-        fileName = qtWidgets.QFileDialog.getSaveFileName(None, 'Save Selected Nodes', folderOfSelected)
+        fileName,junk = qtWidgets.QFileDialog.getSaveFileName(None, 
+                                                'Save Selected Nodes', 
+                                                folderOfSelected)
         
+        writer = IntermediateCSVWriter(str(fileName), \
+                                       selectionWidget=self._dataSelections)
         
+        selectedScans = self._dataSelections.getSelectedScans()
+        writer.writeNodes(selectedScans)
         
     @qtCore.pyqtSlot()
     def saveAsFile(self):
         logger.debug(METHOD_ENTER_STR)
+        
+    @qtCore.pyqtSlot()
+    def _selectBrowserParameters(self):
+        logger.debug(METHOD_ENTER_STR)
+        selectedScans = self._dataSelections.getSelectedScans()
+        firstNode = self._dataSelections.getNodeContainingScan(selectedScans[0])
+        specScan = firstNode.scans[selectedScans[0]]
+        parameters = specScan.positioner.keys()
+        logger.debug("Parameters %s" % parameters)
+        self.positionersToDisplay = PositionerSelector.getPositionSelectorModalDialog(specScan.positioner)
+        logger.debug("Positioners %s" % self.positionersToDisplay)
+        self._dataSelections.setPostionersToDisplay(self.positionersToDisplay)
         
     def updatePlotData(self):
         '''
@@ -388,12 +453,16 @@ class XMCDMainWindow(qtWidgets.QMainWindow):
             #logger.debug("index, len(counters)-1 %s, %s" % (index, len(counters)-1 ))
             if axisLabelIndex[index] == 1:
                 logger.debug("dataOut %s" %dataOut)
-                self._plotWidget.plotAx1(dataOut[0], dataOut[index], plotAxisLabels[index])
+                self._plotWidget.plotAx1(dataOut[0], 
+                                         dataOut[index], 
+                                         plotAxisLabels[index])
                 logger.debug("plotAxisLabels: %s" % plotAxisLabels)
                 self._plotWidget.setXLabel(plotAxisLabels[0])
                 self._plotWidget.setYLabel(plotAxisLabels[index])
             if axisLabelIndex[index] == 2:
-                self._plotWidget.plotAx2(dataOut[0], dataOut[index], plotAxisLabels[index])
+                self._plotWidget.plotAx2(dataOut[0], 
+                                         dataOut[index], 
+                                         plotAxisLabels[index])
                 logger.debug("plotAxisLabels: %s" % plotAxisLabels)
                 self._plotWidget.setXLabel(plotAxisLabels[0])
                 self._plotWidget.setY2Label(plotAxisLabels[index])
