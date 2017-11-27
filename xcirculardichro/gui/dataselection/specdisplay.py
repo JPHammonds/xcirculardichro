@@ -12,7 +12,8 @@ from specguiutils.counterselector import CounterSelector
 from xcirculardichro.gui.choices.choiceholder import ChoiceHolder
 from xcirculardichro import METHOD_ENTER_STR,\
     METHOD_EXIT_STR
-from xcirculardichro.gui.dataselection.AbstractSelectionDisplay import AbstractSelectionDisplay
+from xcirculardichro.gui.dataselection.AbstractSelectionDisplay import AbstractSelectionDisplay,\
+    SelectionTypeNames
 from PyQt5.QtWidgets import QAbstractItemView
 from xcirculardichro.gui.dataselection.pointselectioninfo import PointSelectionInfo
 
@@ -23,6 +24,7 @@ class SpecDisplay(AbstractSelectionDisplay):
     def __init__(self, parent=None):
         super(SpecDisplay, self).__init__(parent)
         
+        self.selectionType = SelectionTypeNames.SPEC_SELECTION
         self.selectedScans = []
         self.currentSelections = {}
         self.typeSelector = ScanTypeSelector()
@@ -245,6 +247,7 @@ class SpecDisplay(AbstractSelectionDisplay):
         if len(self._selectedNodes) == 1:
             logger.debug(type(self._selectedNodes[0]))
             specFile = self._selectedNodes[0].getSpecDataFile()
+            self.scanBrowser.setPositionersToDisplay(self.scanBrowser.positionersToDisplay)
             self.scanBrowser.loadScans(specFile.scans, newFile=True)
             self.typeSelector.loadScans(self.getScanTypes(specFile))
             
@@ -303,6 +306,10 @@ class SpecDisplay(AbstractSelectionDisplay):
         logger.debug(METHOD_ENTER_STR % ((label, selection, average),))
         self.pointSelectionInfo.setSelectionAverage(PointSelectionInfo.POINT_SELECTIONS[0], average)
         self.pointSelectionInfo.setSelectionIndices(PointSelectionInfo.POINT_SELECTIONS[0], selection)
+        
+    def setPositionersToDisplay(self, positioners):
+        logger.debug(METHOD_ENTER_STR, positioners)
+        self.scanBrowser.setPositionersToDisplay(positioners)
         
     def setRightDataSelection(self, label, selection, average):
         logger.debug(METHOD_ENTER_STR % ((label, selection, average),))

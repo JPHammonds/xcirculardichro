@@ -4,7 +4,8 @@
 '''
 import numpy as np
 import logging
-from xcirculardichro.gui.dataselection.AbstractSelectionDisplay import AbstractSelectionDisplay
+from xcirculardichro.gui.dataselection.AbstractSelectionDisplay import AbstractSelectionDisplay,\
+    SelectionTypeNames
 import PyQt5.QtWidgets as qtWidgets
 import PyQt5.QtGui as qtGui
 import PyQt5.QtCore as qtCore
@@ -21,6 +22,7 @@ class IntermediateDataSelection(AbstractSelectionDisplay):
     
     def __init__(self, parent=None):
         super(IntermediateDataSelection, self).__init__(parent=parent)
+        self.selectionType = SelectionTypeNames.INTERMEDIATE_SELECTION
         self.selectedScans = []
         self.scanBrowser = ScanBrowser()
         self.subChoices = IntermediateChoices()
@@ -124,6 +126,11 @@ class IntermediateDataSelection(AbstractSelectionDisplay):
         self.pointSelectionInfo.setSelectionAverage(PointSelectionInfo.POINT_SELECTIONS[0], average)
         self.pointSelectionInfo.setSelectionIndices(PointSelectionInfo.POINT_SELECTIONS[0], selection)
     
+    def setPositionersToDisplay(self):
+        self.debug(METHOD_ENTER_STR)
+        self.scanBrowser.setPostionersToDisplay()
+        
+        
     def setRightDataSelection(self, label, selection, average):
         logger.debug(METHOD_ENTER_STR % ((label, selection, average),))
         self.pointSelectionInfo.setSelectionAverage(PointSelectionInfo.POINT_SELECTIONS[1], average)
@@ -141,6 +148,7 @@ class ScanBrowser(qtWidgets.QDialog):
     
     def __init__(self, parent=None):
         super(ScanBrowser, self).__init__(parent=parent)
+        self.positionersToShow = []
         layout = qtWidgets.QHBoxLayout()
         #
         self.scanList = qtWidgets.QTableWidget()
@@ -192,3 +200,6 @@ class ScanBrowser(qtWidgets.QDialog):
                 scan = str(self.scanList.item(item.row(),0).text())
                 selectedScans.append(scan)
         self.scanSelected[list].emit(selectedScans)
+        
+    def setPositionersToShow(self, positioners):
+        self.positionersToShow = positioners

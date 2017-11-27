@@ -5,14 +5,16 @@
 import logging
 import PyQt5.QtWidgets as qtWidgets
 import PyQt5.QtCore as qtCore
-from xcirculardichro.gui.dataselection.dummyselectiondisplay import DummySelectionDisplay
+from xcirculardichro.gui.dataselection.dummyselectiondisplay import \
+    DummySelectionDisplay
+from xcirculardichro.gui.dataselection.specdisplay import SpecDisplay
+from xcirculardichro.gui.dataselection.intermediatedataselection import \
+    IntermediateDataSelection
 from xcirculardichro import METHOD_ENTER_STR, METHOD_EXIT_STR
 from xcirculardichro.data.specfiledatanode import SpecFileDataNode
-from xcirculardichro.gui.dataselection.specdisplay import SpecDisplay
 from xcirculardichro.data.intermediatedatanode import IntermediateDataNode
-from xcirculardichro.gui.dataselection.intermediatedataselection import IntermediateDataSelection
-from PyQt5.Qt import left
 logger = logging.getLogger(__name__)
+
 
 class SelectionHolder(qtWidgets.QWidget):
     '''
@@ -101,7 +103,10 @@ class SelectionHolder(qtWidgets.QWidget):
             retValue = True
         logger.debug(METHOD_EXIT_STR % retValue)
         return retValue
-                
+
+    def isSelectionType(self, selectionType):
+        return self._selectionWidget.isType(selectionType)
+                    
     def plotAverageData(self):
         '''
         Logical to determine if the plot of this type should be done.  Pass 
@@ -156,6 +161,9 @@ class SelectionHolder(qtWidgets.QWidget):
             self._selectionWidget.pointSelectionReloadPicks.connect(self.handlePointSelectionReloadPicks)
             logger.debug(self._selectionWidget)
             
+    def setPostionersToDisplay(self, positioners):
+        self._selectionWidget.setPositionersToDisplay(positioners)
+        
     def setSelectedNodes(self, selectedNodes):
         logger.debug(METHOD_ENTER_STR % selectedNodes)
         self._selectedNodes = selectedNodes
