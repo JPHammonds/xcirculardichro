@@ -8,7 +8,13 @@ from PyQt5 import QtWidgets
 import PyQt5.QtCore as qtCore
 from xcirculardichro import METHOD_ENTER_STR, METHOD_EXIT_STR
 from specguiutils import XMCDException
+from enum import Enum
 logger = logging.getLogger(__name__)
+
+class SelectionTypeNames(Enum):
+    DUMMY_SELECTION, SPEC_SELECTION, INTERMEDIATE_SELECTION = range(3)
+
+OVERRIDE_METHOD_STR ="Must subclass this and override this method"
 
 class AbstractSelectionDisplay(QtWidgets.QSplitter):
 
@@ -22,6 +28,7 @@ class AbstractSelectionDisplay(QtWidgets.QSplitter):
         super(AbstractSelectionDisplay, self).__init__(parent=parent)
         self.setOrientation(qtCore.Qt.Vertical)
         self._selectedNodes = []
+        self.selectionType = None
         
     @qtCore.pyqtSlot(int)
     def handleSelectorTypeChanged(self, index):
@@ -42,19 +49,19 @@ class AbstractSelectionDisplay(QtWidgets.QSplitter):
     @abstractmethod
     def isMultipleScansSelected(self):
         logger.debug(METHOD_ENTER_STR)
-        raise NotImplementedError("Must subclass this and override this method")
+        raise NotImplementedError(OVERRIDE_METHOD_STR)
         
     @abstractmethod
     def calcPlotData(self, data):
-        raise NotImplementedError("Must subclass this and override this method")
+        raise NotImplementedError(OVERRIDE_METHOD_STR)
         
     @abstractmethod
     def getCorrectedData(self, x, y):
-        raise NotImplementedError("Must subclass this and override this method")
+        raise NotImplementedError(OVERRIDE_METHOD_STR)
         
     @abstractmethod
     def getPlotAxisLabels(self):
-        raise NotImplementedError("Must subclass this and override this method")
+        raise NotImplementedError(OVERRIDE_METHOD_STR)
         
 #     @abstractmethod
 #     def getDataLabels(self):
@@ -72,50 +79,54 @@ class AbstractSelectionDisplay(QtWidgets.QSplitter):
         
     @abstractmethod
     def getPlotAxisLabelsIndex(self):
-        raise NotImplementedError("Must subclass this and override this method")
+        raise NotImplementedError(OVERRIDE_METHOD_STR)
 
     @abstractmethod
     def getSelectedScans(self):
-        raise NotImplementedError("Must subclass this and override this method")
+        raise NotImplementedError(OVERRIDE_METHOD_STR)
         
+    def isType(self, selectionType):
+        logger.debug(METHOD_ENTER_STR % ((selectionType, self.selectionType),))
+        return selectionType == self.selectionType
+    
     @abstractmethod
     def plotAverageData(self):
         '''
         Logical to determine if the plot of this type should be done. 
         '''
-        raise NotImplementedError("Must subclass this and override this method")
+        raise NotImplementedError(OVERRIDE_METHOD_STR)
             
     @abstractmethod
     def plotCorrectedData(self):
         '''
         Logical to determine if the plot of this type should be done. 
         '''
-        raise NotImplementedError("Must subclass this and override this method")
+        raise NotImplementedError(OVERRIDE_METHOD_STR)
 
     @abstractmethod
     def plotIndividualData(self):
         '''
         Logical to determine if the plot of this type should be done. 
         '''
-        raise NotImplementedError("Must subclass this and override this method")
+        raise NotImplementedError(OVERRIDE_METHOD_STR)
         
     @abstractmethod
     def plotNormalizedData(self):
         '''
         Logical to determine if the plot of this type should be done. 
         '''
-        raise NotImplementedError("Must subclass this and override this method")
+        raise NotImplementedError(OVERRIDE_METHOD_STR)
         
     def selectedNodes(self):
         return self._selectedNodes
     
     @abstractmethod
     def setLeftDataSelection(self, label, selection, average):
-        raise NotImplementedError("Must subclass this and override this method")
+        raise NotImplementedError(OVERRIDE_METHOD_STR)
     
     @abstractmethod
     def setRightDataSelection(self, label, selection, average):
-        raise NotImplementedError("Must subclass this and override this method")
+        raise NotImplementedError(OVERRIDE_METHOD_STR)
     
     def setSelectedNodes(self, selectedNodes):
         logger.debug(METHOD_ENTER_STR % self)
@@ -125,7 +136,11 @@ class AbstractSelectionDisplay(QtWidgets.QSplitter):
     @abstractmethod
     def setupDisplayWithSelectedNodes(self):
         logger.debug(METHOD_ENTER_STR)
-        raise NotImplementedError("Must subclass this and override this method")
+        raise NotImplementedError(OVERRIDE_METHOD_STR)
+
+    def setPositionersToDisplay(self):
+        logger.debug(METHOD_ENTER_STR)
+        raise NotImplementedError(OVERRIDE_METHOD_STR)
         
 class XMCDNoScanSelected(XMCDException):
     
