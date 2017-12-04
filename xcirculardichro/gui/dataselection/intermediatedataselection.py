@@ -23,7 +23,6 @@ class IntermediateDataSelection(AbstractSelectionDisplay):
     def __init__(self, parent=None):
         super(IntermediateDataSelection, self).__init__(parent=parent)
         self.selectionType = SelectionTypeNames.INTERMEDIATE_SELECTION
-        self.selectedScans = []
         self.scanBrowser = ScanBrowser()
         self.subChoices = IntermediateChoices()
         self.pointSelectionInfo = PointSelectionInfo()
@@ -126,9 +125,9 @@ class IntermediateDataSelection(AbstractSelectionDisplay):
         self.pointSelectionInfo.setSelectionAverage(PointSelectionInfo.POINT_SELECTIONS[0], average)
         self.pointSelectionInfo.setSelectionIndices(PointSelectionInfo.POINT_SELECTIONS[0], selection)
     
-    def setPositionersToDisplay(self):
-        self.debug(METHOD_ENTER_STR)
-        self.scanBrowser.setPostionersToDisplay()
+    def setPositionersToDisplay(self, positioners):
+        logger.debug(METHOD_ENTER_STR)
+        self.scanBrowser.setPositionersToDisplay(positioners)
         
         
     def setRightDataSelection(self, label, selection, average):
@@ -201,5 +200,5 @@ class ScanBrowser(qtWidgets.QDialog):
                 selectedScans.append(scan)
         self.scanSelected[list].emit(selectedScans)
         
-    def setPositionersToShow(self, positioners):
+    def setPositionersToDisplay(self, positioners):
         self.positionersToShow = positioners

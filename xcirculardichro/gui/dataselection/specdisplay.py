@@ -25,7 +25,6 @@ class SpecDisplay(AbstractSelectionDisplay):
         super(SpecDisplay, self).__init__(parent)
         
         self.selectionType = SelectionTypeNames.SPEC_SELECTION
-        self.selectedScans = []
         self.currentSelections = {}
         self.typeSelector = ScanTypeSelector()
         self.scanBrowser = ScanBrowser()

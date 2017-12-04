@@ -28,6 +28,7 @@ class AbstractSelectionDisplay(QtWidgets.QSplitter):
         super(AbstractSelectionDisplay, self).__init__(parent=parent)
         self.setOrientation(qtCore.Qt.Vertical)
         self._selectedNodes = []
+        self.selectedScans = []
         self.selectionType = None
         
     @qtCore.pyqtSlot(int)
@@ -79,6 +80,10 @@ class AbstractSelectionDisplay(QtWidgets.QSplitter):
         
     @abstractmethod
     def getPlotAxisLabelsIndex(self):
+        raise NotImplementedError(OVERRIDE_METHOD_STR)
+
+    @abstractmethod
+    def getSelectedCounterInfo(self):
         raise NotImplementedError(OVERRIDE_METHOD_STR)
 
     @abstractmethod
@@ -138,7 +143,8 @@ class AbstractSelectionDisplay(QtWidgets.QSplitter):
         logger.debug(METHOD_ENTER_STR)
         raise NotImplementedError(OVERRIDE_METHOD_STR)
 
-    def setPositionersToDisplay(self):
+    @abstractmethod
+    def setPositionersToDisplay(self, positioners):
         logger.debug(METHOD_ENTER_STR)
         raise NotImplementedError(OVERRIDE_METHOD_STR)
         
