@@ -1,0 +1,307 @@
+
+% !BIB TS-program = biber
+% !BIB program = biber
+
+\documentclass[12pt,letterpaper, openany]{book}
+\usepackage[utf8]{inputenc}
+\usepackage{titlesec}
+\usepackage[cc]{titlepic}
+\usepackage[english]{babel}
+\usepackage[autostyle]{csquotes}
+\usepackage[style=numeric, backend=biber]{biblatex}
+\usepackage[]{hyperref}
+\usepackage[usenames, dvipsnames]{xcolor}
+\usepackage{framed}
+\usepackage{realboxes}
+\usepackage[toc,page]{appendix}
+\definecolor{shadecolor}{rgb}{1,0.8,0.3}
+\usepackage{tikz}
+\usepackage{graphicx}
+\usepackage{subfig}
+\bibliography{xcirculardichro}
+\begin{document}
+\begin{titlepage}
+
+
+\titlepic{\includegraphics[width=2in]{images/xmcdchiro.png}}
+\title{xcirculardichro Getting Started}
+\author{John Hammonds \\
+Scientific Software Engineering and Data Management \\
+X-Ray Science Division \\
+Argonne National Laboratory}
+
+\titlepic{\includegraphics[width=2in]{images/ANL_RGB-01.png}}
+
+\end{titlepage}
+
+\maketitle
+\tableofcontents
+\listoffigures
+\chapter{Introduction}
+
+\section{Purpose}
+This program \textbf{\textit{xcirculardichro}} is intended to make it easier to
+get results from X-ray Circular Magnetic Dichroism
+\cite{Bouldi1} experiments
+performed on the beamlines at the Advanced Photon Source
+(APS)\cite{APS}.
+In particular this work was started for use on the beamlines at Beamline 4-ID-C
+\cite{FOUR-IDC}
+Attempts have been made to generalize this code so that it may be extended for 
+use at other sources.  As this is tested at more beamlines at the APS, more 
+documentation will be added to aid in expanding for use elsewhere.
+
+\section{Software requirements}
+This software was developed using Python\textsuperscript{\textregistered} 
+\cite{PYTHONWEB}, \cite{PYTHONLANGREF}, along with various standard Python Packages that will be described in the installation section.  As is common with Python, a 'packaged' distribution of Python was used in the development of \textbf{\textit{xcirculardichro}} in order to ease the installation of many of the required packages used in writing this program.  In particular, the Anaconda \cite{ANACONDAPYTHON}Distribution of python was used here.  While Anaconda, Inc. does provide some versions of it's distribution for sale, most users, and certainly the core needs of this software, will require the version that can be freely downloaded.  
+
+ 
+\chapter{Intallation}
+As explained in the previous chapter, this program was developed using the Anaconda Distribution of Python.  Although it is probable that many other packaged distributions of Python will work with this program, the installation instructions found here will focus on installing \textbf{\textit{xcirculardichro}} using Anaconda Python.  
+
+\section{Installing Anaconda Python}
+The first step described here is the installation of Anaconda Python.  If the user already has Anaconda (or another packaged distribution of Python) installed, the user may want to skip to the next section on installing the required Python packages.  
+At the time of this writing the current version of Anaconda Python is 5.0.1.  Please note that this version number does not correspond to the actual version of Python but to the combined set of packages that are contained in this distribution from Anaconda, Inc.  The user should proceed to the Anaconda webpage \url{https://www.anaconda.com} and then click on the "Download" link on that page.  Following this link will lead the user to links to download a version for the platform (Windows, Mac, Linux) on which they are running.  
+\newline
+\vspace{3mm}
+
+
+  \Fcolorbox{Black}{SpringGreen}%
+  {
+   \begin{minipage}{5.0in}
+      If you desire to download for a different platform then follow the link for other versions.
+   \end{minipage}}
+
+\vspace{3mm}
+
+\noindent
+Note that there are typically at least two versions of Anaconda to chose from.  Although Version 3 of Python has been available for some time Version 2 is still fairly common.  At this time, the Anaconda distribution provides downloads configured for both Python 2.7 and 3.6.  If you do not have any other Python versions installed, then I would recommend downloading \& installing the 3.6 distribution.  \textbf{\textit{xcirculardichro}} was written with Python 3.6.
+If you are working with a fairly recent version of Anaconda Python which was installed from a Python 2.7 installer you will likely not need to install another version.  At this point look over material in Appendix A concerning Anaconda and Python Environments.  In fact, if you are using another Python distribution, some of this material may be helpful.  In a nutshell, Python Environments allow you to set up a 'sandbox' where you can set up Python with a set of modules and possibly (Anaconda allows this) a different version of Python.  It will then allow you to activate/deactivate this version as needed.
+
+\section{Installing Required Packages}
+A number of common support packages are needed by \textbf{\textit{xcirculardichro}}.  These include, but are not limited to:
+
+\begin{itemize}
+\itemsep0em
+\item From the General Python Community
+
+\begin{itemize}
+\itemsep0em
+\item PyQt (5.6)
+\item matplotlib (2.1.0)
+\item h5py (2.7.1)
+\end{itemize}
+
+\item From the Scientific/X-Ray Community
+
+\begin{itemize}
+\itemsep0em
+\item spec2nexus
+\item specguiutils
+\end{itemize}
+
+\end{itemize}
+
+\noindent
+There are a number of different ways to install python packages.  Past
+installing the Anaconda distribution, you will mostly need to know how to
+install extra packages from Anaconda using the 'conda' program and installing
+from the Python Package Index\cite{PYTHONPACKAGEINDEX} using 'pip'
+The packages from the General Python community can be installed using the conda
+command.  To do this install run
+
+conda install $<$package$>$
+\newline
+\noindent
+For packages from the scientific comunity can be installed with the pip command
+as
+
+pip install $<$package$>$
+
+
+\noindent
+Also to install xcirculardichro
+
+pip install xcirculardichro
+
+\chapter{Running \textbf{\textit{xcirculardichro}}}
+
+\section{Launching \textbf{\textit{xcirculardichro}}}
+To launch xcirculardichro run the command:
+
+xcirculardichro    (on Linux/Mac)
+
+or 
+
+xcirculardichro    (on Windows)
+
+You should see something like this: \\
+\begin{figure}
+\includegraphics[width=5in]{images/xmcd_afterFileOpen.png}
+\caption{Image just after opening, the program area is divided into three
+panes.  The pane on the left will show open files in a tree view, the middle
+pane will show scan information for the selected file and the right is a graph
+window that will show the selected scan data.}
+\end{figure}
+
+\section{Opening data file}
+At this point this program is designed to work with \textbf{spec} data files
+that are written at sector 4-ID at the Advanced Photon Source at Argonne
+National Laboratory.  To open a file select \textbf{Open} from the \textbf{File}
+menu and you should see an item appear selected on the tree view on the left and
+information about the scans for that file in the middle.  As you select
+data from the scans, plot of the selected data should show up in the pane on the
+right.  It is possible to change the relative widths of these three
+sections, to enhance selection or views, by dragging selectors between the
+sections.  Note that some graphical elements will appear different on different
+computer platforms (Windows, Mac \& Linux).  \\
+\\
+\begin{figure}
+\includegraphics[width=5in]{images/xmcd_afterFileOpen.png}
+\caption {After opening a file}
+\end{figure}
+\\
+It is possible to open multiple \textbf{spec} files for analysis at one time. 
+It is currently only possible to select one \textbf{spec} files for
+manipulation.  To select a particular spec file, check the box next to the file
+name.  Later we will see that it is possible to select subsets of data and place
+them in an intermediate dataset which will also show up in the tree view.  It is
+possible to select multiple intermediate data sets at one time, and display
+these together on the graphs.
+
+In the top of the middle pane is a table which will allow selection of scans
+from the /textit{spec} file.  A pulldown menu above the list shows the different
+scan types in the file or displaying all of the scans types at one time.  While
+all scan types are shown, it is only possible to select one scan at a time. 
+When a particular scan type is shown multiple selection is enabled but selection
+of scans with a different number of scan points will raise a flag since the
+selection will attempt to average the selected sets in many cases.  Options for
+particular scan types will provide different options in the lower part of the
+middle pane.  In particular, a different set of pull down options near the
+middle may show and a different set of 'counters' (named data collected during
+the scan) will be selected by default.  As we move into showing some of the
+features for working with the data, we will demonstrate this using the
+non-lockin data from 4-ID-C which has a scan type of \textit{qxdichro}.
+
+One last feature of the middle section refers back to the table of available
+scans.  When a \textbf{spec} file is selected, it is possible to add more data
+to the table.  Selecting the \textbf{SelectBrowserParameters} from the
+\textbf{View} menu will bring up a list of the positioner parameters (defined
+by the \#On fields in the \textbf{spec} file)  as shown below.  Available
+parameters will show on the left and a box for selected parameters is on the
+right.  Parameters can be added or removed from either list by selecting the
+desired parameter and pushing the appropriate button in the middle.
+
+\begin{figure}
+\includegraphics[width=5in]{images/xmcd_selectBrowserParameters.png}
+\caption {Control for selecting positioners to display in the scan browser}
+\end{figure}
+
+When the selection of positioners is completed, the scan browser will have a new
+column for each selected parameter and the value associated with each parameter
+will be shown in the table.
+
+\begin{figure}
+\includegraphics[width=5in]{images/xmcd_scanBrowserWithPositioners.png}
+\caption {Scan browser with extra positioners}
+\label{fig:selectedScanBrowser}
+\end{figure}
+
+\section{Selecting Data}
+Now that we have some of the basics out of the way we can discuss more about
+selecting and viewing data.  Again, for the purpose of consistancy, we will show
+the non-lockin data as defined by qxdichro scan types.  If we load a run with
+this type of data and then select qxdichro in the \textbf{Scan Type} pull down
+then we will see all of the scans of this type in the scan browser.  This is as
+shown in Figure~\ref{fig:selectedScanBrowser}.  
+
+Selecting scans of this type will cause a set of options to populate in the
+middle section of this pane as 
+
+\begin{figure}[htp]
+
+\centering
+\subfloat[]{
+\includegraphics[width=5in ]{images/xmcdSelectionPlotData.png}
+\label{Expand Plot Data}
+}
+
+\subfloat[]{
+\includegraphics[width=5in ]{images/xmcdSelectionDataType.png}
+\label{Expand Data Type}
+}
+
+\subfloat[]{
+\includegraphics[width=5in ]{images/xmcdSelectionPlotType.png}
+\label{Expand Plot Type}
+}
+\caption {Choices for selected scans}
+\label{fig:selectionChoice}
+\end{figure}
+
+More information about this type of data will be given in Appendix
+\ref{non-lockin} but we will discuss some of the contents here. For non-lockin
+type of data the goal is to produce data for two types signals, the X-ray
+Absorption Spectroscopy (XAS) and the X-ray Magnetic Circular Dichroism XMCD. 
+Data here is recorded with separate signals for diferent helicities, marked
+\textbf{+} or \textbf{-} for convenience.  For the particular data set given
+here this data was collected as a function of Energy.  In an ideal world, the
+signals collected the same way all of the time, the correct signals would be
+selected automatically and ready for processing.  In practice however, the
+actual signals collected that would produce XAS \& XMCD change for some reason
+so we have provided a way to select the correct signal.  This is done in the lower
+section of the middle pane.  For this type of data we have five signals to
+select: Energy, D+, D-, M+ and M-.  D+/D- are detector signals and M+/M- are
+monitor signals.  XAS+ \& XAS- are given by D/M (with correct +/-)  This
+represents the XAS signal associated with the particular helicity.  
+
+We can see below that the lower part of the middle pane will allow us to select
+the counter gathered in the scan can be assigned to each of these signals and
+will start to show the XAS/XMCD data.
+
+With a particular scan type selected, it is also possible to select multiple
+scans.  In this case it is possible to select (See Figure
+\ref{fig:selectionChoice}(a)) to show all datasets together with the average of
+the set, just the selected data, or just the average of the selected data.
+\begin{figure}
+\includegraphics[width=5in]{images/xmcdSelectedDataWithPlot.png}
+\caption {Scan browser with extra positioners}
+\label{fig:selectedScanBrowser}
+\end{figure}
+
+\begin{figure}[htp]
+
+\centering
+\subfloat[]{
+\includegraphics[width=5in]{images/xmcdMultipleSelectionPlotDataAndAverage.png}
+\label{Expand Plot Data}
+}
+
+\subfloat[]{
+\includegraphics[width=5in]{images/xmcdMultipleSelectionPlotDataOnly.png}
+\label{Expand Data Type}
+}
+
+\subfloat[]{
+\includegraphics[width=5in]{images/xmcdMultipleSelectionPlotAverageOnly.png}
+\label{Expand Plot Type}
+}
+\caption {Choices for selected scans}
+\label{fig:selectionChoice}
+\end{figure}
+
+\begin{appendices}
+\chapter{Anaconda \& Python Environments}
+\section{What is a Python Environment}
+\chapter{Scan Type Definitions}
+\section{default scan type}
+\section{non-lockin type (qxdichro, kepdichro, tempdichro,
+etc)\label{non-lockin}}
+\section{lockin type (qxscan)}
+
+\end{appendices}
+
+\printbibliography
+
+\end{document}
+ 
