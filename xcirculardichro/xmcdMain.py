@@ -7,7 +7,7 @@ import PyQt5.QtWidgets as qtWidgets
 from xcirculardichro.gui.xmcdmainwindow import XMCDMainWindow
 
 
-if __name__ == "__main__":
+def main():
     app = qtWidgets.QApplication(sys.argv)
     mainWindow = XMCDMainWindow()
 #    mainWindow.show()
