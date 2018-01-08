@@ -83,9 +83,12 @@ class XMCDMainWindow(qtWidgets.QMainWindow):
         closeAction = qtWidgets.QAction("Close", self)
         closeAction.triggered.connect(self.closeFile)
 
-        self.selectBrowserParams = \
-            qtWidgets.QAction("SelectBrowserParameters", self)
-        self.selectBrowserParams.triggered.connect(self._selectBrowserParameters)
+        self.selectPositionerParams = \
+            qtWidgets.QAction("SelectPositionerParameters", self)
+        self.selectUserParams = \
+            qtWidgets.QAction("SelectUserParameters", self)
+        self.selectPositionerParams.triggered.connect(self._selectPositionerParameters)
+        self.selectUserParams.triggered.connect(self._selectUserParameters)
 
         self.captureCurrentAction = \
             qtWidgets.QAction("Capture Current", self)
@@ -111,8 +114,9 @@ class XMCDMainWindow(qtWidgets.QMainWindow):
         fileMenu.addSeparator()
         fileMenu.addAction(exitAction)
 
-        viewMenu.addAction(self.selectBrowserParams)
-
+        viewMenu.addAction(self.selectPositionerParams)
+        viewMenu.addAction(self.selectUserParams)
+        
         dataMenu.addAction(self.captureCurrentAction)
         dataMenu.addAction(self.captureCurrentAverageAction)
         dataMenu.addAction(self.captureCurrentCorrectedAction)
@@ -144,9 +148,11 @@ class XMCDMainWindow(qtWidgets.QMainWindow):
     def _configureViewMenuEnable(self):
         logger.debug(METHOD_ENTER_STR)
         if self._dataSelections.isSelectionType(SelectionTypeNames.SPEC_SELECTION):
-            self.selectBrowserParams.setEnabled(True)
+            self.selectPositionerParams.setEnabled(True)
+            self.selectUserParams.setEnabled(True)
         else:
             self.selectBrowserParams.setEnabled(False)
+            self.selectUserParams.setEnabled(False)
         
     @qtCore.pyqtSlot() 
     def captureCurrent(self):
@@ -267,7 +273,7 @@ class XMCDMainWindow(qtWidgets.QMainWindow):
         logger.debug(METHOD_ENTER_STR)
         
     @qtCore.pyqtSlot()
-    def _selectBrowserParameters(self):
+    def _selectPositionerParameters(self):
         logger.debug(METHOD_ENTER_STR)
         selectedScans = self._dataSelections.getSelectedScans()
         firstNode = self._dataSelections.getNodeContainingScan(selectedScans[0])
@@ -277,6 +283,18 @@ class XMCDMainWindow(qtWidgets.QMainWindow):
         self.positionersToDisplay = PositionerSelector.getPositionSelectorModalDialog(specScan.positioner)
         logger.debug("Positioners %s" % self.positionersToDisplay)
         self._dataSelections.setPostionersToDisplay(self.positionersToDisplay)
+        
+    @qtCore.pyqtSlot()
+    def _selectUserParameters(self):
+        logger.debug(METHOD_ENTER_STR)
+        selectedScans = self._dataSelections.getSelectedScans()
+        firstNode = self._dataSelections.getNodeContainingScan(selectedScans[0])
+        specScan = firstNode.scans[selectedScans[0]]
+        parameters = specScan.U.keys()
+        logger.debug("Parameters %s" % parameters)
+        self.userParamsToDisplay = PositionerSelector.getPositionSelectorModalDialog(specScan.U)
+        logger.debug("Positioners %s" % self.userParamsToDisplay)
+        self._dataSelections.setUserParamsToDisplay(self.userParamsToDisplay)
         
     def updatePlotData(self):
         '''
@@ -380,10 +398,14 @@ class XMCDMainWindow(qtWidgets.QMainWindow):
                     self._plotWidget.plotAx1Average(dataOut[scan][0], 
                                                     dataAverage, 
                                                     dataLabel)
+                    self._plotWidget.setXLabel(plotAxisLabels[0])
+                    self._plotWidget.setYLabel(plotAxisLabels[index])
                 if axisLabelIndex[index] == 2:
                     self._plotWidget.plotAx2Average(dataOut[scan][0], 
                                                     dataAverage, 
                                                     dataLabel)
+                    self._plotWidget.setXLabel(plotAxisLabels[0])
+                    self._plotWidget.setY2Label(plotAxisLabels[index])
                 dataAverageArray.append(dataAverage)
             if self._dataSelections.plotCorrectedData():
                 correctedData = \
@@ -448,6 +470,8 @@ class XMCDMainWindow(qtWidgets.QMainWindow):
 #         plotDataLabel = self._dataSelections.getPlotAxisLabels()
         axisLabelIndex = self._dataSelections.getPlotAxisLabelsIndex()
         logger.debug("plotAxesLabels %s", plotAxisLabels)
+        logger.debug("axisLabelIndex %s", axisLabelIndex)
+        logger.debug("countIndex " + str(countIndex))
         for index in countIndex:
             logger.debug("index, counters %s %s" % (index, counters))
             #logger.debug("index, len(counters)-1 %s, %s" % (index, len(counters)-1 ))
