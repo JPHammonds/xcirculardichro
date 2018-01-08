@@ -148,6 +148,7 @@ class ScanBrowser(qtWidgets.QDialog):
     def __init__(self, parent=None):
         super(ScanBrowser, self).__init__(parent=parent)
         self.positionersToShow = []
+        self.userParamsToShow = []
         layout = qtWidgets.QHBoxLayout()
         #
         self.scanList = qtWidgets.QTableWidget()
@@ -202,3 +203,6 @@ class ScanBrowser(qtWidgets.QDialog):
         
     def setPositionersToDisplay(self, positioners):
         self.positionersToShow = positioners
+        
+    def setUserParamsToDisplay(self, userParams):
+        self.userParamsToShow = userParams

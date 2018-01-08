@@ -315,6 +315,10 @@ class SpecDisplay(AbstractSelectionDisplay):
         self.pointSelectionInfo.setSelectionAverage(PointSelectionInfo.POINT_SELECTIONS[1], average)
         self.pointSelectionInfo.setSelectionIndices(PointSelectionInfo.POINT_SELECTIONS[1], selection)
   
+    def setUserParamsToDisplay(self, userParams):
+        logger.debug(METHOD_ENTER_STR, userParams)
+        self.scanBrowser.setUserParamsToDisplay(userParams)
+        
     def storePlotSelections(self, typeName):
         if not (typeName in self.currentSelections.keys()):
             logger.debug("dealing with new scan type %s" %typeName)

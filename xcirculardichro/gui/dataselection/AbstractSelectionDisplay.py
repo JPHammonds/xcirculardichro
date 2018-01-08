@@ -148,6 +148,11 @@ class AbstractSelectionDisplay(QtWidgets.QSplitter):
         logger.debug(METHOD_ENTER_STR)
         raise NotImplementedError(OVERRIDE_METHOD_STR)
         
+    @abstractmethod
+    def setUserParamsToDisplay(self, userParams):
+        logger.debug(METHOD_ENTER_STR)
+        raise NotImplementedError(OVERRIDE_METHOD_STR)
+
 class XMCDNoScanSelected(XMCDException):
     
     def __init__(self, msg):

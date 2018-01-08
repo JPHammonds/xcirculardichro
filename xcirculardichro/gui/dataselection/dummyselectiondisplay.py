@@ -85,4 +85,10 @@ class DummySelectionDisplay(AbstractSelectionDisplay):
         '''
         logger.debug(METHOD_ENTER_STR % DUMMY_STR)
     
+    def setUserParamsToDisplay(self, userParams):
+        '''
+        Dummy override that does nothing
+        '''
+        logger.debug(METHOD_ENTER_STR % DUMMY_STR)
+
     

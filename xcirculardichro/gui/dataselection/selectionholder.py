@@ -179,4 +179,7 @@ class SelectionHolder(qtWidgets.QWidget):
         if isinstance(self._selectedNodes[0],IntermediateDataNode):
             self.setDisplayWidget(IntermediateDataSelection())
             self._selectionWidget.setSelectedNodes(self._selectedNodes)
-         
+
+    def setUserParamsToDisplay(self, positioners):
+        self._selectionWidget.setUserParamsToDisplay(positioners)
+        
