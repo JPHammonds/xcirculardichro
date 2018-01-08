@@ -7,14 +7,18 @@ import PyQt5.QtWidgets as qtWidgets
 import PyQt5.QtCore as qtCore
 from xcirculardichro.gui.choices.undefinedchoices import UndefinedChoices
 import logging
-from xcirculardichro.gui.choices.nonlockinxmcdchoices import NonLockinXMCDChoices
+from xcirculardichro.gui.choices.nonlockinxmcdchoices import \
+    NonLockinXMCDChoices
 from xcirculardichro.gui.choices.lockinxmcdchoices import LockinXMCDChoices
 from xcirculardichro import METHOD_ENTER_STR
+from xcirculardichro.gui.choices.multinonlockinxmcdchoices import \
+    MultiNonLockinXMCDChoices
 logger = logging.getLogger(__name__)
 QXDICHRO = 'qxdichro'
 QXSCAN = 'qxscan'
 TEMPDICHRO = 'tempdichro'
 KEPDICHRO = 'kepdichro'
+XMCDVSE = 'XMCDvsE'
 
 class ChoiceHolder(qtWidgets.QDialog):
     
@@ -106,6 +110,9 @@ class ChoiceHolder(qtWidgets.QDialog):
         elif typeName == QXSCAN:
             logger.debug("setting choice to lockin")
             self.setChoiceWidget(LockinXMCDChoices())
+        elif typeName == XMCDVSE:
+            logger.debug("setting choice to lockin")
+            self.setChoiceWidget(MultiNonLockinXMCDChoices())
         else:
             logger.debug("setting choice to other")
             self.setChoiceWidget(UndefinedChoices())
