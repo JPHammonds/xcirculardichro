@@ -129,7 +129,7 @@ class NonLockinXMCDChoices(AbstractChoices):
         self.plotSelections = DEFAULT_SELECTIONS[newType]
         self.subTypeChanged[int].emit(newType)
         
-    @qtCore.pyqtSlot(int)
+    @qtCore.pyqtSlot()
     def plotCorrectedData(self):
         return True
         
