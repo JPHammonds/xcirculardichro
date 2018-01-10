@@ -6,7 +6,6 @@ import sys
 import PyQt5.QtWidgets as qtWidgets
 from xcirculardichro import __path__ as XCD_PATH
 from xcirculardichro.gui.xmcdmainwindow import XMCDMainWindow
-from os import environ
 from  spec2nexus.plugin import PLUGIN_SEARCH_PATH_ENVIRONMENT_VARIABLE \
     as S2N_PLUGIN_ENV_VAR
 import os
