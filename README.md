@@ -35,8 +35,23 @@ Version 0.6  2017-10-02
    - Something wrong with 0.5
    
 Version 0.7 2017-10-02
-	- Set ScanBrowser in IntermediateDataSelexction so that the table is not editable.
-    - Add in singal handling so that point selection for pre/post peak levels can be adjusted to provide for normalization.
+	- Set ScanBrowser in IntermediateDataSelexction so that the table is not 
+	  editable.
+    - Add in signal handling so that point selection for pre/post peak levels 
+      can be adjusted to provide for normalization.
     
-Version 0.7 2017-10-02
-    - change vesion number for specguiutils
+Version 0.8 2017-10-02
+    - change version number for specguiutils
+    
+Version 0.8pre1
+   - Add extraction of data into intermediate sets which are more manageable.  
+   Can Extract Groups of individual scans, average of a group of scans, or 
+   Edge-Normalized spectra.  
+   - Can  plot Normalized data
+   - Can save intermediate results to a file.  File will be text delimited columns with a header for extra information and then a row of named columns.
+   - Added the ability to add selected parameters/positioners into the spec data selector's scanBrowser so that the user can see extra information that may help them distinguish between runs that go together and those that should be processed separately.
+
+Version 0.8.rc5 2018-01-10
+    - Initial code added for reading files from David Keavney.  Problems exist with data display after reading which crash the application. This data has multiple XAS and XMCD per file.  This causes a problem with the code bit that allows selection of points for step normalization.
+    - Add code for selecting parameters from the positioner list.   This is used to add columns to the ScanBrowser for extra data selection information.
+    - Add code for the user parameters at sector 4 to display in the scan browser table.
