@@ -13,11 +13,11 @@ import logging
 logger = logging.getLogger(__name__)
 
 def addXmcdPluginsToS2NPluginPath():
-    #Append the directory for xcirculardichro.spec2nexus.plugins
+    #Append the directory for xcirculardichro._spec2nexus.plugins
     # to the spec2nexus plugin path so that the plugin for finding #U
     # parameters is found
     logger.debug("path " + str(XCD_PATH))
-    REL_PATH_TO_S2N_PLUGINS = "spec2nexus/plugins"
+    REL_PATH_TO_S2N_PLUGINS = "_spec2nexus/plugins"
     PATH_TO_S2N_PLUGINS = os.path.join(XCD_PATH[0], \
                                        REL_PATH_TO_S2N_PLUGINS)
     logger.debug("PATH_TO_S2N_PLUGINS" + str(PATH_TO_S2N_PLUGINS))
