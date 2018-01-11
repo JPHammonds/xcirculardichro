@@ -18,6 +18,9 @@
 \usepackage{tikz}
 \usepackage{graphicx}
 \usepackage{subfig}
+\usepackage{amsmath}
+\usepackage{listings}
+
 \bibliography{xcirculardichro}
 \begin{document}
 \begin{titlepage}
@@ -37,9 +40,9 @@ Argonne National Laboratory}
 \maketitle
 \tableofcontents
 \listoffigures
-\chapter{Introduction}
+\chapter{Introduction}\label{chap:introduction}
 
-\section{Purpose}
+\section{Purpose}\label{sec:purpose}
 This program \textbf{\textit{xcirculardichro}} is intended to make it easier to
 get results from X-ray Circular Magnetic Dichroism
 \cite{Bouldi1} experiments
@@ -51,17 +54,38 @@ Attempts have been made to generalize this code so that it may be extended for
 use at other sources.  As this is tested at more beamlines at the APS, more 
 documentation will be added to aid in expanding for use elsewhere.
 
-\section{Software requirements}
-This software was developed using Python\textsuperscript{\textregistered} 
-\cite{PYTHONWEB}, \cite{PYTHONLANGREF}, along with various standard Python Packages that will be described in the installation section.  As is common with Python, a 'packaged' distribution of Python was used in the development of \textbf{\textit{xcirculardichro}} in order to ease the installation of many of the required packages used in writing this program.  In particular, the Anaconda \cite{ANACONDAPYTHON}Distribution of python was used here.  While Anaconda, Inc. does provide some versions of it's distribution for sale, most users, and certainly the core needs of this software, will require the version that can be freely downloaded.  
+\section{Software requirements}\label{softwareReqs}
+This software was developed using Python\textsuperscript{\textregistered}
+\cite{PYTHONWEB}, \cite{PYTHONLANGREF}, along with vaqrious standard Python
+Packages that will be described in the installation section.  As is common with
+Python, a 'packaged' distribution of Python was used in the development of
+\textbf{\textit{xcirculardichro}} in order to ease the installation of many of
+the required packages used in writing this program.  In particular, the Anaconda
+\cite{ANACONDAPYTHON}Distribution of python was used here.  While Anaconda, Inc.
+does provide some versions of it's distribution for sale, most users, and
+certainly the core needs of this software, will require the version that can be
+freely downloaded.
 
  
-\chapter{Intallation}
-As explained in the previous chapter, this program was developed using the Anaconda Distribution of Python.  Although it is probable that many other packaged distributions of Python will work with this program, the installation instructions found here will focus on installing \textbf{\textit{xcirculardichro}} using Anaconda Python.  
+\chapter{Intallation}\label{chap:installation}
+As explained in the previous chapter, this program was developed using the
+Anaconda Distribution of Python.  Although it is probable that many other
+packaged distributions of Python will work with this program, the installation
+instructions found here will focus on installing
+\textbf{\textit{xcirculardichro}} using Anaconda Python.
 
-\section{Installing Anaconda Python}
-The first step described here is the installation of Anaconda Python.  If the user already has Anaconda (or another packaged distribution of Python) installed, the user may want to skip to the next section on installing the required Python packages.  
-At the time of this writing the current version of Anaconda Python is 5.0.1.  Please note that this version number does not correspond to the actual version of Python but to the combined set of packages that are contained in this distribution from Anaconda, Inc.  The user should proceed to the Anaconda webpage \url{https://www.anaconda.com} and then click on the "Download" link on that page.  Following this link will lead the user to links to download a version for the platform (Windows, Mac, Linux) on which they are running.  
+\section{Installing Anaconda Python}\label{sec:installingAnaconda}
+The first step described here is the installation of Anaconda Python.  If the
+user already has Anaconda (or another packaged distribution of Python)
+installed, the user may want to skip to the next section on installing the
+required Python packages.
+At the time of this writing the current version of Anaconda Python is 5.0.1. 
+Please note that this version number does not correspond to the actual version
+of Python but to the combined set of packages that are contained in this
+distribution from Anaconda, Inc.  The user should proceed to the Anaconda
+webpage \url{https://www.anaconda.com} and then click on the "Download" link on
+that page.  Following this link will lead the user to links to download a
+version for the platform (Windows, Mac, Linux) on which they are running.
 \newline
 \vspace{3mm}
 
@@ -69,17 +93,31 @@ At the time of this writing the current version of Anaconda Python is 5.0.1.  Pl
   \Fcolorbox{Black}{SpringGreen}%
   {
    \begin{minipage}{5.0in}
-      If you desire to download for a different platform then follow the link for other versions.
+      If you desire to download for a different platform then follow the link
+      for other versions.
    \end{minipage}}
 
 \vspace{3mm}
 
-\noindent
-Note that there are typically at least two versions of Anaconda to chose from.  Although Version 3 of Python has been available for some time Version 2 is still fairly common.  At this time, the Anaconda distribution provides downloads configured for both Python 2.7 and 3.6.  If you do not have any other Python versions installed, then I would recommend downloading \& installing the 3.6 distribution.  \textbf{\textit{xcirculardichro}} was written with Python 3.6.
-If you are working with a fairly recent version of Anaconda Python which was installed from a Python 2.7 installer you will likely not need to install another version.  At this point look over material in Appendix A concerning Anaconda and Python Environments.  In fact, if you are using another Python distribution, some of this material may be helpful.  In a nutshell, Python Environments allow you to set up a 'sandbox' where you can set up Python with a set of modules and possibly (Anaconda allows this) a different version of Python.  It will then allow you to activate/deactivate this version as needed.
+\noindent Note that there are typically at least two versions of Anaconda to
+chose from.  Although Version 3 of Python has been available for some time
+Version 2 is still fairly common.  At this time, the Anaconda distribution
+provides downloads configured for both Python 2.7 and 3.6.  If you do not have
+any other Python versions installed, then I would recommend downloading \&
+installing the 3.6 distribution.  \textbf{\textit{xcirculardichro}} was written
+with Python 3.6.
+If you are working with a fairly recent version of Anaconda Python which was
+installed from a Python 2.7 installer you will likely not need to install
+another version.  At this point look over material in Appendix A concerning
+Anaconda and Python Environments.  In fact, if you are using another Python
+distribution, some of this material may be helpful.  In a nutshell, Python
+Environments allow you to set up a 'sandbox' where you can set up Python with a
+set of modules and possibly (Anaconda allows this) a different version of
+Python.  It will then allow you to activate/deactivate this version as needed.
 
-\section{Installing Required Packages}
-A number of common support packages are needed by \textbf{\textit{xcirculardichro}}.  These include, but are not limited to:
+\section{Installing Required Packages}\label{sec:installingReqPackages}
+A number of common support packages are needed by
+\textbf{\textit{xcirculardichro}}.  These include, but are not limited to:
 
 \begin{itemize}
 \itemsep0em
@@ -124,9 +162,9 @@ Also to install xcirculardichro
 
 pip install xcirculardichro
 
-\chapter{Running \textbf{\textit{xcirculardichro}}}
+\chapter{Running \textbf{\textit{xcirculardichro}}}\label{chap:running}
 
-\section{Launching \textbf{\textit{xcirculardichro}}}
+\section{Launching \textbf{\textit{xcirculardichro}}}\label{sec:launching}
 To launch xcirculardichro run the command:
 
 xcirculardichro    (on Linux/Mac)
@@ -207,7 +245,7 @@ will be shown in the table.
 \label{fig:selectedScanBrowser}
 \end{figure}
 
-\section{Selecting Data}
+\section{Selecting Data}\label{sec:selectingData}
 Now that we have some of the basics out of the way we can discuss more about
 selecting and viewing data.  Again, for the purpose of consistancy, we will show
 the non-lockin data as defined by qxdichro scan types.  If we load a run with
@@ -240,20 +278,21 @@ middle section of this pane as
 \end{figure}
 
 More information about this type of data will be given in Appendix
-\ref{non-lockin} but we will discuss some of the contents here. For non-lockin
-type of data the goal is to produce data for two types signals, the X-ray
-Absorption Spectroscopy (XAS) and the X-ray Magnetic Circular Dichroism XMCD. 
+\ref{sec:non-lockinDataType} but we will discuss some of the contents here. For
+non-lockin type of data the goal is to produce data for two types signals, the
+X-ray Absorption Spectroscopy (XAS) and the X-ray Magnetic Circular Dichroism
+XMCD.
 Data here is recorded with separate signals for diferent helicities, marked
 \textbf{+} or \textbf{-} for convenience.  For the particular data set given
 here this data was collected as a function of Energy.  In an ideal world, the
 signals collected the same way all of the time, the correct signals would be
 selected automatically and ready for processing.  In practice however, the
 actual signals collected that would produce XAS \& XMCD change for some reason
-so we have provided a way to select the correct signal.  This is done in the lower
-section of the middle pane.  For this type of data we have five signals to
+so we have provided a way to select the correct signal.  This is done in the
+lower section of the middle pane.  For this type of data we have five signals to
 select: Energy, D+, D-, M+ and M-.  D+/D- are detector signals and M+/M- are
 monitor signals.  XAS+ \& XAS- are given by D/M (with correct +/-)  This
-represents the XAS signal associated with the particular helicity.  
+represents the XAS signal associated with the particular helicity.
 
 We can see below that the lower part of the middle pane will allow us to select
 the counter gathered in the scan can be assigned to each of these signals and
@@ -271,33 +310,399 @@ the set, just the selected data, or just the average of the selected data.
 
 \begin{figure}[htp]
 
-\centering
-\subfloat[]{
-\includegraphics[width=5in]{images/xmcdMultipleSelectionPlotDataAndAverage.png}
-\label{Expand Plot Data}
+\centering \subfloat[Plotting selected data and the average of the data]{
+\includegraphics[width=4.0in]{images/xmcdMultipleSelectionPlotDataAndAverage.png}
+\label{Select Data and Average}
 }
 
-\subfloat[]{
-\includegraphics[width=5in]{images/xmcdMultipleSelectionPlotDataOnly.png}
-\label{Expand Data Type}
+\subfloat[Plotting only the selected data]{
+\includegraphics[width=4.0in]{images/xmcdMultipleSelectionPlotDataOnly.png}
+\label{Select Data Only}
 }
 
-\subfloat[]{
-\includegraphics[width=5in]{images/xmcdMultipleSelectionPlotAverageOnly.png}
-\label{Expand Plot Type}
+\subfloat[Plotting only the average of the selected data]{
+\includegraphics[width=4.0in]{images/xmcdMultipleSelectionPlotAverageOnly.png}
+\label{Select Average Only}
 }
 \caption {Choices for selected scans}
 \label{fig:selectionChoice}
 \end{figure}
 
+\section{Processing Data and Intermediate Datasets}
+\subsection{Discussion of the end goal}
+At this point, we can finally settle in to processing the data.  At this point
+we have selected scans for processing, selected appropriate counters to be used
+in generating XAS+/- and XMCD+/- (See Appendix \ref{dataDefinitions} for the
+specifics on different data types).  We then combine the data from the different
+helicities to get XAS and XMCD.
+
+In a real experiment we will have two data sets of this type.  This type of data
+is taken with a magnetic field applied to the sample and in practice the data
+will be taken with the magnetic field in one direction and then another set
+taken with the field applied in the opposite direction.  In order to combine the
+data, we will need to apply some normalization on the data, select processed
+data to be extracted into intermediate datasets and then combine the data from
+different field directions.  These steps will be discussed in the next few
+sections.
+
+\subsection{Applying Step Normalization}\label{sec:stepNormalization}
+
+\begin{figure}
+\includegraphics[width=5in]{images/xmcdPlotMarkedWithOffsets.png}
+\caption {Plot of XAS showing baseline offsets before and after absorption
+edge}
+\label{fig:xmcdStepNormalizeBefore}
+\end{figure}
+
+A main correction that needs to be applied to the values calcultated thus far
+come from adjusting XAS and XMCD based on baseline offsets in XAS measurement.
+In Figure \ref{fig:xmcdStepNormalizeBefore} we see the XAS data marked with a
+couple of offsets from the baseline (0.0).  We can apply a corrections to both
+XAS and XCMD based on this.  Given the pre-edge offset and post-edge offset we
+can calculate a \textbf{step} between these two 
+
+\begin{equation}
+step = offset_{post} - offset_{pre}
+\label{eq:stepNormalizeStep}
+\end{equation}
+
+Based on this \textbf{step}, we can calculate a step-normalized XAS as
+
+\begin{equation}
+XAS_{step-normalized} = \frac{(XAS_{averaged} - offset_pre)}{step}
+\label{eq:stepNormalizeXAS}
+\end{equation}
+
+and a step-normalized XMCD as
+ 
+\begin{equation}
+XMCD_{step-normalized} = \frac{XMCD_{averaged}}{step}
+\label{eq:stepNormalizeXMCD}
+\end{equation}
+
+Note here we assume that XAS and XMCD have up to this point are the average of a
+number of measurements.  Hence the $XAS_{averaged}$ and $XMCD_{Averaged}$ This
+is done to ensure that enough statistics for the measurement are made without
+risk of losing data due to a problem in the sytem.
+
+\begin{figure}[htp]
+
+\centering
+\subfloat[Plotting selected data and the average of the data]{
+\includegraphics[width=4in]{images/xmcdPointSelectionControl.png}
+\label{fig:pointSelectionControlWNoPointsSelected}
+}
+
+\subfloat[Plotting only the selected data]{
+\includegraphics[width=4.0in]
+{images/xmcdPointSelectionControlWPointsSelected.png}
+\label{fig:pointSelectionControlWNoPointsSelected}
+}
+
+\caption {Choices for selected scans}
+\label{fig:pointSelectionControl}
+\end{figure}
+
+To set up for making this correction we need to select points before and after
+the absorption edge.   To do this, there is a control in the center pane, below
+the counter selection table (See Figure
+\ref{fig:pointSelectionControlWNoPointsSelected}).
+Here there are two pulldown boxes to aid in setting up the point selection.  The
+\textbf{PointSet to Select} pulldown allows selection of either the pre-edge or
+post-edge points.  This means that if the pre-edge is selected, and the user
+clicks on a point in the graph the data point is added to the \textbf{Pre-Edge
+Indices} and it's value contributes to the Average.   For this the selected
+points will be red.  To deselect a point simply click on it once again.   With
+\textbf{Post-Edge} selected, points that are clicked on will be added to the
+\textbf{Post-Edge Indicies} and the value will be added to the appropriate
+average.  Note that points for the post-Edge should show in blue and a blue line
+representing the average will be drawn over the range of selected points.  See
+figures \ref{fig:pointSelectionControlWNoPointsSelected} and
+\ref{fig:plotSelectedPoints}.
+The \textbf{PointSelect Axis} pulldown selects data from the left axis or the right
+axis is active for selection.  Normally, XAS is plottted on the Left axis so
+this control is normally left set to \textbf{Left}.
+
+\begin{figure}
+\includegraphics[width=5in]
+{images/xmcdPlotWithPointsSelectedForStepNormalization.png}
+\caption {Plot shown with data points selected for step normalization}
+\label{fig:plotSelectedPoints}
+\end{figure}
+
+Once points are selected for this correction, a new set of curves should appear
+(sometimes this does not happen until another scan is selected) showing the
+Step-Normalized Data.  Note that these plots will typically appear right over
+the original plots.  An additional set of legends show at the bottom for the
+corrected data (Figure \ref{fig:plotStepNormalizedData}).  The scale for the
+corrected data shows on the outer axes.  Note that XAS will now appear closer to
+the origin since we shifted by the pre-edge offset before scaling, and that the
+axes scales are quite diferent due to the scaling factor from the step size.
+
+\begin{figure}
+\includegraphics[width=5in]
+{images/xmcdPlotWithStepNormalizedData.png}
+\caption {Plot shown with data points selected for step normalization}
+\label{fig:plotStepNormalizedData}
+\end{figure}
+
+\subsection{Extracting Intermediate Data and Combining with Other Results}
+\begin{figure}
+\includegraphics[width=5in]
+{images/xmcdMultipleSelectWithStepNormalization.png}
+\caption {Multiple scans averages and step-normalized}
+\label{fig:multipleSelectWithStepNormalization}
+\end{figure}
+Now that we have covered step-normalized data we can start to consider combining
+data from the two different field directions.  At this point we assume that we
+have collected a number of scans with each field direction.  We have selected
+first all of the scans from one direction, averaging the result and then
+performing a step normalization this set.  This is shown in Figure
+\ref {fig:multipleSelectWithStepNormalization} We can then capture this result,
+placing it into an intermediate dataset.  This is done by selecting
+\textbf{Capture Current Corrected]} from the \textbf{Data} menu. Once this is
+done a new element will appear in the tree view on the left pane.  We can
+select this element and the 'scan' that appears in the scan browser in the
+middle pane and we will see the plot of the data in the right pane as in Figure
+\ref{fig:stepNormalizedInIntermediateSet}.  Now that we have the data from one
+field direction processed we can follow the same steps for the second field
+direction, ultimately placing a second intermediate dataset into the tree view.
+Shown in Figure \ref{fig:stepNormalizedBothFieldsInIntermediateSet}.
+
+\begin{figure}
+\includegraphics[width=5in]
+{images/xmcdStepNormalizedInIntermediateSet.png}
+\caption {Step-normalized data in an intermediate dataset}
+\label{fig:stepNormalizedInIntermediateSet}
+\end{figure}
+
+\begin{figure}
+\includegraphics[width=5in]
+{images/xmcdStepNormalizedBothFieldsInOwnIntermediateSet.png}
+\caption {Step-normalized data from both field directions.  Each direction is in
+an intermediate dataset}
+\label{fig:stepNormalizedBothFieldsInIntermediateSet}
+\end{figure}
+
+The data as it appears puts the two step-normalized datasets together and simply
+averages the two sets.  The final step for this kind of analysis is to combine
+these results together, similar to the two helicities, averaging XAS results to
+get the final XAS and subtracting the XMCD results to get XMCD.  This can be
+done by selecting a new option in \textbf{PlotData} pulldown in the middle pane.
+Since we are now dealing with two intermediate datasets we are presented with a
+new set of options as shown in Figure
+\ref{fig:plotDataSelectionOptionsIntermediateSet}.
+
+\begin{figure}
+\includegraphics[width=4in]
+{images/xmcdSelectionParametersForIntermediateData.png}
+\caption {Plot Data options for Intermediate Datasets}
+\label{fig:plotDataSelectionOptionsIntermediateSet}
+\end{figure}
+
+\begin{figure}
+\includegraphics[width=5in]
+{images/xmcdPlotOfNormalizedDataFromBothFieldDirections.png}
+\caption {Plot of data from both field directions with final normalized result}
+\label{fig:plotnormalizedDataBothFields}
+\end{figure}
+
 \begin{appendices}
 \chapter{Anaconda \& Python Environments}
 \section{What is a Python Environment}
-\chapter{Scan Type Definitions}
-\section{default scan type}
+Python environments\cite{PYTHONVIRTUALENVIRONMENT} provide a means to create a separate
+python space for running developing and running applications which require a different set 
+of packages and/or different versions of packages.  This is a convenient 
+method to deal with problems that often occur with when packages depend on 
+differnt versions of another package.  It is also a convinient way to deal 
+with the current problem that there are two major versions of Python itself
+(2.7 and 3.x) and different applications may require one or the other of 
+these versions.  In order to deal with these issues, Python has created a
+system for defining a named Python environment in which to run a particular
+application and a fairly simple mechanism to switch between these 
+environments to run your applications.  Note that the Anaconda distribution of
+Python includes it's own version of Python environments\cite{ANACONDAENVIRONMENT} and
+the discussion of Python Environments covered here will use this version.
+
+\section{Anaconda Environments}
+The Anaconda distribution of Python currently provides two different 
+downloads of their Python tools.  One of these is set up for Python 2.7 
+and the other is set up for Python 3.6.  Our application
+\textbf{xcirculardichro} requires Python 3.6 to run.  If you have already installed the Python 2.7 
+version of Anaconda you \textbf{do not} need to install a separate version 
+of Anaconda in order to run \textbf{xcirculardichro}.  This is because the
+only difference between the 2.7 and 3.6 version of the distribution is that
+the default environment provided by the install is either Python 2.7 or 
+Python 3.6 respectively.  It is possible to create a separate environment
+from either one which is configured for the other Python version (or possibly 
+other versions in between).  If you have Python 2.7 installed, or if 
+you want to create a separate environment to install and run
+\textbf{xcirculardichro} you can start by running the command
+\lstset{language=bash}
+\begin{lstlisting}
+conda create -name xcirculardichro -python=3.6
+\end{lstlisting}
+This you will then be prompted with some information about what packages
+will be included and asked to accept.  On accepting this the system will 
+create a directory in which to place the new environment which will include 
+binaries (or links to them), libraries and packages for this environment. This
+wiwill typically be placed in the user's home directory, under a subdirectory
+\texttt{anaconda/envs/xcirculardichro} or
+\texttt{anaconda3/envs/xcirculardichro}  depending on the installed version of
+the anaconda tools).  To make this python environment the active python 
+environment type the command
+
+\lstset{language=bash}
+\begin{lstlisting}
+source activate xcirculardichro (for linux or Mac)
+\end{lstlisting}
+
+or
+
+\lstset{language=bash}
+\begin{lstlisting}
+activate xcirculardichro (for Windows)
+\end{lstlisting}
+
+After setting up an environment in this manner you can then follow the
+instructions for installing an application, such as \textbf{xcirculardichro}. 
+Note that at this point you have a version of python with a minimal number of
+packages (unless you have configured conda to create environments with a
+default set of packages) so after activating the environment you will need to
+install packages needed by \textbf{xcirculardichro} and their depenancies using 
+either 
+
+\lstset{language = bash}
+\begin{lstlisting}
+conda install packagename
+\end{lstlisting}
+
+or 
+
+\begin{lstlisting}
+pip install packagename
+\end{lstlisting}
+
+as appropriate. 
+
+Just to reiterate here, there is nothing special here about the Anaconda Python
+distribution except the authors familiarity with this and it's use at the 
+Advanced Photon Source.  It should be possible to install
+\textbf{xcirculardichro} using any python distribution and that concept of 
+python environments is not unique to anaconda.  Anaconda does seem to have 
+some modifications to the standard python environment but much of the above
+discussion whould hold for most modern Python distributions.
+\chapter{Scan Type Definitions\label{dataDefinitions}}
+\section{default scan type\label{sec:defaultDataType}}
+The default data type is simply a type to allow display of data with unknown
+characteristices.  This type allows selection of an x axis and two signals. 
+This data will simply be treated as generic x, y data pairs.  No specific
+calculation will be performed on this data type.  If multiple scans are
+selected, then the data will be averaged over the scans.  Data will be displayed
+on the graph view.
+
 \section{non-lockin type (qxdichro, kepdichro, tempdichro,
-etc)\label{non-lockin}}
-\section{lockin type (qxscan)}
+etc)}\label{sec:non-lockinDataType}
+\begin{figure}
+\includegraphics[width=5in]
+{images/xmcdCounterSelectForNonLockin.png}
+\caption {Selection of counters for non-lockin types}
+\label{fig:counterSelectNonLockin}
+\end{figure}
+
+This data type is taken such that data from each helicity is taken in a separate
+data set and must be combined to give the overall XAS and XMCD for a particular
+field direction.  This collection type assumes that the data is collected as a
+detector/monitor pair.  When this scan type if data is selected in the scan
+browser then the counter selector in the lower part of the middle pane will
+allow the user to select the data source (from collected scan fields) for the
+dependant variable (E, Temp, etc) and D+, D-, M+ and M- (detector and monitor
+for each helicity) as in Figure \ref{fig:counterSelectNonLockin}.  At Sector
+4-ID, scan files usually place the counters associated with the detector and
+monitor near the end of the counter list.  Usually the last columns (in the scan
+file) are sum, dist and flip.  The four columns preceeding these are
+M\textsubscript{+}, M\textsubscript{-}, D\textsubscript{+} and
+D\textsubscript{-}.  In order to facilitate long collection times without the
+risk of data loss, a number of measurements are typically repeated and stored in
+multiple scans in the SPEC file.  One feature of \textbf{xcirculardichro} is
+that it can automatically average multiple scans simply by selecting the desired
+scans.  In order to do multiple selection you will need to select a particular
+data type (such as qxdichro) and then select multiple scans with the same number
+of data points.
+
+From these measurements we will be able to calculate XAS
+for each of the helicities as Equation \ref{eq:xasEachHelicityNonLockin} or
+{eq:xasEachHelicityTransmisssionNonLockin}:
+
+\begin{equation}
+XAS_+ = \frac{D_+}{M_+} \quad\mathrm{   and   }\quad XAS_- = \frac{D_-}{M_-}
+\label{eq:xasEachHelicityNonLockin}
+\end{equation}
+
+for flourescence measurement, or
+
+\begin{equation}
+XAS_+ = log_e\frac{M_+}{D_+} \quad\mathrm{   and   }\quad XAS_-
+= log_e\frac{M_-}{D_-}
+\label{eq:xasEachHelicityTransmisssionNonLockin}
+\end{equation}
+
+for transmission measurement.
+
+From the measurements of XAS for each helicity we can then calculate XAS and
+XMCD for a particular field direction $\vec{B}$ as 
+
+\begin{equation}
+\begin{split}
+XAS_{\vec{B}} = \frac{XAS_{+(\vec{B})} + XAS_{-(\vec{B})}}{2} 
+\\
+ XMCD_{\vec{B}} = XAS_{+(\vec{B})} - XAS_{-(\vec{B})} .
+\label{eq:xasFieldDirectionFlourecenceNonLockin}
+\end{split}
+\end{equation}
+
+These measurements are then normalized through a process called step
+normalization.  In order to step normalize XAS and XMCD calculated for a
+particular field direction, one would measusre a zero offset below the
+absorption edge and step offset after the absorption edge as in Figure
+\ref{fig:xmcdStepNormalizeBefore}.  Normalization would be calculated from these
+offsets as given by Equations \ref{eq:stepNormalizeStep},
+\ref{eq:stepNormalizeXAS} and \ref{eq:stepNormalizeXMCD}
+
+A measurement is made in opposite field direction $\vec{B}$ and $-\vec{B}$ and a
+final normalized XAS and XMCD are calculated as
+
+\begin{equation}
+\begin{split}
+XAS_final = \frac{XAS_{\vec{B}} + XAS_{-\vec{B}}}{2}
+\\
+XMCD_final = XAS_{\vec{B}} - XAS_{-\vec{B}}
+\end{split}
+\end{equation}
+
+In practice, processing these values is outlined in \ref{sec:stepNormalization}
+
+
+
+\section{lock-in type (qxscan)}\label{sec:lockinDataType}
+For this type of data, the detectors already contain XAS and XMCD data that is
+polarized averaged.  This means that many of the steps outlined for the
+Non-Lockin data described in Section \ref{sec:non-lockinDataType}.  Lock-in data
+is normally collected at Sector 4-ID in \textbf{SPEC} files and the XAS and XMCD
+data are typically collected as the last two columns of the file and will be labeled as
+lockDC and lockACfix.  In order to perform longer acquisition without the risk
+of data loss, data is normally collected in a series of small steps collected in
+multiple scans in the \textbf{SPEC} file.  To deal with this,
+\textbf{xcirculardichro} is able to automaticlly average data from multiple
+scans simply by selecting multiple scans in the scan browser (see Sectiom
+\ref{dataSelection}).  It is likely that it will be necessary to step normalize
+this data as shown in Section \ref{sec:stepNormalization}.  From here it is a
+matter of combining data from different scans by first extracting step
+normalized data for XAS and XMCD for each field direction as described in
+Section 
+
+
+
 
 \end{appendices}
 
