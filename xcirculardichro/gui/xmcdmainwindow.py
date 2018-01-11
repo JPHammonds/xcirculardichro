@@ -286,13 +286,30 @@ class XMCDMainWindow(qtWidgets.QMainWindow):
         
     @qtCore.pyqtSlot()
     def _selectUserParameters(self):
+        '''
+        set up a dialog to allow the user to select parameters defined 
+        in the #U fields in a scan.  From this selection, the selected 
+        parameters will be added to the scanBrowser table to provide 
+        the user with more information as selection criteria for which 
+        scans to select for processing
+        '''
         logger.debug(METHOD_ENTER_STR)
         selectedScans = self._dataSelections.getSelectedScans()
         firstNode = self._dataSelections.getNodeContainingScan(selectedScans[0])
         specScan = firstNode.scans[selectedScans[0]]
         parameters = specScan.U.keys()
         logger.debug("Parameters %s" % parameters)
-        self.userParamsToDisplay = PositionerSelector.getPositionSelectorModalDialog(specScan.U)
+        try:
+            self.userParamsToDisplay = PositionerSelector.getPositionSelectorModalDialog(specScan.U)
+        except :
+            warningMessage = "No user parameters were found for the " \
+                    + "selected scans.  Either no #U lines were found in "\
+                    + "the spec file or no plugin was found to parse " \
+                    + "the #U"
+            qtWidgets.QMessageBox.warning(self, \
+                                          "User Parameters Not Found", \
+                                          warningMessage)
+            return
         logger.debug("Positioners %s" % self.userParamsToDisplay)
         self._dataSelections.setUserParamsToDisplay(self.userParamsToDisplay)
         
