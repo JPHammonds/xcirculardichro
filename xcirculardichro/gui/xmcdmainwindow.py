@@ -151,7 +151,7 @@ class XMCDMainWindow(qtWidgets.QMainWindow):
             self.selectPositionerParams.setEnabled(True)
             self.selectUserParams.setEnabled(True)
         else:
-            self.selectBrowserParams.setEnabled(False)
+            self.selectPositionerParams.setEnabled(False)
             self.selectUserParams.setEnabled(False)
         
     @qtCore.pyqtSlot() 
