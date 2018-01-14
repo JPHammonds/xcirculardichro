@@ -280,7 +280,7 @@ class MultiNonLockinXMCDChoices(AbstractChoices):
         
     @qtCore.pyqtSlot(int)
     def plotCorrectedData(self):
-        return True
+        return False
     
     @qtCore.pyqtSlot(int)
     def plotSelectorChanged(self, newType):
