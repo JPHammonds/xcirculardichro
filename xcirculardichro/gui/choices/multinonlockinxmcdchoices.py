@@ -10,7 +10,6 @@ from xcirculardichro import METHOD_ENTER_STR
 import PyQt5.QtWidgets as qtWidgets
 import PyQt5.QtCore as qtCore
 from PyQt5.Qt import QHBoxLayout
-from email.generator import UNDERSCORE
 
 logger = logging.getLogger(__name__)
 
@@ -81,7 +80,7 @@ class MultiNonLockinXMCDChoices(AbstractChoices):
         self.plotSelector.insertItems(0, PLOT_CHOICES)
         self.plotSelector.setCurrentIndex(0)
         plotLayout.addWidget(label)
-        
+        plotLayout.addWidget(self.plotSelector)
         layout.addLayout(plotLayout)
         
         self.plotSelector.currentIndexChanged[int]. \
@@ -96,19 +95,7 @@ class MultiNonLockinXMCDChoices(AbstractChoices):
         output values for XAS and XMCD 
         '''
         logger.debug(METHOD_ENTER_STR % data)
-        xasTeyRCP = None
-        xasTeyLCP = None
-        xasTfyRCP = None
-        xasTfyLCP = None
-        xasRefRCP = None
-        xasRefLCP = None
-        xasTey = None
-        xasTfy = None
-        xasRef = None
-        xmcdTey = None
-        xmcdTfy = None
-        xmcdRef = None
-        
+        #Grab stuff from the incoming array
         energy = np.array(data[0])
         teyRCP = np.array(data[1])
         teyLCP = np.array(data[2])
@@ -154,7 +141,7 @@ class MultiNonLockinXMCDChoices(AbstractChoices):
         elif str(self.plotSelector.currentText()) == PLOT_CHOICES[PlotChoiceId.refRcpLcp.value] :
             retData = [energy, refRCP, refLCP]
         elif str(self.plotSelector.currentText()) == PLOT_CHOICES[PlotChoiceId.i0RcpLcp.value]:
-            retData = [energy, refRCP, refLCP]
+            retData = [energy, i0RCP, i0LCP]
         else:
             raise LookupError(" No data selection for " + \
                               str(self.plotSelector.currentText()))
@@ -178,24 +165,53 @@ class MultiNonLockinXMCDChoices(AbstractChoices):
                        "".join([XMCD_STR, UNDERSCORE_STR, TFY_STR]),
                        "".join([XMCD_STR, UNDERSCORE_STR, REF_STR])]
         elif str(self.plotSelector.currentText()) == PLOT_CHOICES[PlotChoiceId.xasRcpLcpXasXmcd.value]:
-            retData = [energy, xasTeyRCP,xasTeyLCP, xasTfyRCP,xasTfyLCP, \
-                    xasRefRCP,xasRefLCP, xasTey, xasTfy, xasRef, \
-                    xmcdTey, xmcdTfy, xmcdRef]
+            yLabels = ["".join([XAS_STR, UNDERSCORE_STR, TEY_STR, \
+                                UNDERSCORE_STR, RCP_STR]), \
+                       "".join([XAS_STR, UNDERSCORE_STR, TEY_STR, \
+                                UNDERSCORE_STR, LCP_STR]), \
+                       "".join([XAS_STR, UNDERSCORE_STR, TFY_STR, \
+                                UNDERSCORE_STR, RCP_STR]), \
+                       "".join([XAS_STR, UNDERSCORE_STR, TFY_STR, \
+                                UNDERSCORE_STR, LCP_STR]), \
+                       "".join([XAS_STR, UNDERSCORE_STR, REF_STR, \
+                                UNDERSCORE_STR, RCP_STR]), \
+                       "".join([XAS_STR, UNDERSCORE_STR, REF_STR, \
+                                UNDERSCORE_STR, LCP_STR]), \
+                       "".join([XAS_STR, UNDERSCORE_STR, TEY_STR]), 
+                       "".join([XAS_STR, UNDERSCORE_STR, TFY_STR]),
+                       "".join([XAS_STR, UNDERSCORE_STR, REF_STR]),
+                       "".join([XMCD_STR, UNDERSCORE_STR, TEY_STR]),
+                       "".join([XMCD_STR, UNDERSCORE_STR, TFY_STR]),
+                       "".join([XMCD_STR, UNDERSCORE_STR, REF_STR])]
         elif str(self.plotSelector.currentText()) == PLOT_CHOICES[PlotChoiceId.xasRcpLcp.value ]:
-            retData = [energy, xasTeyRCP,xasTeyLCP, xasTfyRCP,xasTfyLCP, \
-                    xasRefRCP,xasRefLCP]
+            yLabels = ["".join([XAS_STR, UNDERSCORE_STR, TEY_STR, \
+                                UNDERSCORE_STR, RCP_STR]), \
+                       "".join([XAS_STR, UNDERSCORE_STR, TEY_STR, \
+                                UNDERSCORE_STR, LCP_STR]), \
+                       "".join([XAS_STR, UNDERSCORE_STR, TFY_STR, \
+                                UNDERSCORE_STR, RCP_STR]), \
+                       "".join([XAS_STR, UNDERSCORE_STR, TFY_STR, \
+                                UNDERSCORE_STR, LCP_STR]), \
+                       "".join([XAS_STR, UNDERSCORE_STR, REF_STR, \
+                                UNDERSCORE_STR, RCP_STR]), \
+                       "".join([XAS_STR, UNDERSCORE_STR, REF_STR, \
+                                UNDERSCORE_STR, LCP_STR])]
         elif str(self.plotSelector.currentText()) == PLOT_CHOICES[PlotChoiceId.teyRcpLcp.value] :
-            retData = [energy, teyRCP, teyLCP]
+            yLabels = ["".join([TEY_STR, UNDERSCORE_STR, RCP_STR]), \
+                       "".join([TEY_STR, UNDERSCORE_STR, LCP_STR])]
         elif str(self.plotSelector.currentText()) == PLOT_CHOICES[PlotChoiceId.tfyRcpLcp.value] :
-            retData = [energy, tfyRCP, tfyLCP]
+            yLabels = ["".join([TFY_STR, UNDERSCORE_STR, RCP_STR]), \
+                       "".join([TFY_STR, UNDERSCORE_STR, LCP_STR])]
         elif str(self.plotSelector.currentText()) == PLOT_CHOICES[PlotChoiceId.refRcpLcp.value] :
-            retData = [energy, refRCP, refLCP]
+            yLabels = ["".join([REF_STR, UNDERSCORE_STR, RCP_STR]), \
+                       "".join([REF_STR, UNDERSCORE_STR, LCP_STR])]
         elif str(self.plotSelector.currentText()) == PLOT_CHOICES[PlotChoiceId.i0RcpLcp.value]:
-            retData = [energy, refRCP, refLCP]
+            yLabels = ["".join([I0_STR, UNDERSCORE_STR, RCP_STR]), \
+                       "".join([I0_STR, UNDERSCORE_STR, LCP_STR])]
         else:
             raise LookupError(" No data selection for " + \
                               str(self.plotSelector.currentText()))
-        labels.append(yLabels)
+        labels.extend(yLabels)
         return labels
     
     def getPlotSelections(self):
@@ -214,7 +230,7 @@ class MultiNonLockinXMCDChoices(AbstractChoices):
                          XMCD_STR + SPACE_STR + TEY_STR, \
                          XMCD_STR + SPACE_STR + TFY_STR, \
                          XMCD_STR + SPACE_STR + REF_STR]        
-        if str(self.plotSelector.currentText()) == \
+        elif str(self.plotSelector.currentText()) == \
                                 PLOT_CHOICES[PlotChoiceId.xasRcpLcpXasXmcd]:
             addLabels = [XAS_STR + SPACE_STR + TEY_STR + SPACE_STR + RCP_STR,\
                          XAS_STR + SPACE_STR + TEY_STR + SPACE_STR + LCP_STR, \
@@ -228,7 +244,7 @@ class MultiNonLockinXMCDChoices(AbstractChoices):
                          XMCD_STR + SPACE_STR + TEY_STR, \
                          XMCD_STR + SPACE_STR + TFY_STR, \
                          XMCD_STR + SPACE_STR + REF_STR]        
-        if str(self.plotSelector.currentText()) == \
+        elif str(self.plotSelector.currentText()) == \
                                         PLOT_CHOICES[PlotChoiceId.xasRcpLcp]:
             addLabels = [XAS_STR + SPACE_STR + TEY_STR + SPACE_STR + RCP_STR,\
                          XAS_STR + SPACE_STR + TEY_STR + SPACE_STR + LCP_STR, \
@@ -236,23 +252,22 @@ class MultiNonLockinXMCDChoices(AbstractChoices):
                          XAS_STR + SPACE_STR + TFY_STR + SPACE_STR + LCP_STR, \
                          XAS_STR + SPACE_STR + REF_STR + SPACE_STR + RCP_STR,\
                          XAS_STR + SPACE_STR + REF_STR + SPACE_STR + LCP_STR]
-        if str(self.plotSelector.currentText()) == \
+        elif str(self.plotSelector.currentText()) == \
                                         PLOT_CHOICES[PlotChoiceId.teyRcpLcp]:
             addLabels = [TEY_STR + SPACE_STR + RCP_STR,\
                          TEY_STR + SPACE_STR + LCP_STR]
-        if str(self.plotSelector.currentText()) == \
+        elif str(self.plotSelector.currentText()) == \
                                         PLOT_CHOICES[PlotChoiceId.tfyRcpLcp]:
             addLabels = [TFY_STR + SPACE_STR + RCP_STR,\
                          TFY_STR + SPACE_STR + LCP_STR]
-        if str(self.plotSelector.currentText()) == \
+        elif str(self.plotSelector.currentText()) == \
                                         PLOT_CHOICES[PlotChoiceId.refRcpLcp]:
             addLabels = [REF_STR + SPACE_STR + RCP_STR,\
                          REF_STR + SPACE_STR + LCP_STR]
-        if str(self.plotSelector.currentText()) == \
+        elif str(self.plotSelector.currentText()) == \
                                         PLOT_CHOICES[PlotChoiceId.i0RcpLcp]:
             addLabels = [I0_STR + SPACE_STR + RCP_STR,\
                          I0_STR + SPACE_STR + LCP_STR]
-        return labels
         labels.extend(addLabels)
         return labels
         
@@ -269,23 +284,22 @@ class MultiNonLockinXMCDChoices(AbstractChoices):
     
     @qtCore.pyqtSlot(int)
     def plotSelectorChanged(self, newType):
-        self.plotTypeSelectorChanged[int].emit(newType)
+        self.plotTypeChanged[int].emit(newType)
         
     def setPlotSelections(self, selections):
         pass
     
     def getPlotAxisLabelsIndex(self):
-        plotTypes = self.plotSelector.currentText().split("/")
+        plotTypes = self.getPlotAxisLabels()
+        logger.debug("==== plot axis labels ")
         axisIndex = []
         axisIndex.append(0)    #x axis, kQTExifUserDataFlashEnergy
-        for pType in plotTypes:
+        for pType in plotTypes[1:]:
             if pType.startswith("XAS"):
+                logger.debug("%s getting assigned label index %d" % (pType, 1) )
                 axisIndex.append(1)
             elif pType.startswith("XMCD"):
-                axisIndex.append(2)
-            elif pType.startswith('D+') or pType.startswith('w-'):
-                axisIndex.append(1)
-            elif pType.startswith('M+') or pType.startswith('w-'):
+                logger.debug("%s getting assigned label index %d" % (pType, 2) )
                 axisIndex.append(2)
             else:
                 axisIndex.append(1)
