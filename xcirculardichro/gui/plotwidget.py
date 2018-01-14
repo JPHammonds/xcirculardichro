@@ -275,7 +275,7 @@ class PlotWidget(qtWidgets.QDialog):
         
     
     def plotAx1(self, x, y, label):
-        logger.debug(METHOD_ENTER_STR % ((x,y),))
+        logger.debug(METHOD_ENTER_STR % ((label, x,y),))
         
         line, = self.ax.plot(x, y, label=label, picker=True, pickradius=6)
         self.selector1[label] = HighlightSelected(line, parent=self)
@@ -297,7 +297,7 @@ class PlotWidget(qtWidgets.QDialog):
         #line.setp( line, linewidth = 2)
         
     def plotAx2(self, x, y, label):
-        logger.debug(METHOD_ENTER_STR % ((x,y),))
+        logger.debug(METHOD_ENTER_STR % ((label, x,y),))
         
         line, = self.ax2.plot(x, y, label=label, 
                       linestyle=":", picker=True, pickradius=6)
