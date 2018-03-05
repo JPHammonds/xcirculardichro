@@ -18,11 +18,16 @@ OVERRIDE_METHOD_STR ="Must subclass this and override this method"
 
 class AbstractSelectionDisplay(QtWidgets.QSplitter):
 
-    dataSelectionsChanged = qtCore.pyqtSignal(name="dataSelectionsChanged")
+    dataSelectionsChanged = \
+        qtCore.pyqtSignal(name="dataSelectionsChanged")
     plotOptionChanged = qtCore.pyqtSignal(name="plotOptionChanged")    
-    pointSelectionTypeChanged = qtCore.pyqtSignal(int, name="pointSelectionTypeChanged")
-    pointSelectionAxisChanged = qtCore.pyqtSignal(int, name="pointSelectionAxisChanged")
-    pointSelectionReloadPicks = qtCore.pyqtSignal(list, list, name="pointSelectReloadPicks")
+    pointSelectionTypeChanged = \
+        qtCore.pyqtSignal(int, name="pointSelectionTypeChanged")
+    pointSelectionAxisChanged = \
+        qtCore.pyqtSignal(int, name="pointSelectionAxisChanged")
+    pointSelectionReloadPicks = \
+        qtCore.pyqtSignal(list, list, name="pointSelectReloadPicks")
+    rangeValuesChanged = qtCore.pyqtSignal(list, list, name='rangeValuesChanged')
 
     def __init__(self, parent=None):
         super(AbstractSelectionDisplay, self).__init__(parent=parent)
@@ -79,6 +84,14 @@ class AbstractSelectionDisplay(QtWidgets.QSplitter):
         return nodeContainingScan
         
     @abstractmethod
+    def getPostEdgeRange(self):
+        raise NotImplementedError(OVERRIDE_METHOD_STR)
+    
+    @abstractmethod
+    def getPreEdgeRange(self):
+        raise NotImplementedError(OVERRIDE_METHOD_STR)
+    
+    @abstractmethod
     def getPlotAxisLabelsIndex(self):
         raise NotImplementedError(OVERRIDE_METHOD_STR)
 
@@ -88,6 +101,14 @@ class AbstractSelectionDisplay(QtWidgets.QSplitter):
 
     @abstractmethod
     def getSelectedScans(self):
+        raise NotImplementedError(OVERRIDE_METHOD_STR)
+    
+    @abstractmethod
+    def getSelectedEdgeRangeData(self):
+        raise NotImplementedError(OVERRIDE_METHOD_STR)
+        
+    @abstractmethod
+    def getSelectedScansRange(self):
         raise NotImplementedError(OVERRIDE_METHOD_STR)
         
     def isType(self, selectionType):
@@ -152,6 +173,20 @@ class AbstractSelectionDisplay(QtWidgets.QSplitter):
     def setUserParamsToDisplay(self, userParams):
         logger.debug(METHOD_ENTER_STR)
         raise NotImplementedError(OVERRIDE_METHOD_STR)
+    
+    def validateRangeSelection(self):
+        selectedScansRange = self.getSelectedScansRange()
+        preEdgeRange = self.getPreEdgeRange()
+        postEdgeRange = self.getPostEdgeRange()
+        if (preEdgeRange[0] >= selectedScansRange[0]) and \
+            (preEdgeRange [0] <= preEdgeRange[1]) and \
+            (postEdgeRange[0] > preEdgeRange[1]) and \
+            (postEdgeRange[0] <= postEdgeRange[1]) and \
+            (postEdgeRange[1] <= selectedScansRange[1]):
+            return True
+        else:
+            return False
+            
 
 class XMCDNoScanSelected(XMCDException):
     
