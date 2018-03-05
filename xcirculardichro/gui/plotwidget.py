@@ -74,6 +74,14 @@ class PlotWidget(qtWidgets.QDialog):
                 self.selector2[key].applyPickPoints(preEdgePoints, postEdgePoints)
         logger.debug(METHOD_EXIT_STR)
         
+        
+    def applyRangeSelection(self, preEdgePoints, postEdgePoints):
+        logger.debug(METHOD_ENTER_STR %((preEdgePoints, postEdgePoints),))
+        plt.axvline(preEdgePoints[0])
+        plt.axvline(preEdgePoints[1])
+        plt.axvline(postEdgePoints[0])
+        plt.axvline(postEdgePoints[1])
+        
     def clear(self):
         logger.debug("Entering")
         plt.clf()
