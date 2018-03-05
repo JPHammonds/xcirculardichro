@@ -11,7 +11,7 @@ import PyQt5.QtGui as qtGui
 import PyQt5.QtCore as qtCore
 from xcirculardichro import METHOD_ENTER_STR
 from xcirculardichro.gui.choices.intermediatechoices import IntermediateChoices
-from xcirculardichro.gui.dataselection.pointselectioninfo import PointSelectionInfo
+from xcirculardichro.gui.dataselection.rangeselectioninfo import RangeSelectionInfo
 
 SCAN_COL = 0
 CMD_COL = 1
@@ -25,7 +25,7 @@ class IntermediateDataSelection(AbstractSelectionDisplay):
         self.selectionType = SelectionTypeNames.INTERMEDIATE_SELECTION
         self.scanBrowser = ScanBrowser()
         self.subChoices = IntermediateChoices()
-        self.pointSelectionInfo = PointSelectionInfo()
+        self.pointSelectionInfo = RangeSelectionInfo()
         
         self.addWidget(self.scanBrowser)
         self.addWidget(self.subChoices)
@@ -122,8 +122,8 @@ class IntermediateDataSelection(AbstractSelectionDisplay):
         
     def setLeftDataSelection(self, label, selection, average):
         logger.debug(METHOD_ENTER_STR % ((label, selection, average),))
-        self.pointSelectionInfo.setSelectionAverage(PointSelectionInfo.POINT_SELECTIONS[0], average)
-        self.pointSelectionInfo.setSelectionIndices(PointSelectionInfo.POINT_SELECTIONS[0], selection)
+        self.pointSelectionInfo.setSelectionAverage(RangeSelectionInfo.POINT_SELECTIONS[0], average)
+        self.pointSelectionInfo.setSelectionIndices(RangeSelectionInfo.POINT_SELECTIONS[0], selection)
     
     def setPositionersToDisplay(self, positioners):
         logger.debug(METHOD_ENTER_STR)
@@ -132,8 +132,8 @@ class IntermediateDataSelection(AbstractSelectionDisplay):
         
     def setRightDataSelection(self, label, selection, average):
         logger.debug(METHOD_ENTER_STR % ((label, selection, average),))
-        self.pointSelectionInfo.setSelectionAverage(PointSelectionInfo.POINT_SELECTIONS[1], average)
-        self.pointSelectionInfo.setSelectionIndices(PointSelectionInfo.POINT_SELECTIONS[1], selection)
+        self.pointSelectionInfo.setSelectionAverage(RangeSelectionInfo.POINT_SELECTIONS[1], average)
+        self.pointSelectionInfo.setSelectionIndices(RangeSelectionInfo.POINT_SELECTIONS[1], selection)
     
     def setupDisplayWithSelectedNodes(self):
         self.scanBrowser.clearBrowser()
