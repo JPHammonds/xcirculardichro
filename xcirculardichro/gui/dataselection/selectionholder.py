@@ -29,6 +29,8 @@ class SelectionHolder(qtWidgets.QWidget):
     pointSelectionAxisChanged = qtCore.pyqtSignal(int, name="pointSelectionAxisChanged")
     pointSelectionTypeChanged = qtCore.pyqtSignal(int, name="pointSelectionTypeChanged")
     pointSelectionReloadPicks = qtCore.pyqtSignal(list, list, name="pointSelectReloadPicks")
+    rangeSelectionChanged = qtCore.pyqtSignal(list, list, name="rangeSelectionChanged")
+    rangeValuesChanged = qtCore.pyqtSignal(list,list, name='rangeValuesChanged')
     
     def __init__(self, parent=None):
         super(SelectionHolder, self).__init__(parent=parent)
@@ -45,6 +47,7 @@ class SelectionHolder(qtWidgets.QWidget):
         self._selectionWidget.pointSelectionAxisChanged[int].connect(self.handlePointSelectionAxisChanged)
         self._selectionWidget.pointSelectionTypeChanged[int].connect(self.handlePointSelectionTypeChanged)
         self._selectionWidget.pointSelectionReloadPicks.connect(self.handlePointSelectionReloadPicks)
+        self._selectionWidget.rangeValuesChanged.connect(self.handleDataRangesChanged)
 
     def calcPlotData(self, data):
         return self._selectionWidget.calcPlotData(data)
@@ -66,6 +69,9 @@ class SelectionHolder(qtWidgets.QWidget):
     def getPlotAxisLabelsIndex(self):
         return self._selectionWidget.getPlotAxisLabelsIndex()
 
+    def getSelectedEdgeRangeData(self):
+        return self._selectionWidget.getSelectedEdgeRangeData()
+        
     def getSelectedCounterInfo(self):
         return self._selectionWidget.getSelectedCounterInfo()
  
@@ -96,6 +102,10 @@ class SelectionHolder(qtWidgets.QWidget):
     def handlePointSelectionTypeChanged(self, index):
         self.pointSelectionTypeChanged[int].emit(index)
  
+    def handleDataRangesChanged(self, preEdgeRange, postEdgeRange):
+        logger.debug(METHOD_ENTER_STR % ((preEdgeRange, postEdgeRange),))
+        self.rangeValuesChanged.emit(preEdgeRange, postEdgeRange)
+        
     def hasValidPointSelectionInfo(self):
         retValue = False
         if self._selectionWidget.hasPointSelectionWidget() and  \
@@ -149,6 +159,7 @@ class SelectionHolder(qtWidgets.QWidget):
             self._selectionWidget.pointSelectionAxisChanged[int].disconnect(self.handlePointSelectionAxisChanged)
             self._selectionWidget.pointSelectionTypeChanged[int].disconnect(self.handlePointSelectionTypeChanged)
             self._selectionWidget.pointSelectionReloadPicks.disconnect(self.handlePointSelectionReloadPicks)
+            self._selectionWidget.rangeValuesChanged.disconnect(self.handleDataRangesChanged)
             layout = self.layout()
             self._selectionWidget.hide()
             layout.removeWidget(self._selectionWidget)
@@ -159,6 +170,7 @@ class SelectionHolder(qtWidgets.QWidget):
             self._selectionWidget.pointSelectionAxisChanged[int].connect(self.handlePointSelectionAxisChanged)
             self._selectionWidget.pointSelectionTypeChanged[int].connect(self.handlePointSelectionTypeChanged)
             self._selectionWidget.pointSelectionReloadPicks.connect(self.handlePointSelectionReloadPicks)
+            self._selectionWidget.rangeValuesChanged.connect(self.handleDataRangesChanged)
             logger.debug(self._selectionWidget)
             
     def setPostionersToDisplay(self, positioners):
