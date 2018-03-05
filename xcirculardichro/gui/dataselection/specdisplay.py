@@ -15,7 +15,7 @@ from xcirculardichro import METHOD_ENTER_STR,\
 from xcirculardichro.gui.dataselection.AbstractSelectionDisplay import AbstractSelectionDisplay,\
     SelectionTypeNames
 from PyQt5.QtWidgets import QAbstractItemView
-from xcirculardichro.gui.dataselection.pointselectioninfo import PointSelectionInfo
+from xcirculardichro.gui.dataselection.rangeselectioninfo import RangeSelectionInfo
 
 logger = logging.getLogger(__name__)
 
@@ -33,13 +33,13 @@ class SpecDisplay(AbstractSelectionDisplay):
         self.counterSelector = CounterSelector(
             counterOpts = self.subChoices.choiceWidget.COUNTER_OPTS)
         self.scanBrowser.scanList.setSelectionMode(QAbstractItemView.SingleSelection)
-        self.pointSelectionInfo = PointSelectionInfo()
+        self.rangeSelectionInfo = RangeSelectionInfo()
         
         self.addWidget(self.typeSelector)
         self.addWidget(self.scanBrowser)
         self.addWidget(self.subChoices)
         self.addWidget(self.counterSelector)
-        self.addWidget(self.pointSelectionInfo)
+        self.addWidget(self.rangeSelectionInfo)
         
         
         self.scanBrowser.scanSelected[list].connect(self.handleScanSelection)
@@ -52,8 +52,10 @@ class SpecDisplay(AbstractSelectionDisplay):
         self.subChoices.subTypeChanged[int].connect(self.handleSubTypeChanged)
         self.subChoices.plotTypeChanged[int].connect(self.handlePlotTypeChanged)
         self.subChoices.plotOptionChanged.connect(self.handlePlotOptionChanged)
-        self.pointSelectionInfo.selectorTypeChanged[int].connect(self.handleSelectorTypeChanged)
-        self.pointSelectionInfo.selectorAxisChanged[int].connect(self.handleSelectorAxisChanged)
+        self.rangeSelectionInfo.selectorTypeChanged[int].connect(self.handleSelectorTypeChanged)
+        self.rangeSelectionInfo.selectorAxisChanged[int].connect(self.handleSelectorAxisChanged)
+        self.rangeSelectionInfo.grabRangeFromSelection.connect(self.setDefSelectedScansRange)
+        self.rangeSelectionInfo.dataRangeChanged.connect(self.handleEdgeRangeChanged)
         self.show()
         
     
@@ -61,8 +63,8 @@ class SpecDisplay(AbstractSelectionDisplay):
         return self.subChoices.choiceWidget.calcPlotData(data)
         
     def copyPickedPointsToData(self):
-        leftIndices = self.pointSelectionInfo.pointSelections[PointSelectionInfo.POINT_SELECTIONS[0]].getIndices()
-        rightIndices = self.pointSelectionInfo.pointSelections[PointSelectionInfo.POINT_SELECTIONS[1]].getIndices()
+        leftIndices = self.rangeSelectionInfo.pointSelections[RangeSelectionInfo.POINT_SELECTIONS[0]].getIndices()
+        rightIndices = self.rangeSelectionInfo.pointSelections[RangeSelectionInfo.POINT_SELECTIONS[1]].getIndices()
         logger.debug("Points to copy to another Left: %s Right: %s" % (leftIndices, rightIndices) )
         self.pointSelectionReloadPicks.emit(leftIndices, rightIndices)
 
@@ -85,6 +87,12 @@ class SpecDisplay(AbstractSelectionDisplay):
     def getPlotAxisLabelsIndex(self):
         return self.subChoices.choiceWidget.getPlotAxisLabelsIndex()
 
+    def getPostEdgeRange(self):
+        return self.rangeSelectionInfo.getPostEdgeRange()
+        
+    def getPreEdgeRange(self):
+        return self.rangeSelectionInfo.getPreEdgeRange()
+        
     def getScanTypes(self, specFile):
         scanTypes = set()
         for scan in specFile.scans:
@@ -98,9 +106,47 @@ class SpecDisplay(AbstractSelectionDisplay):
         counterNames = self.counterSelector.getSelectedCounterNames(counters)
         return counters, counterNames
  
+    def getSelectedEdgeRangeData(self):
+        return (self.rangeSelectionInfo.getPreEdgeRange(),
+                self.rangeSelectionInfo.getPostEdgeRange())
+        
     def getSelectedScans(self):
         return self.selectedScans
     
+
+    def getSelectedScansRange(self):
+        scans = self.selectedScans
+        minScan = None
+        maxScan = None
+        
+        counters, counterNames = self.getSelectedCounterInfo()
+        for scan in scans:
+            node = self.getNodeContainingScan(scan)
+            thisScan = node.scans[scan]
+            axisCounter = counterNames[0]
+            try:
+                dataThisScan = thisScan.data[axisCounter][:]
+                if dataThisScan is not None and len(dataThisScan) > 1:
+                    if minScan is None:
+                        minScan = dataThisScan[0]
+                    else:
+                        minScan = minScan if minScan < dataThisScan[0] \
+                            else dataThisScan[0]
+                    if maxScan is None:
+                        maxScan = dataThisScan[-1]
+                    else:
+                        maxScan = maxScan if maxScan > dataThisScan[-1] \
+                            else dataThisScan[-1]
+            except KeyError:
+                logger.exception("Tried to load data that does "  +\
+                                 "not have counters selected.")
+                
+        if minScan is None:
+            minScan = 999999.
+        if maxScan is None:
+            maxScan = -999999.9
+        return [minScan, maxScan]
+        
     '''
     Triggered when a user selects a new option for which counter to use in a 
     particular roll in calculations/plotting
@@ -136,6 +182,10 @@ class SpecDisplay(AbstractSelectionDisplay):
             #TODO: plot widget is external to this.   Need to raise signal to main window
             self.plotWidget.plot(energyData, data)
         
+    def handleEdgeRangeChanged(self, preEdgeRange, postEdgeRange):
+        logger.debug(METHOD_ENTER_STR, ((preEdgeRange, postEdgeRange),))
+        self.rangeValuesChanged.emit(preEdgeRange, postEdgeRange)
+        
     @qtCore.pyqtSlot()
     def handlePlotOptionChanged(self):
         logger.debug(METHOD_ENTER_STR)
@@ -144,7 +194,7 @@ class SpecDisplay(AbstractSelectionDisplay):
     @qtCore.pyqtSlot(int)
     def handlePlotTypeChanged(self, newType, suppressFilter=False):
         logger.debug(METHOD_ENTER_STR)
-
+        
     '''
     Called when a user actually selects a new scan from the list in the 
     ScanBrowser.  When a new scan is selected, it's type needs to be determined, 
@@ -202,11 +252,14 @@ class SpecDisplay(AbstractSelectionDisplay):
         self.counterSelector.setSelectedCounters(
             self.currentSelections[newScanType])
         self.dataSelectionsChanged.emit()
-        self.copyPickedPointsToData()
-        self.pointSelectionTypeChanged.emit(
-            self.pointSelectionInfo.getPointSetType())
-        self.pointSelectionAxisChanged.emit(
-            self.pointSelectionInfo.getAxisSelection())
+        self.validateRangeSelection()
+        if (self.rangeSelectionInfo.edgeRangesAtDummyValues()):
+            self.setDefSelectedScansRange()
+#         self.copyPickedPointsToData()
+#         self.pointSelectionTypeChanged.emit(
+#             self.pointSelectionInfo.getPointSetType())
+#         self.pointSelectionAxisChanged.emit(
+#             self.pointSelectionInfo.getAxisSelection())
         
     '''
     Handle a sequence of operations when the contents of the scan browser 
@@ -234,6 +287,14 @@ class SpecDisplay(AbstractSelectionDisplay):
     def hasValidPointSelectionData(self):
         return self.pointSelectionInfo.hasValidPointSelectionData()
 
+    def isDataIncreasingX(self, dataSet):
+        logger.debug(METHOD_ENTER_STR % dataSet)
+        retValue = False
+        if dataSet[0] <= dataSet[-1]:
+            retValue = True
+        logger.debug(METHOD_EXIT_STR % retValue)
+        return retValue
+        
     def isMultipleScansSelected(self):
         logger.debug(METHOD_ENTER_STR % self.selectedNodes)
         if len(self.selectedScans) > 1:
@@ -258,8 +319,8 @@ class SpecDisplay(AbstractSelectionDisplay):
    
     def plotCorrectedData(self):
         logger.debug(METHOD_ENTER_STR)
-        decision = (len(self.pointSelectionInfo.getPointSetLeftPoints()) > 0) and \
-            (len(self.pointSelectionInfo.getPointSetRightPoints()) > 0) and \
+        decision = (len(self.rangeSelectionInfo.getPointSetLeftPoints()) > 0) and \
+            (len(self.rangeSelectionInfo.getPointSetRightPoints()) > 0) and \
             self.subChoices.plotCorrectedData()
         logger.debug(METHOD_EXIT_STR % decision)
         return decision 
@@ -301,10 +362,68 @@ class SpecDisplay(AbstractSelectionDisplay):
         self.scanBrowser.scanList.itemSelectionChanged.emit()
         self.dataSelectionsChanged.emit()            
         
+    def setDefSelectedScansRange(self):
+        logger.debug(METHOD_ENTER_STR)
+        scans = self.selectedScans
+        minScan = None
+        maxScan = None
+        percentFromEdge = 0.05
+        
+        counters, counterNames = self.getSelectedCounterInfo()
+        
+        if len(scans) > 0:
+            for scan in scans:
+                node = self.getNodeContainingScan(scan)
+                thisScan = node.scans[scan]
+                logger.debug("thisScan %s" % thisScan)
+                logger.debug("thisScan.data %s" % thisScan.data)
+                axisCounter = counterNames[0]
+                logger.debug(axisCounter)
+                try:
+                    dataThisScan = thisScan.data[axisCounter][:]
+                    logger.debug("dataThisScan %s" % dataThisScan)
+                    if dataThisScan is not None and len(dataThisScan) > 1:
+                        if self.isDataIncreasingX(dataThisScan):
+                            if minScan is None:
+                                minScan = dataThisScan[0]
+                            else:
+                                minScan = minScan if minScan < dataThisScan[0] \
+                                    else dataThisScan[0]
+                            if maxScan is None:
+                                maxScan = dataThisScan[-1]
+                            else:
+                                maxScan = maxScan if maxScan > dataThisScan[-1] \
+                                    else dataThisScan[-1]
+                        else:
+                            if minScan is None:
+                                minScan = dataThisScan[-1]
+                            else:
+                                minScan = minScan if minScan < dataThisScan[-1] \
+                                    else dataThisScan[-1]
+                            if maxScan is None:
+                                maxScan = dataThisScan[0]
+                            else:
+                                maxScan = maxScan if maxScan > dataThisScan[0] \
+                                    else dataThisScan[0]
+                    else: 
+                        return
+                        
+                except KeyError:
+                    logger.exception("Tried to load data that does "  +\
+                                     "not have counters selected.")
+                
+                minPlus = minScan + (maxScan - minScan) * percentFromEdge
+                maxMinus = maxScan - (maxScan - minScan) * percentFromEdge
+                logger.debug("minScan, minPlus: %s" % ((minScan, minPlus),) )
+                logger.debug("maxMinus, minScan: %s" % ((maxMinus, minScan),) )
+                self.rangeSelectionInfo.setPreEdgeRange([minScan, minPlus])
+                self.rangeSelectionInfo.setPostEdgeRange([maxMinus, maxScan])
+        
+        
     def setLeftDataSelection(self, label, selection, average):
         logger.debug(METHOD_ENTER_STR % ((label, selection, average),))
-        self.pointSelectionInfo.setSelectionAverage(PointSelectionInfo.POINT_SELECTIONS[0], average)
-        self.pointSelectionInfo.setSelectionIndices(PointSelectionInfo.POINT_SELECTIONS[0], selection)
+        self.pointSelectionInfo.setSelectionAverage(RangeSelectionInfo.POINT_SELECTIONS[0], average)
+        self.pointSelectionInfo.setSelectionIndices(RangeSelectionInfo.POINT_SELECTIONS[0], selection)
         
     def setPositionersToDisplay(self, positioners):
         logger.debug(METHOD_ENTER_STR, positioners)
@@ -312,8 +431,8 @@ class SpecDisplay(AbstractSelectionDisplay):
         
     def setRightDataSelection(self, label, selection, average):
         logger.debug(METHOD_ENTER_STR % ((label, selection, average),))
-        self.pointSelectionInfo.setSelectionAverage(PointSelectionInfo.POINT_SELECTIONS[1], average)
-        self.pointSelectionInfo.setSelectionIndices(PointSelectionInfo.POINT_SELECTIONS[1], selection)
+        self.pointSelectionInfo.setSelectionAverage(RangeSelectionInfo.POINT_SELECTIONS[1], average)
+        self.pointSelectionInfo.setSelectionIndices(RangeSelectionInfo.POINT_SELECTIONS[1], selection)
   
     def setUserParamsToDisplay(self, userParams):
         logger.debug(METHOD_ENTER_STR, userParams)
