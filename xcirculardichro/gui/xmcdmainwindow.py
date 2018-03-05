@@ -198,7 +198,7 @@ class XMCDMainWindow(qtWidgets.QMainWindow):
         selection = self._plotWidget.getLeftSelectionIndexes(label)
         average = self._plotWidget.getLeftSelectionAverage(label)
         self._dataSelections.setLeftDataSelection(label, selection, average)
-        #self.updatePlotData()
+        self.updatePlotData()
         
     @qtCore.pyqtSlot(str)
     def handleRightDataSelectionChanged(self, label):
@@ -210,7 +210,7 @@ class XMCDMainWindow(qtWidgets.QMainWindow):
         selection = self._plotWidget.getRightSelectionIndexes(label)
         average = self._plotWidget.getRightSelectionAverage(label)
         self._dataSelections.setRightDataSelection(label, selection, average)
-        #self.updatePlotData()
+        self.updatePlotData()
         
         
     @qtCore.pyqtSlot(qtCore.QModelIndex, qtCore.QModelIndex)
@@ -223,7 +223,9 @@ class XMCDMainWindow(qtWidgets.QMainWindow):
               
     def handlePointSelectionReloadPicks(self, preEdgePoints, postEdgePoints):
         logger.debug(METHOD_ENTER_STR % ((preEdgePoints, postEdgePoints, "a"),))
-        self._plotWidget.applyPickPoints(preEdgePoints, postEdgePoints)     
+        self._plotWidget.applyPickPoints(preEdgePoints, postEdgePoints)
+        if ((len(preEdgePoints) > 0) and (len(postEdgePoints) > 0)):
+            self.updatePlotData()
         logger.debug(METHOD_EXIT_STR)
         
     @qtCore.pyqtSlot()
@@ -526,7 +528,7 @@ class XMCDMainWindow(qtWidgets.QMainWindow):
                     self._plotWidget.plotAx4Corrected(dataOut[0],
                                                       correctedData[index-1],
                                                       dataLabel)
-                    
+        
         self._plotWidget.plotDraw()
                    
         
