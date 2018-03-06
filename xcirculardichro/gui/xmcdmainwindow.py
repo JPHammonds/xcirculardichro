@@ -31,6 +31,7 @@ class XMCDMainWindow(qtWidgets.QMainWindow):
     def __init__(self, parent=None):
         super(XMCDMainWindow, self).__init__(parent)
         logger.debug(METHOD_ENTER_STR)
+        self.currentDirectory =str( os.path.dirname(os.path.realpath(__file__)))
         self.setAttribute(qtCore.Qt.WA_DeleteOnClose)
         self._createMenuBar()
         self.positionersToDisplay = []
@@ -56,6 +57,7 @@ class XMCDMainWindow(qtWidgets.QMainWindow):
         self._dataSelections.pointSelectionAxisChanged[int].connect(self._plotWidget.setPointSelectionAxis)
         self._dataSelections.pointSelectionTypeChanged[int].connect(self._plotWidget.setPointSelectionType)
         self._dataSelections.pointSelectionReloadPicks.connect(self.handlePointSelectionReloadPicks)
+        self._dataSelections.rangeValuesChanged.connect(self.handleEdgeRangeValuesChanged)
         logger.debug(METHOD_EXIT_STR)
         
     def _createMenuBar(self):
@@ -188,6 +190,10 @@ class XMCDMainWindow(qtWidgets.QMainWindow):
         logger.debug(METHOD_ENTER_STR)
         self.updatePlotData()
         
+    def handleEdgeRangeValuesChanged(self, preEdgeRange, postEdgeRange):
+        logger.debug(METHOD_ENTER_STR % ((preEdgeRange, postEdgeRange),))
+        self._plotWidget.applyRangeSelection(preEdgeRange, postEdgeRange)
+        
     @qtCore.pyqtSlot(str)
     def handleLeftDataSelectionChanged(self, label):
         '''
@@ -234,7 +240,9 @@ class XMCDMainWindow(qtWidgets.QMainWindow):
         Open a file, populate the navigator window as appropriate
         '''
         logger.debug(METHOD_ENTER_STR)
-        fileName = qtWidgets.QFileDialog.getOpenFileName(None, "Open Spec File")[0]
+        fileName = qtWidgets.QFileDialog.getOpenFileName(None, 
+                                caption="Open Spec File",
+                                directory=self.currentDirectory)[0]
         specFile = None
         if fileName != "":
             try:
@@ -244,6 +252,7 @@ class XMCDMainWindow(qtWidgets.QMainWindow):
                               "The file %s does not seem to be a spec file" %
                               fileName)
                 return
+            self.currentDirectory = str(os.path.realpath(fileName))
         else:
             return
         self._dataNavigator.addSpecDataFileNode(specFile)
