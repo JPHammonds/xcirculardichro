@@ -7,6 +7,7 @@ import PyQt5.QtWidgets as qtWidgets
 import PyQt5.QtCore as qtCore
 import PyQt5.QtGui as qtGui
 from xcirculardichro import METHOD_ENTER_STR, METHOD_EXIT_STR
+
 logger = logging.getLogger(__name__)
 DUMMY_MINIMUM = 999999.9
 DUMMY_MAXIMUM = -999999.9
@@ -21,8 +22,10 @@ class RangeSelectionInfo(qtWidgets.QDialog):
        
     def __init__(self, parent=None):
         super(RangeSelectionInfo, self).__init__(parent=parent)
+        self.overallRange = [DUMMY_MINIMUM, DUMMY_MAXIMUM]
         layout = qtWidgets.QVBoxLayout()
         layout.setSpacing(5)
+
         hLayout1 = qtWidgets.QHBoxLayout()
         label = qtWidgets.QLabel("PointSet to Select: ")
         hLayout1.addWidget(label)
@@ -40,10 +43,21 @@ class RangeSelectionInfo(qtWidgets.QDialog):
         hLayout2.addWidget(self.axisSelector)
         layout.addLayout(hLayout2)
         self.pointSelections = {}
-        for selection in self.POINT_SELECTIONS:
-            self.pointSelections[selection] = PointSetInfo(selection)
-            layout.addWidget(self.pointSelections[selection])
-            self.pointSelections[selection].dataRangeChanged.connect(self.handleRangeChanged)
+
+        
+        self.preEdgeRangeSelection = RangeSetInfo(self.POINT_SELECTIONS[0])
+        layout.addWidget(self.preEdgeRangeSelection)
+        self.preEdgeRangeSelection.dataRangeChanged.connect(self.handleRangeChanged)
+        
+        self.postEdgeRangeSelection = RangeSetInfo(self.POINT_SELECTIONS[1])
+        layout.addWidget(self.postEdgeRangeSelection)
+        self.postEdgeRangeSelection.dataRangeChanged.connect(self.handleRangeChanged)
+        
+        
+#         for selection in self.POINT_SELECTIONS:
+#             self.pointSelections[selection] = PointSetInfo(selection)
+#             layout.addWidget(self.pointSelections[selection])
+#             self.pointSelections[selection].dataRangeChanged.connect(self.handleRangeChanged)
         self.grabRangeButton = qtWidgets.QPushButton("Grab Range From Data")
         layout.addWidget(self.grabRangeButton)
         
@@ -55,8 +69,8 @@ class RangeSelectionInfo(qtWidgets.QDialog):
     def edgeRangesAtDummyValues(self):
         logger.debug(METHOD_ENTER_STR)
         retValue = False
-        if self.pointSelections[self.POINT_SELECTIONS[0]].rangeAtDummyValues() and \
-            self.pointSelections[self.POINT_SELECTIONS[1]].rangeAtDummyValues():
+        if self.preEdgeRangeSelection.rangeAtDummyValues() and \
+            self.postEdgeRangeSelection.rangeAtDummyValues():
             retValue = True
         logger.debug(METHOD_EXIT_STR % retValue)
         return retValue
@@ -68,26 +82,26 @@ class RangeSelectionInfo(qtWidgets.QDialog):
         return self.pointSetSelector.currentIndex()
     
     def getPointSetAverageLeft(self):
-        return self.pointSelections[self.POINT_SELECTIONS[0]].getAverage()
+        return self.preEdgeRangeSelection.getAverage()
     
     def getPointSetAverageRight(self):
-        return self.pointSelections[self.POINT_SELECTIONS[1]].getAverage()
+        return self.postEdgeRangeSelection.getAverage()
     
     def getPointSetLeftPoints(self):
-        infoSet = self.pointSelections[self.POINT_SELECTIONS[0]].getIndices()
+        infoSet = self.preEdgeRangeSelection.getIndices()
         return infoSet
         
     def getPointSetRightPoints(self):
-        infoSet = self.pointSelections[self.POINT_SELECTIONS[1]].getIndices()
+        infoSet = self.postEdgeRangeSelection.getIndices()
         return infoSet
     
     def getPostEdgeRange(self):
         logger.debug(METHOD_ENTER_STR)
-        return self.pointSelections[self.POINT_SELECTIONS[1]].getRange()
+        return self.postEdgeRangeSelection.getRange()
 
     def getPreEdgeRange(self):
         logger.debug(METHOD_ENTER_STR)
-        return self.pointSelections[self.POINT_SELECTIONS[0]].getRange()
+        return self.preEdgeRangeSelection.getRange()
 
     @qtCore.pyqtSlot()
     def grabRange(self):
@@ -136,18 +150,23 @@ class RangeSelectionInfo(qtWidgets.QDialog):
         logger.debug(METHOD_ENTER_STR % ((selectionType,average),))
         self.pointSelections[selectionType].setAverage(average)
  
+    def setOverallRange(self, range):
+        self.overallRange = range
+    
     def setPreEdgeRange(self, dataRange):
-        self.pointSelections[self.POINT_SELECTIONS[0]].setRange(dataRange)
+        self.preEdgeRangeSelection.setRange(dataRange,self.overallRange)
 
     def setPostEdgeRange(self, dataRange):
-        self.pointSelections[self.POINT_SELECTIONS[1]].setRange(dataRange)
+        self.postEdgeRangeSelection.setRange(dataRange, self.overallRange)
         
-class PointSetInfo(qtWidgets.QDialog):
+    
+        
+class RangeSetInfo(qtWidgets.QDialog):
 
     dataRangeChanged = qtCore.pyqtSignal(list)
 
     def __init__(self, pointSetLabel, parent=None):
-        super(PointSetInfo, self).__init__(parent=parent)
+        super(RangeSetInfo, self).__init__(parent=parent)
         layout = qtWidgets.QHBoxLayout()
         label = qtWidgets.QLabel(str(pointSetLabel))
         layout.addWidget(label)
@@ -165,7 +184,10 @@ class PointSetInfo(qtWidgets.QDialog):
         layout.addWidget(self.rangeMaximum)
         
         self.rangeMinimum.editingFinished.connect(self.handleMinValueChanged)
-        self.rangeMinimum.editingFinished.connect(self.handleMaxValueChanged)
+        self.rangeMinimum.textChanged.connect(self.handleMinValueTextChanged)
+        self.rangeMaximum.editingFinished.connect(self.handleMaxValueChanged)
+        self.rangeMaximum.textChanged.connect(self.handleMaxValueTextChanged)
+        
         self.setLayout(layout)
 
     def getIndices(self):
@@ -195,12 +217,32 @@ class PointSetInfo(qtWidgets.QDialog):
     @qtCore.pyqtSlot()
     def handleMinValueChanged(self):
         logger.debug(METHOD_ENTER_STR)
-        self.dataRangeChanged.emit(self.getRange())
+        dataRange = self.getRange()
+        self.rangeMaxValidator.setBottom(dataRange[0])
+        self.dataRangeChanged.emit(dataRange)
+        
+    @qtCore.pyqtSlot(str)
+    def handleMinValueTextChanged(self, currentText):
+        logger.debug(METHOD_ENTER_STR % currentText)
+        if not self.rangeMinimum.hasAcceptableInput():
+            qtWidgets.QToolTip.showText(self.rangeMinimum.mapToGlobal(qtCore.QPoint()), 'Invalid Input')
+        else:
+            qtWidgets.QToolTip.hideText()
         
     @qtCore.pyqtSlot()
     def handleMaxValueChanged(self):
         logger.debug(METHOD_ENTER_STR)
-        self.dataRangeChanged.emit(self.getRange())
+        dataRange = self.getRange()
+        self.rangeMinValidator.setTop(dataRange[1])
+        self.dataRangeChanged.emit(dataRange)
+        
+    @qtCore.pyqtSlot(str)
+    def handleMaxValueTextChanged(self, currentText):
+        logger.debug(METHOD_ENTER_STR % currentText)
+        if not self.rangeMaximum.hasAcceptableInput():
+            qtWidgets.QToolTip.showText(self.rangeMaximum.mapToGlobal(qtCore.QPoint()), 'Invalid Input')
+        else:
+            qtWidgets.QToolTip.hideText()
         
     def rangeAtDummyValues(self):
         '''
@@ -222,7 +264,11 @@ class PointSetInfo(qtWidgets.QDialog):
         logger.debug(METHOD_ENTER_STR % average)
         #self.pointSetAverage.setText(str(average))
         
-    def setRange(self, dataRange):
+    def setRange(self, dataRange, overallRange):
+        self.rangeMinValidator.setBottom(overallRange[0])
+        self.rangeMinValidator.setTop(dataRange[1])
+        self.rangeMaxValidator.setBottom(dataRange[0])
+        self.rangeMaxValidator.setTop(overallRange[1])
         self.rangeMinimum.setText(str(dataRange[0]))
         self.rangeMaximum.setText(str(dataRange[1]))
     

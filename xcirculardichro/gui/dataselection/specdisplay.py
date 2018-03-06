@@ -416,6 +416,7 @@ class SpecDisplay(AbstractSelectionDisplay):
                 maxMinus = maxScan - (maxScan - minScan) * percentFromEdge
                 logger.debug("minScan, minPlus: %s" % ((minScan, minPlus),) )
                 logger.debug("maxMinus, minScan: %s" % ((maxMinus, minScan),) )
+                self.rangeSelectionInfo.setOverallRange([minScan, maxScan])
                 self.rangeSelectionInfo.setPreEdgeRange([minScan, minPlus])
                 self.rangeSelectionInfo.setPostEdgeRange([maxMinus, maxScan])
         
