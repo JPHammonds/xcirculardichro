@@ -44,8 +44,8 @@ class PlotWidget(qtWidgets.QDialog):
         self.canvas.setFocusPolicy( qtCore.Qt.ClickFocus )
         self.canvas.setFocus()
 
-        self.selector1 = {}
-        self.selector2 = {}
+#         self.selector1 = {}
+#         self.selector2 = {}
         #self.switchPlot(1,1)
         self.clear()
         self.plotAx1(range(10), range(10), "line")
@@ -57,30 +57,33 @@ class PlotWidget(qtWidgets.QDialog):
         self.setMinimumSize(400, 300)
         self.show()
         
-    def applyPickPoints(self, preEdgePoints, postEdgePoints):
-        logger.debug(METHOD_ENTER_STR %((preEdgePoints, postEdgePoints),))
-        print (METHOD_ENTER_STR % ((preEdgePoints, postEdgePoints),))
-        currentAxis = self.currentPlotAxis()
-        key1List = list(self.selector1.keys())
-        key2List = list(self.selector2.keys())
-        if currentAxis == 0:
-            print("Axis = 0")
-            if len(key1List)>0:
-                key = key1List[-1]
-                self.selector1[key].applyPickPoints(preEdgePoints, postEdgePoints)
-        else:
-            print("Axis = 0")
-            if len(key2List)>0:
-                key = key2List[-1]
-                self.selector2[key].applyPickPoints(preEdgePoints, postEdgePoints)
-        logger.debug(METHOD_EXIT_STR)
+#     def applyPickPoints(self, preEdgePoints, postEdgePoints):
+#         logger.debug(METHOD_ENTER_STR %((preEdgePoints, postEdgePoints),))
+#         print (METHOD_ENTER_STR % ((preEdgePoints, postEdgePoints),))
+#         currentAxis = self.currentPlotAxis()
+#         key1List = list(self.selector1.keys())
+#         key2List = list(self.selector2.keys())
+#         if currentAxis == 0:
+#             print("Axis = 0")
+#             if len(key1List)>0:
+#                 key = key1List[-1]
+#                 self.selector1[key].applyPickPoints(preEdgePoints, postEdgePoints)
+#         else:
+#             print("Axis = 0")
+#             if len(key2List)>0:
+#                 key = key2List[-1]
+#                 self.selector2[key].applyPickPoints(preEdgePoints, postEdgePoints)
+#         logger.debug(METHOD_EXIT_STR)
         
         
     def applyRangeSelection(self, preEdgePoints, postEdgePoints):
         logger.debug(METHOD_ENTER_STR %((preEdgePoints, postEdgePoints),))
         allLines = self.ax.lines
+        
         for line in self.rangeLines:
-            line.remove()
+            logger.debug("Clearing line %s" % line)
+            if line in allLines:
+                line.remove()
         self.rangeLines.clear()
         self.rangeLines.append( \
         self.ax.axvline(x=preEdgePoints[0], linewidth=1, \
@@ -90,10 +93,10 @@ class PlotWidget(qtWidgets.QDialog):
                         linestyle='dashed', color='red'))
         self.rangeLines.append( \
         self.ax.axvline(x=postEdgePoints[0], linewidth=1, \
-                        linestyle='dashed', color='red'))
+                        linestyle='dashed', color='blue'))
         self.rangeLines.append( \
         self.ax.axvline(x=postEdgePoints[1], linewidth=1, \
-                        linestyle='dashed', color='red'))
+                        linestyle='dashed', color='blue'))
         self.canvas.draw()
         
     def clear(self):
@@ -119,9 +122,9 @@ class PlotWidget(qtWidgets.QDialog):
         logger.debug(METHOD_ENTER_STR)
 # #         self.buttonPressId = self.canvas.mpl_connect('button_press_event', self.onButtonPress)
 # #         self.buttonReleaseId = self.canvas.mpl_connect('button_release_event', self.onButtonRelease)
-        self.keyPressId = self.canvas.mpl_connect('key_press_event', self.onKeyPress)
+#         self.keyPressId = self.canvas.mpl_connect('key_press_event', self.onKeyPress)
 #         self.keyReleaseId = self.canvas.mpl_connect('key_release_event', self.onKeyRelease)
-        self.pickId = self.canvas.mpl_connect('pick_event', self.onPick)
+#         self.pickId = self.canvas.mpl_connect('pick_event', self.onPick)
 #         self.figureEnterId = self.canvas.mpl_connect('figure_enter_event', self.onFigureEnter)
 #         self.figureLeaveId = self.canvas.mpl_connect('figure_leave_event', self.onFigureLeave)
 #         self.axesEnterId = self.canvas.mpl_connect('axes_enter_event', self.onAxesEnter)
@@ -235,51 +238,51 @@ class PlotWidget(qtWidgets.QDialog):
         '''
         logger.debug(METHOD_ENTER_STR % event)
     
-    def onKeyPress(self, event):
-        '''
-        Handle key press events
-        '''
-        logger.debug(METHOD_ENTER_STR % event)
-        logger.debug("Key: %s " % event.key)
-        if event.key == 'l':
-            HighlightSelected.setSelectLeft()
-        elif event.key == 'r':
-            HighlightSelected.setSelectRight()
-        elif event.key == '+':
-            HighlightSelected.setSelectOn()
-        elif event.key == '-':
-            HighlightSelected.setSelectOff()
-        elif event.key == 't':
-            logger.debug("ax.zorder %f, ax2.zorder %f" % 
-                         ( self.ax.get_zorder(),self.ax2.get_zorder()))
-            if self.ax.get_zorder() == 0:
-                logger.debug("Setting for axis 2")
-                self.ax.set_zorder(0.1)
-                self.ax2.set_zorder(0)
-                self.ax2.patch.set_visible(True)
-                self.ax.patch.set_visible(False)
-            else:
-                logger.debug("Setting for axis 1")
-                self.ax.set_zorder(0)
-                self.ax2.set_zorder(0.1)
-                self.ax2.patch.set_visible(False)
-                self.ax.patch.set_visible(True)
+#     def onKeyPress(self, event):
+#         '''
+#         Handle key press events
+#         '''
+#         logger.debug(METHOD_ENTER_STR % event)
+#         logger.debug("Key: %s " % event.key)
+#         if event.key == 'l':
+#             HighlightSelected.setSelectLeft()
+#         elif event.key == 'r':
+#             HighlightSelected.setSelectRight()
+#         elif event.key == '+':
+#             HighlightSelected.setSelectOn()
+#         elif event.key == '-':
+#             HighlightSelected.setSelectOff()
+#         elif event.key == 't':
+#             logger.debug("ax.zorder %f, ax2.zorder %f" % 
+#                          ( self.ax.get_zorder(),self.ax2.get_zorder()))
+#             if self.ax.get_zorder() == 0:
+#                 logger.debug("Setting for axis 2")
+#                 self.ax.set_zorder(0.1)
+#                 self.ax2.set_zorder(0)
+#                 self.ax2.patch.set_visible(True)
+#                 self.ax.patch.set_visible(False)
+#             else:
+#                 logger.debug("Setting for axis 1")
+#                 self.ax.set_zorder(0)
+#                 self.ax2.set_zorder(0.1)
+#                 self.ax2.patch.set_visible(False)
+#                 self.ax.patch.set_visible(True)
             
     def onKeyRelease(self, event):
         logger.debug(METHOD_ENTER_STR % event)
     
-    def onPick(self, event):
-        logger.debug(METHOD_ENTER_STR % event)
-        logger.debug("dir(event) %s" % dir(event))
-        logger.debug("name %s" % event.name)
-        logger.debug("ind %s" % event.ind)
-        logger.debug("artist %s" %event.artist)
-        logger.debug("canvas %s" % event.canvas)
-        logger.debug("guiEvent %s" % event.guiEvent)
-        logger.debug("mouseEvent %s" % event.mouseevent)
-        artist = event.artist
-#         if isinstance(artist, Line2D):
-#                 logger.debug("Selected from %s" % artist.name())
+#     def onPick(self, event):
+#         logger.debug(METHOD_ENTER_STR % event)
+#         logger.debug("dir(event) %s" % dir(event))
+#         logger.debug("name %s" % event.name)
+#         logger.debug("ind %s" % event.ind)
+#         logger.debug("artist %s" %event.artist)
+#         logger.debug("canvas %s" % event.canvas)
+#         logger.debug("guiEvent %s" % event.guiEvent)
+#         logger.debug("mouseEvent %s" % event.mouseevent)
+#         artist = event.artist
+# #         if isinstance(artist, Line2D):
+# #                 logger.debug("Selected from %s" % artist.name())
         
     def onFigureEnter(self, event):
         logger.debug(METHOD_ENTER_STR % event)
@@ -300,18 +303,18 @@ class PlotWidget(qtWidgets.QDialog):
         logger.debug(METHOD_ENTER_STR % ((label, x,y),))
         
         line, = self.ax.plot(x, y, label=label, picker=True, pickradius=6)
-        self.selector1[label] = HighlightSelected(line, parent=self)
-        self.selector1[label].rightSelectionChanged[str].connect(self.handleRightSelectionChanged)
-        self.selector1[label].leftSelectionChanged[str].connect(self.handleLeftSelectionChanged)
+#         self.selector1[label] = HighlightSelected(line, parent=self)
+#         self.selector1[label].rightSelectionChanged[str].connect(self.handleRightSelectionChanged)
+#         self.selector1[label].leftSelectionChanged[str].connect(self.handleLeftSelectionChanged)
         
     def plotAx1Average(self, x, y, label):
         logger.debug(METHOD_ENTER_STR % ((x,y),))
         
         line, = self.ax.plot(x, y, label=label, picker=True, pickradius=6)
         plt.setp(line, linewidth=2)
-        self.selector1[label] = HighlightSelected(line, parent=self)
-        self.selector1[label].rightSelectionChanged[str].connect(self.handleRightSelectionChanged)
-        self.selector1[label].leftSelectionChanged[str].connect(self.handleLeftSelectionChanged)
+#         self.selector1[label] = HighlightSelected(line, parent=self)
+#         self.selector1[label].rightSelectionChanged[str].connect(self.handleRightSelectionChanged)
+#         self.selector1[label].leftSelectionChanged[str].connect(self.handleLeftSelectionChanged)
         
     def plotAx3Corrected(self, x, y, label):
         logger.debug(METHOD_ENTER_STR % ((x,y),))
@@ -323,9 +326,9 @@ class PlotWidget(qtWidgets.QDialog):
         
         line, = self.ax2.plot(x, y, label=label, 
                       linestyle=":", picker=True, pickradius=6)
-        self.selector2[label] = HighlightSelected(line, parent=self)
-        self.selector2[label].rightSelectionChanged[str].connect(self.handleRightSelectionChanged)
-        self.selector2[label].leftSelectionChanged[str].connect(self.handleLeftSelectionChanged)
+#         self.selector2[label] = HighlightSelected(line, parent=self)
+#         self.selector2[label].rightSelectionChanged[str].connect(self.handleRightSelectionChanged)
+#         self.selector2[label].leftSelectionChanged[str].connect(self.handleLeftSelectionChanged)
         
     def plotAx2Average(self, x, y, label):
         logger.debug(METHOD_ENTER_STR % ((x,y),))
@@ -333,9 +336,9 @@ class PlotWidget(qtWidgets.QDialog):
         line, = self.ax2.plot(x, y, label=label, 
                               linestyle=":", linewidth=2, 
                               picker=True, pickradius=6)
-        self.selector2[label] = HighlightSelected(line, parent=self)
-        self.selector2[label].rightSelectionChanged[str].connect(self.handleRightSelectionChanged)
-        self.selector2[label].leftSelectionChanged[str].connect(self.handleLeftSelectionChanged)
+#         self.selector2[label] = HighlightSelected(line, parent=self)
+#         self.selector2[label].rightSelectionChanged[str].connect(self.handleRightSelectionChanged)
+#         self.selector2[label].leftSelectionChanged[str].connect(self.handleLeftSelectionChanged)
         
     def plotAx4Corrected(self, x, y, label):
         logger.debug(METHOD_ENTER_STR % ((x,y),))
