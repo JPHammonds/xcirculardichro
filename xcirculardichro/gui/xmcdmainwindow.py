@@ -52,11 +52,11 @@ class XMCDMainWindow(qtWidgets.QMainWindow):
         self._dataNavigator.model().dataChanged.connect(self.handleNavigatorDataChanged)
         self._dataSelections.dataSelectionsChanged.connect(self.handleDataSelectionsChanged)
         self._dataSelections.plotOptionChanged.connect(self.updatePlotData)
-        self._plotWidget.leftSelectionChanged[str].connect(self.handleLeftDataSelectionChanged)
-        self._plotWidget.rightSelectionChanged[str].connect(self.handleRightDataSelectionChanged)
+#         self._plotWidget.leftSelectionChanged[str].connect(self.handleLeftDataSelectionChanged)
+#         self._plotWidget.rightSelectionChanged[str].connect(self.handleRightDataSelectionChanged)
         self._dataSelections.pointSelectionAxisChanged[int].connect(self._plotWidget.setPointSelectionAxis)
         self._dataSelections.pointSelectionTypeChanged[int].connect(self._plotWidget.setPointSelectionType)
-        self._dataSelections.pointSelectionReloadPicks.connect(self.handlePointSelectionReloadPicks)
+#         self._dataSelections.pointSelectionReloadPicks.connect(self.handlePointSelectionReloadPicks)
         self._dataSelections.rangeValuesChanged.connect(self.handleEdgeRangeValuesChanged)
         logger.debug(METHOD_EXIT_STR)
         
@@ -227,12 +227,12 @@ class XMCDMainWindow(qtWidgets.QMainWindow):
         self._dataSelections.setPostionersToDisplay(self.positionersToDisplay)
         self._dataSelections.handleDataSelectionsChanged()
               
-    def handlePointSelectionReloadPicks(self, preEdgePoints, postEdgePoints):
-        logger.debug(METHOD_ENTER_STR % ((preEdgePoints, postEdgePoints, "a"),))
-        self._plotWidget.applyPickPoints(preEdgePoints, postEdgePoints)
-        if ((len(preEdgePoints) > 0) and (len(postEdgePoints) > 0)):
-            self.updatePlotData()
-        logger.debug(METHOD_EXIT_STR)
+#     def handlePointSelectionReloadPicks(self, preEdgePoints, postEdgePoints):
+#         logger.debug(METHOD_ENTER_STR % ((preEdgePoints, postEdgePoints, "a"),))
+#         self._plotWidget.applyPickPoints(preEdgePoints, postEdgePoints)
+#         if ((len(preEdgePoints) > 0) and (len(postEdgePoints) > 0)):
+#             self.updatePlotData()
+#         logger.debug(METHOD_EXIT_STR)
         
     @qtCore.pyqtSlot()
     def openFile(self):
