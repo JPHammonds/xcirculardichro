@@ -49,6 +49,7 @@ class PlotWidget(qtWidgets.QDialog):
         #self.switchPlot(1,1)
         self.clear()
         self.plotAx1(range(10), range(10), "line")
+        self.rangeLines = []
 #         self.ax = None
 #         self.ax2 = None
         layout.addWidget(self.canvas)
@@ -77,10 +78,23 @@ class PlotWidget(qtWidgets.QDialog):
         
     def applyRangeSelection(self, preEdgePoints, postEdgePoints):
         logger.debug(METHOD_ENTER_STR %((preEdgePoints, postEdgePoints),))
-        plt.axvline(preEdgePoints[0])
-        plt.axvline(preEdgePoints[1])
-        plt.axvline(postEdgePoints[0])
-        plt.axvline(postEdgePoints[1])
+        allLines = self.ax.lines
+        for line in self.rangeLines:
+            line.remove()
+        self.rangeLines.clear()
+        self.rangeLines.append( \
+        self.ax.axvline(x=preEdgePoints[0], linewidth=1, \
+                        linestyle='dashed', color='red'))
+        self.rangeLines.append( \
+        self.ax.axvline(x=preEdgePoints[1], linewidth=1, \
+                        linestyle='dashed', color='red'))
+        self.rangeLines.append( \
+        self.ax.axvline(x=postEdgePoints[0], linewidth=1, \
+                        linestyle='dashed', color='red'))
+        self.rangeLines.append( \
+        self.ax.axvline(x=postEdgePoints[1], linewidth=1, \
+                        linestyle='dashed', color='red'))
+        self.canvas.draw()
         
     def clear(self):
         logger.debug("Entering")
