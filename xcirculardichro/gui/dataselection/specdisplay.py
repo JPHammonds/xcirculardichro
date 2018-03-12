@@ -253,13 +253,19 @@ class SpecDisplay(AbstractSelectionDisplay):
             self.currentSelections[newScanType])
         self.dataSelectionsChanged.emit()
         self.validateRangeSelection()
-        if (self.rangeSelectionInfo.edgeRangesAtDummyValues()):
-            self.setDefSelectedScansRange()
-#         self.copyPickedPointsToData()
-#         self.pointSelectionTypeChanged.emit(
-#             self.pointSelectionInfo.getPointSetType())
-#         self.pointSelectionAxisChanged.emit(
-#             self.pointSelectionInfo.getAxisSelection())
+#         if (self.rangeSelectionInfo.edgeRangesAtDummyValues()):
+#             logging.debug("Current edges at dummy values")
+#             self.setDefSelectedScansRange()
+#         else:
+#             currentPreEdgeRange, currentPostEdgeRange = \
+#                 self.getSelectedEdgeRangeData()
+#             currentSelectedScanRange = self.getSelectedScansRange()
+#             if (currentPreEdgeRange[0] < currentSelectedScanRange[0]) or \
+#                 (currentPostEdgeRange[1] > currentSelectedScanRange[1]):
+#                 logging.debug("Current edge values %s outside range of current selection %s" % \
+#                               ((currentPreEdgeRange, currentPostEdgeRange), currentSelectedScanRange))
+#                 self.setDefSelectedScansRange()
+        
         
     '''
     Handle a sequence of operations when the contents of the scan browser 
@@ -419,7 +425,8 @@ class SpecDisplay(AbstractSelectionDisplay):
                 self.rangeSelectionInfo.setOverallRange([minScan, maxScan])
                 self.rangeSelectionInfo.setPreEdgeRange([minScan, minPlus])
                 self.rangeSelectionInfo.setPostEdgeRange([maxMinus, maxScan])
-        
+        self.rangeValuesChanged.emit(self.getPreEdgeRange(), 
+                                     self.getPostEdgeRange())
         
     def setLeftDataSelection(self, label, selection, average):
         logger.debug(METHOD_ENTER_STR % ((label, selection, average),))
@@ -448,3 +455,18 @@ class SpecDisplay(AbstractSelectionDisplay):
                 self.subChoices.getPlotSelections()
         logger.debug("currentSelections %s" % self.currentSelections[typeName]) 
         
+    def updateEdgeRanges(self):
+        logger.debug(METHOD_ENTER_STR)
+        if (self.rangeSelectionInfo.edgeRangesAtDummyValues()):
+            logging.debug("Current edges at dummy values")
+            self.setDefSelectedScansRange()
+        else:
+            currentPreEdgeRange, currentPostEdgeRange = \
+                self.getSelectedEdgeRangeData()
+            currentSelectedScanRange = self.getSelectedScansRange()
+            if (currentPreEdgeRange[0] < currentSelectedScanRange[0]) or \
+                (currentPostEdgeRange[1] > currentSelectedScanRange[1]):
+                logging.debug("Current edge values %s outside range of current selection %s" % \
+                              ((currentPreEdgeRange, currentPostEdgeRange), currentSelectedScanRange))
+                self.setDefSelectedScansRange()
+ 

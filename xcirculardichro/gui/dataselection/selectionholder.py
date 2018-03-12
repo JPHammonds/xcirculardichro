@@ -195,3 +195,5 @@ class SelectionHolder(qtWidgets.QWidget):
     def setUserParamsToDisplay(self, positioners):
         self._selectionWidget.setUserParamsToDisplay(positioners)
         
+    def updateEdgeRanges(self):
+        self._selectionWidget.updateEdgeRanges()
