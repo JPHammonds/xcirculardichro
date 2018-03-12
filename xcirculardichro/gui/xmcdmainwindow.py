@@ -337,6 +337,8 @@ class XMCDMainWindow(qtWidgets.QMainWindow):
             self.updatePlotDataSingle(counters, counterNames)
         else:
             self.updatePlotDataMultiple(counters, counterNames)
+        preEdgeRange, postEdgeRange = self._dataSelections.getSelectedEdgeRangeData()
+        self._plotWidget.applyRangeSelection(preEdgeRange, postEdgeRange)
             
     def updatePlotDataMultiple(self, counters, counterNames, 
                                displayAverage=True, displayEach=True):
