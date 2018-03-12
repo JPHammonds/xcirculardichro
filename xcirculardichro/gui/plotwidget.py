@@ -87,16 +87,16 @@ class PlotWidget(qtWidgets.QDialog):
         self.rangeLines.clear()
         self.rangeLines.append( \
         self.ax.axvline(x=preEdgePoints[0], linewidth=1, \
-                        linestyle='dashed', color='red'))
+                        linestyle='dashed', color='darkred'))
         self.rangeLines.append( \
         self.ax.axvline(x=preEdgePoints[1], linewidth=1, \
-                        linestyle='dashed', color='red'))
+                        linestyle='dashed', color='darkred'))
         self.rangeLines.append( \
         self.ax.axvline(x=postEdgePoints[0], linewidth=1, \
-                        linestyle='dashed', color='blue'))
+                        linestyle='dashed', color='darkblue'))
         self.rangeLines.append( \
         self.ax.axvline(x=postEdgePoints[1], linewidth=1, \
-                        linestyle='dashed', color='blue'))
+                        linestyle='dashed', color='darkblue'))
         self.canvas.draw()
         
     def clear(self):
