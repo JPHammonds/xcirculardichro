@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 DUMMY_MINIMUM = 999999.9
 DUMMY_MAXIMUM = -999999.9
 
-class RangeSelectionInfo(qtWidgets.QDialog):
+class RangeSelectionInfo(qtWidgets.QWidget):
     POINT_SELECTIONS = ["Pre-Edge", "Post-Edge"]
     AXIS_SELECTIONS = ["Left", "Right"]
     selectorTypeChanged = qtCore.pyqtSignal(int)
@@ -161,7 +161,7 @@ class RangeSelectionInfo(qtWidgets.QDialog):
         
     
         
-class RangeSetInfo(qtWidgets.QDialog):
+class RangeSetInfo(qtWidgets.QWidget):
 
     dataRangeChanged = qtCore.pyqtSignal(list)
 
