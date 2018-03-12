@@ -44,9 +44,9 @@ class SelectionHolder(qtWidgets.QWidget):
         self.show()
         self._selectionWidget.dataSelectionsChanged.connect(self.handleDataSelectionsChanged)
         self._selectionWidget.plotOptionChanged.connect(self.handlePlotOptionChanged)
-        self._selectionWidget.pointSelectionAxisChanged[int].connect(self.handlePointSelectionAxisChanged)
-        self._selectionWidget.pointSelectionTypeChanged[int].connect(self.handlePointSelectionTypeChanged)
-        self._selectionWidget.pointSelectionReloadPicks.connect(self.handlePointSelectionReloadPicks)
+        self._selectionWidget.pointSelectionAxisChanged[int].connect(self.handleRangeSelectionAxisChanged)
+        self._selectionWidget.pointSelectionTypeChanged[int].connect(self.handleRangeSelectionTypeChanged)
+        self._selectionWidget.pointSelectionReloadPicks.connect(self.handleRangeSelectionReloadPicks)
         self._selectionWidget.rangeValuesChanged.connect(self.handleDataRangesChanged)
 
     def calcPlotData(self, data):
@@ -92,24 +92,24 @@ class SelectionHolder(qtWidgets.QWidget):
         self.plotOptionChanged.emit()
     
     @qtCore.pyqtSlot(int)   
-    def handlePointSelectionAxisChanged(self, index):
+    def handleRangeSelectionAxisChanged(self, index):
         self.pointSelectionAxisChanged[int].emit(index)
     
-    def handlePointSelectionReloadPicks(self, leftSelection, rightSelection):
+    def handleRangeSelectionReloadPicks(self, leftSelection, rightSelection):
         self.pointSelectionReloadPicks.emit(leftSelection, rightSelection)
         
     @qtCore.pyqtSlot(int)   
-    def handlePointSelectionTypeChanged(self, index):
+    def handleRangeSelectionTypeChanged(self, index):
         self.pointSelectionTypeChanged[int].emit(index)
  
     def handleDataRangesChanged(self, preEdgeRange, postEdgeRange):
         logger.debug(METHOD_ENTER_STR % ((preEdgeRange, postEdgeRange),))
         self.rangeValuesChanged.emit(preEdgeRange, postEdgeRange)
         
-    def hasValidPointSelectionInfo(self):
+    def hasValidRangeSelectionInfo(self):
         retValue = False
-        if self._selectionWidget.hasPointSelectionWidget() and  \
-            self._selectionWidget.hasValidPointSelectionData():
+        if self._selectionWidget.hasRangeSelectionWidget() and  \
+            self._selectionWidget.hasValidRangeSelectionData():
             retValue = True
         logger.debug(METHOD_EXIT_STR % retValue)
         return retValue
@@ -141,13 +141,13 @@ class SelectionHolder(qtWidgets.QWidget):
     def plotNormalizedData(self):
         return self._selectionWidget.plotNormalizedData()
         
-    def setLeftDataSelection(self, label, selection, average):
-        logger.debug(METHOD_ENTER_STR % ((label, selection, average),))
-        self._selectionWidget.setLeftDataSelection(label, selection, average)
+#     def setLeftDataSelection(self, label, selection, average):
+#         logger.debug(METHOD_ENTER_STR % ((label, selection, average),))
+#         self._selectionWidget.setLeftDataSelection(label, selection, average)
         
-    def setRightDataSelection(self, label, selection, average):
-        logger.debug(METHOD_ENTER_STR % ((label, selection, average),))
-        self._selectionWidget.setRightDataSelection(label, selection, average)
+#     def setRightDataSelection(self, label, selection, average):
+#         logger.debug(METHOD_ENTER_STR % ((label, selection, average),))
+#         self._selectionWidget.setRightDataSelection(label, selection, average)
         
     def setDisplayWidget(self, newDisplay):
         logger.debug(METHOD_ENTER_STR)
@@ -156,9 +156,9 @@ class SelectionHolder(qtWidgets.QWidget):
         else:
             self._selectionWidget.dataSelectionsChanged.disconnect(self.handleDataSelectionsChanged)
             self._selectionWidget.plotOptionChanged.disconnect(self.handlePlotOptionChanged)
-            self._selectionWidget.pointSelectionAxisChanged[int].disconnect(self.handlePointSelectionAxisChanged)
-            self._selectionWidget.pointSelectionTypeChanged[int].disconnect(self.handlePointSelectionTypeChanged)
-            self._selectionWidget.pointSelectionReloadPicks.disconnect(self.handlePointSelectionReloadPicks)
+            self._selectionWidget.pointSelectionAxisChanged[int].disconnect(self.handleRangeSelectionAxisChanged)
+            self._selectionWidget.pointSelectionTypeChanged[int].disconnect(self.handleRangeSelectionTypeChanged)
+            self._selectionWidget.pointSelectionReloadPicks.disconnect(self.handleRangeSelectionReloadPicks)
             self._selectionWidget.rangeValuesChanged.disconnect(self.handleDataRangesChanged)
             layout = self.layout()
             self._selectionWidget.hide()
@@ -167,9 +167,9 @@ class SelectionHolder(qtWidgets.QWidget):
             layout.addWidget(self._selectionWidget)
             self._selectionWidget.dataSelectionsChanged.connect(self.handleDataSelectionsChanged)
             self._selectionWidget.plotOptionChanged.connect(self.handlePlotOptionChanged)
-            self._selectionWidget.pointSelectionAxisChanged[int].connect(self.handlePointSelectionAxisChanged)
-            self._selectionWidget.pointSelectionTypeChanged[int].connect(self.handlePointSelectionTypeChanged)
-            self._selectionWidget.pointSelectionReloadPicks.connect(self.handlePointSelectionReloadPicks)
+            self._selectionWidget.pointSelectionAxisChanged[int].connect(self.handleRangeSelectionAxisChanged)
+            self._selectionWidget.pointSelectionTypeChanged[int].connect(self.handleRangeSelectionTypeChanged)
+            self._selectionWidget.pointSelectionReloadPicks.connect(self.handleRangeSelectionReloadPicks)
             self._selectionWidget.rangeValuesChanged.connect(self.handleDataRangesChanged)
             logger.debug(self._selectionWidget)
             
