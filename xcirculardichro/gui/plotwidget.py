@@ -352,7 +352,7 @@ class PlotWidget(qtWidgets.QDialog):
         self.canvas.draw()
         
     @qtCore.pyqtSlot(int)
-    def setPointSelectionAxis(self, axis):
+    def setRangeSelectionAxis(self, axis):
         logger.debug(METHOD_ENTER_STR % axis)
         if axis == 0:
             logger.debug("Setting for axis 1")
@@ -368,7 +368,7 @@ class PlotWidget(qtWidgets.QDialog):
             self.ax2.patch.set_visible(False)
             
     @qtCore.pyqtSlot(int)
-    def setPointSelectionType(self, selectionType):
+    def setRangeSelectionType(self, selectionType):
         logger.debug(METHOD_ENTER_STR % selectionType)
         if selectionType == 0:
             HighlightSelected.setSelectLeft()
