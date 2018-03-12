@@ -54,8 +54,8 @@ class XMCDMainWindow(qtWidgets.QMainWindow):
         self._dataSelections.plotOptionChanged.connect(self.updatePlotData)
 #         self._plotWidget.leftSelectionChanged[str].connect(self.handleLeftDataSelectionChanged)
 #         self._plotWidget.rightSelectionChanged[str].connect(self.handleRightDataSelectionChanged)
-        self._dataSelections.pointSelectionAxisChanged[int].connect(self._plotWidget.setPointSelectionAxis)
-        self._dataSelections.pointSelectionTypeChanged[int].connect(self._plotWidget.setPointSelectionType)
+        self._dataSelections.pointSelectionAxisChanged[int].connect(self._plotWidget.setRangeSelectionAxis)
+        self._dataSelections.pointSelectionTypeChanged[int].connect(self._plotWidget.setRangeSelectionType)
 #         self._dataSelections.pointSelectionReloadPicks.connect(self.handlePointSelectionReloadPicks)
         self._dataSelections.rangeValuesChanged.connect(self.handleEdgeRangeValuesChanged)
         logger.debug(METHOD_EXIT_STR)
@@ -139,7 +139,7 @@ class XMCDMainWindow(qtWidgets.QMainWindow):
                 self.captureCurrentCorrectedAction.setEnabled(False)
             elif not self._dataSelections.isMultipleScansSelected():
                 self.captureCurrentAverageAction.setEnabled(False)
-            if not self._dataSelections.hasValidPointSelectionInfo():
+            if not self._dataSelections.hasValidRangeSelectionInfo():
                 self.captureCurrentCorrectedAction.setEnabled(False)
         except NotImplementedError as ex:
             self.captureCurrentAction.setEnabled(False)
@@ -192,31 +192,32 @@ class XMCDMainWindow(qtWidgets.QMainWindow):
         
     def handleEdgeRangeValuesChanged(self, preEdgeRange, postEdgeRange):
         logger.debug(METHOD_ENTER_STR % ((preEdgeRange, postEdgeRange),))
+        self.updatePlotData()
         self._plotWidget.applyRangeSelection(preEdgeRange, postEdgeRange)
         
-    @qtCore.pyqtSlot(str)
-    def handleLeftDataSelectionChanged(self, label):
-        '''
-        Handle selection on left side of the plot.  Feed selection information 
-        to the choice widget and then handle any necessary plot changes
-        '''
-        logger.debug(METHOD_ENTER_STR % label)
-        selection = self._plotWidget.getLeftSelectionIndexes(label)
-        average = self._plotWidget.getLeftSelectionAverage(label)
-        self._dataSelections.setLeftDataSelection(label, selection, average)
-        self.updatePlotData()
+#     @qtCore.pyqtSlot(str)
+#     def handleLeftDataSelectionChanged(self, label):
+#         '''
+#         Handle selection on left side of the plot.  Feed selection information 
+#         to the choice widget and then handle any necessary plot changes
+#         '''
+#         logger.debug(METHOD_ENTER_STR % label)
+#         selection = self._plotWidget.getLeftSelectionIndexes(label)
+#         average = self._plotWidget.getLeftSelectionAverage(label)
+#         self._dataSelections.setLeftDataSelection(label, selection, average)
+#         self.updatePlotData()
         
-    @qtCore.pyqtSlot(str)
-    def handleRightDataSelectionChanged(self, label):
-        '''
-        Handle selection on right side of the plot.  Feed selection information 
-        to the choice widget and then handle any necessary plot changes
-        '''
-        logger.debug(METHOD_ENTER_STR % label)
-        selection = self._plotWidget.getRightSelectionIndexes(label)
-        average = self._plotWidget.getRightSelectionAverage(label)
-        self._dataSelections.setRightDataSelection(label, selection, average)
-        self.updatePlotData()
+#     @qtCore.pyqtSlot(str)
+#     def handleRightDataSelectionChanged(self, label):
+#         '''
+#         Handle selection on right side of the plot.  Feed selection information 
+#         to the choice widget and then handle any necessary plot changes
+#         '''
+#         logger.debug(METHOD_ENTER_STR % label)
+#         selection = self._plotWidget.getRightSelectionIndexes(label)
+#         average = self._plotWidget.getRightSelectionAverage(label)
+#         self._dataSelections.setRightDataSelection(label, selection, average)
+#         self.updatePlotData()
         
         
     @qtCore.pyqtSlot(qtCore.QModelIndex, qtCore.QModelIndex)
