@@ -46,12 +46,20 @@ class AbstractSelectionDisplay(QtWidgets.QSplitter):
         logger.debug(METHOD_ENTER_STR % index)
         self.pointSelectionAxisChanged[int].emit(index)
     
-    def hasPointSelectionWidget(self):
+    def hasRangeSelectionWidget(self):
         return False
     
-    def hasValidPointSelectionData(self):
+    def hasValidRangeSelectionData(self):
         return False
     
+    def isDataIncreasingX(self, dataSet):
+        logger.debug(METHOD_ENTER_STR % dataSet)
+        retValue = False
+        if dataSet[0] <= dataSet[-1]:
+            retValue = True
+        logger.debug(METHOD_EXIT_STR % retValue)
+        return retValue
+        
     @abstractmethod
     def isMultipleScansSelected(self):
         logger.debug(METHOD_ENTER_STR)
@@ -146,13 +154,13 @@ class AbstractSelectionDisplay(QtWidgets.QSplitter):
     def selectedNodes(self):
         return self._selectedNodes
     
-    @abstractmethod
-    def setLeftDataSelection(self, label, selection, average):
-        raise NotImplementedError(OVERRIDE_METHOD_STR)
+#     @abstractmethod
+#     def setLeftDataSelection(self, label, selection, average):
+#         raise NotImplementedError(OVERRIDE_METHOD_STR)
     
-    @abstractmethod
-    def setRightDataSelection(self, label, selection, average):
-        raise NotImplementedError(OVERRIDE_METHOD_STR)
+#     @abstractmethod
+#     def setRightDataSelection(self, label, selection, average):
+#         raise NotImplementedError(OVERRIDE_METHOD_STR)
     
     def setSelectedNodes(self, selectedNodes):
         logger.debug(METHOD_ENTER_STR % self)
