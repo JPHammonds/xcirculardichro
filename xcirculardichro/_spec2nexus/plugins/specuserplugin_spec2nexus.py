@@ -22,7 +22,10 @@ class XCircularDichro(ControlLineHandler):
             spec_obj.U = {}
         textLine = strip_first_word(text)
         keyValue = textLine.split(":")
-        spec_obj.U[keyValue[0]] = keyValue[1]
+        try:
+            spec_obj.U[keyValue[0]] = keyValue[1]
+        except IndexError as ex:
+            logger.exception("Error on: " +str(textLine))
         if isinstance(spec_obj, SpecDataFileHeader):
             spec_obj.addH5writer(self.key, self.writer)
             
