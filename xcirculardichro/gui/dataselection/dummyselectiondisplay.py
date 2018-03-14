@@ -43,7 +43,7 @@ class DummySelectionDisplay(AbstractSelectionDisplay):
 
     def getSelectedScans(self):
         logger.debug(METHOD_ENTER_STR % self.selectedScans)
-        return[]
+        return None
         
     def isMultipleScansSelected(self):
         logger.debug(METHOD_ENTER_STR % DUMMY_STR)
