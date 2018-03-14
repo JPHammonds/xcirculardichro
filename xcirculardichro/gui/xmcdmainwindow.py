@@ -70,20 +70,20 @@ class XMCDMainWindow(qtWidgets.QMainWindow):
         viewMenu = menuBar.addMenu('View')
         dataMenu = menuBar.addMenu('Data')
         
-        openAction = qtWidgets.QAction("Open", self)
-        openAction.triggered.connect(self.openFile)
+        self.openAction = qtWidgets.QAction("Open", self)
+        self.openAction.triggered.connect(self.openFile)
         
-        saveAction = qtWidgets.QAction("Save", self)
-        saveAction.triggered.connect(self.saveFile)
+        self.saveAction = qtWidgets.QAction("Save", self)
+        self.saveAction.triggered.connect(self.saveFile)
 
-        saveAsAction = qtWidgets.QAction("Save As", self)
-        saveAsAction.triggered.connect(self.saveAsFile)
+        self.saveAsAction = qtWidgets.QAction("Save As", self)
+        self.saveAsAction.triggered.connect(self.saveAsFile)
         
-        exportAction = qtWidgets.QAction("Export", self)
-        exportAction.triggered.connect(self.export)
+        self.exportAction = qtWidgets.QAction("Export", self)
+        self.exportAction.triggered.connect(self.export)
         
-        closeAction = qtWidgets.QAction("Close", self)
-        closeAction.triggered.connect(self.closeFile)
+        self.closeAction = qtWidgets.QAction("Close", self)
+        self.closeAction.triggered.connect(self.closeFile)
 
         self.selectPositionerParams = \
             qtWidgets.QAction("SelectPositionerParameters", self)
@@ -103,16 +103,19 @@ class XMCDMainWindow(qtWidgets.QMainWindow):
         self.captureCurrentCorrectedAction = qtWidgets.QAction("Capture Current Corrected", self)
         self.captureCurrentCorrectedAction.triggered.connect(self.captureCurrentCorrected)
         
+        self.captureCurrentFullNormalizedAction = qtWidgets.QAction("Capture Current Full Normalized", self)
+        self.captureCurrentFullNormalizedAction.triggered.connect(self.captureCurrentFullNormalized)
+        
         exitAction = qtWidgets.QAction("Exit", self)
         exitAction.setShortcut('Ctrl+Q')
         exitAction.triggered.connect(self.close)
         
-        fileMenu.addAction(openAction)
-        fileMenu.addAction(saveAction)
+        fileMenu.addAction(self.openAction)
+        fileMenu.addAction(self.saveAction)
 #        fileMenu.addAction(saveAsAction)
-        fileMenu.addAction(closeAction)
+        fileMenu.addAction(self.closeAction)
         fileMenu.addSeparator()
-        fileMenu.addAction(exportAction)
+        fileMenu.addAction(self.exportAction)
         fileMenu.addSeparator()
         fileMenu.addAction(exitAction)
 
@@ -122,6 +125,7 @@ class XMCDMainWindow(qtWidgets.QMainWindow):
         dataMenu.addAction(self.captureCurrentAction)
         dataMenu.addAction(self.captureCurrentAverageAction)
         dataMenu.addAction(self.captureCurrentCorrectedAction)
+        dataMenu.addAction(self.captureCurrentFullNormalizedAction)
         
         viewMenu.aboutToShow.connect(self._configureViewMenuEnable)
         dataMenu.aboutToShow.connect(self._configureDataMenuEnable)
@@ -132,6 +136,7 @@ class XMCDMainWindow(qtWidgets.QMainWindow):
         self.captureCurrentAction.setEnabled(True)
         self.captureCurrentAverageAction.setEnabled(True)
         self.captureCurrentCorrectedAction.setEnabled(True)
+        self.captureCurrentFullNormalizedAction.setEnabled(True)
         try:
             if self._dataSelections.getSelectedScans() is None:
                 self.captureCurrentAction.setEnabled(False)
@@ -146,6 +151,10 @@ class XMCDMainWindow(qtWidgets.QMainWindow):
             self.captureCurrentAverageAction.setEnabled(False)
             self.captureCurrentCorrectedAction.setEnabled(False)
             
+    @qtCore.pyqtSlot()
+    def _configureFileMenuEnable(self):
+        self.open
+    
     @qtCore.pyqtSlot()
     def _configureViewMenuEnable(self):
         logger.debug(METHOD_ENTER_STR)
@@ -176,6 +185,13 @@ class XMCDMainWindow(qtWidgets.QMainWindow):
         dataSelection = self._dataSelections._selectionWidget
         self._dataNavigator.addIntermediateDataNode(dataSelection, \
                                                     option=DataSelectionTypes.STEP_NORMALIZED)
+        
+    @qtCore.pyqtSlot() 
+    def captureCurrentFullNormalized(self):
+        logger.debug(METHOD_ENTER_STR)
+        dataSelection = self._dataSelections._selectionWidget
+        self._dataNavigator.addIntermediateDataNode(dataSelection, \
+                                                    option=DataSelectionTypes.FULL_NORMALIZED)
         
     @qtCore.pyqtSlot()
     def closeFile(self):
@@ -241,7 +257,7 @@ class XMCDMainWindow(qtWidgets.QMainWindow):
         Open a file, populate the navigator window as appropriate
         '''
         logger.debug(METHOD_ENTER_STR)
-        fileName = qtWidgets.QFileDialog.getOpenFileName(None, 
+        fileName = qtWidgets.QFileDialog.getOpenFileName(self, 
                                 caption="Open Spec File",
                                 directory=self.currentDirectory)[0]
         specFile = None
@@ -262,24 +278,30 @@ class XMCDMainWindow(qtWidgets.QMainWindow):
     @qtCore.pyqtSlot()
     def saveFile(self):
         logger.debug(METHOD_ENTER_STR)
-        selectedScan = self._dataSelections.getSelectedScans()[0]
-        logger.debug("First Selected Node %s" % selectedScan)
-        selectedName = \
-            self._dataSelections.getNodeContainingScan(selectedScan).getFileName()
-        logger.debug("selectedName %s" % selectedName)
-        folderOfSelected = os.path.dirname(str(selectedName))
-        logger.debug("First Selected File %s" % folderOfSelected)
-        
-        fileName,junk = qtWidgets.QFileDialog.getSaveFileName(None, 
-                                                'Save Selected Nodes', 
-                                                folderOfSelected)
-        
-        writer = IntermediateCSVWriter(str(fileName), \
-                                       selectionWidget=self._dataSelections)
-        
-        selectedScans = self._dataSelections.getSelectedScans()
-        writer.writeNodes(selectedScans)
-        
+        try:
+            selectedScan = self._dataSelections.getSelectedScans()[0]
+            logger.debug("First Selected Node %s" % selectedScan)
+            selectedName = \
+                self._dataSelections.getNodeContainingScan(selectedScan).getFileName()
+            logger.debug("selectedName %s" % selectedName)
+            folderOfSelected = os.path.dirname(str(selectedName))
+            logger.debug("First Selected File %s" % folderOfSelected)
+            
+            fileName,junk = qtWidgets.QFileDialog.getSaveFileName(None, 
+                                                    'Save Selected Nodes', 
+                                                    folderOfSelected)
+            
+            if fileName != "":
+                writer = IntermediateCSVWriter(str(fileName), \
+                                               selectionWidget=self._dataSelections)
+                
+                selectedScans = self._dataSelections.getSelectedScans()
+                writer.writeNodes(selectedScans)
+        except TypeError as te:
+            logger.exception (te)
+        except Exception as ex:
+            logger.exception(ex)
+            
     @qtCore.pyqtSlot()
     def saveAsFile(self):
         logger.debug(METHOD_ENTER_STR)
