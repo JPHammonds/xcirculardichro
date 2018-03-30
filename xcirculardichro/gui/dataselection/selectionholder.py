@@ -78,6 +78,49 @@ class SelectionHolder(qtWidgets.QWidget):
     def getSelectedScans(self):
         return self._selectionWidget.getSelectedScans()
     
+    def getWriterForSelection(self):
+        logger.debug(METHOD_ENTER_STR)
+        scansForNode = {}
+        selectedNodes = set()
+        for scan in self.getSelectedScans():
+            logger.debug("Getting Node for %s" % scan)
+            nodeForScan = \
+                self.getNodeContainingScan(scan)
+            selectedNodes.add(nodeForScan)
+            if not (nodeForScan in scansForNode.keys()):
+                scansForNode[nodeForScan] = []
+            scansForNode[nodeForScan].append(scan)
+            print("SelectedNodes %s" % selectedNodes)
+        selectedNodes = list(selectedNodes)
+        
+        nodeType = None
+        if hasattr(selectedNodes, "__iter__"):
+            for node in selectedNodes:
+                if node.__class__ is None:
+                    raise TypeError("Found a node with Type None. " \
+                                    "Need to select a node for "
+                                    "display/Writing")
+                if nodeType == None:
+                    # This is the first type everything else will need 
+                    # to match this.
+                    nodeType = node.__class__
+                    nodeForReturn = node
+                else:
+                    # Make sure nodes are of the same class.  If not
+                    # throw Exception since we cannot use a type based 
+                    # writer for all nodes
+                    if not isinstance(node, nodeType):
+                        raise TypeError("Selected Nodes have different" \
+                                        "node types.  Currently only " \
+                                        "operations with the same " \
+                                        "type are allowed")
+        if nodeType is None:
+            raise TypeError("Did not find an appropriate Writer")
+        logger.debug("nodeType " + str(nodeType))
+        return nodeForReturn.getWriterClass()
+                        
+                
+
     def isMultipleScansSelected(self):
         logger.debug(METHOD_ENTER_STR)
         return self._selectionWidget.isMultipleScansSelected()
