@@ -14,5 +14,10 @@ class FileDataNode(DataNode):
         return self.scans
     
     def getFileName(self):
-        raise NotImplementedError("This method must be implemented in the " +
+        raise NotImplementedError("This method must be implemented in the " \
                                   "subclass")
+        
+    def getWriterClass(self):
+        raise NotImplementedError("Writing is not supported for the " \
+                                  "current Node selection %s" % \
+                                  str(self.__class__))
