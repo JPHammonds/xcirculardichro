@@ -4,7 +4,7 @@
 '''
 import logging
 from xcirculardichro import METHOD_ENTER_STR
-from xcirculardichro.data.scandatanode import ScanDataNode
+from xcirculardichro.data import ScanDataNode
 logger = logging.getLogger(__name__)
 
 class SpecScanNode(ScanDataNode):

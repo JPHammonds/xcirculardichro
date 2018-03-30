@@ -2,7 +2,7 @@
  Copyright (c) 2017, UChicago Argonne, LLC
  See LICENSE file.
 '''
-from xcirculardichro.data.datanode import DataNode
+from xcirculardichro.data import DataNode
 
 
 class ScanDataNode(DataNode):

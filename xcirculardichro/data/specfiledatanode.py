@@ -5,8 +5,8 @@
 import logging
 from xcirculardichro import METHOD_ENTER_STR
 import os
-from xcirculardichro.data.specscannode import SpecScanNode
-from xcirculardichro.data.filedatanode import FileDataNode
+from xcirculardichro.data import SpecScanNode
+from xcirculardichro.data import FileDataNode
 
 logger = logging.getLogger(__name__)
 
