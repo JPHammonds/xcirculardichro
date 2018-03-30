@@ -1,0 +1,1 @@
+from .xmcddatanavigatormodel import XMCDDataNavigatorModel
