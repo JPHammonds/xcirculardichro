@@ -106,6 +106,9 @@ class XMCDMainWindow(qtWidgets.QMainWindow):
         self.captureCurrentFullNormalizedAction = qtWidgets.QAction("Capture Current Full Normalized", self)
         self.captureCurrentFullNormalizedAction.triggered.connect(self.captureCurrentFullNormalized)
         
+        self.removeSelectedAction = qtWidgets.QAction("Remove Selected", self)
+        self.removeSelectedAction.triggered.connect(self.removeSelectedNodes)
+        
         exitAction = qtWidgets.QAction("Exit", self)
         exitAction.setShortcut('Ctrl+Q')
         exitAction.triggered.connect(self.close)
@@ -118,7 +121,8 @@ class XMCDMainWindow(qtWidgets.QMainWindow):
         fileMenu.addAction(self.exportAction)
         fileMenu.addSeparator()
         fileMenu.addAction(exitAction)
-
+        fileMenu.setToolTipsVisible(True)
+        
         viewMenu.addAction(self.selectPositionerParams)
         viewMenu.addAction(self.selectUserParams)
         
@@ -126,7 +130,10 @@ class XMCDMainWindow(qtWidgets.QMainWindow):
         dataMenu.addAction(self.captureCurrentAverageAction)
         dataMenu.addAction(self.captureCurrentCorrectedAction)
         dataMenu.addAction(self.captureCurrentFullNormalizedAction)
+        dataMenu.addSeparator()
+        dataMenu.addAction(self.removeSelectedAction)
         
+        fileMenu.aboutToShow.connect(self._configureFileMenuEnable)
         viewMenu.aboutToShow.connect(self._configureViewMenuEnable)
         dataMenu.aboutToShow.connect(self._configureDataMenuEnable)
         
@@ -141,19 +148,40 @@ class XMCDMainWindow(qtWidgets.QMainWindow):
             if self._dataSelections.getSelectedScans() is None:
                 self.captureCurrentAction.setEnabled(False)
                 self.captureCurrentAverageAction.setEnabled(False)
-                self.captureCurrentCorrectedAction.setEnabled(False)
+                self.captureCurrentFullNormalizedAction.setEnabled(False)
+                self.removeSelectedAction.setEnabled(False)
             elif not self._dataSelections.isMultipleScansSelected():
                 self.captureCurrentAverageAction.setEnabled(False)
             if not self._dataSelections.hasValidRangeSelectionInfo():
                 self.captureCurrentCorrectedAction.setEnabled(False)
-        except NotImplementedError as ex:
+        except NotImplementedError:
             self.captureCurrentAction.setEnabled(False)
             self.captureCurrentAverageAction.setEnabled(False)
             self.captureCurrentCorrectedAction.setEnabled(False)
             
     @qtCore.pyqtSlot()
     def _configureFileMenuEnable(self):
-        self.open
+        self.openAction.setEnabled(True)
+        self.saveAction.setEnabled(True)
+        self.saveAsAction.setEnabled(False)
+        self.exportAction.setEnabled(False)
+        self.closeAction.setEnabled(False)
+        
+        if self._dataSelections.getSelectedScans() is None:
+            self.saveAction.setEnabled(False)
+            self.saveAsAction.setEnabled(False)
+            self.exportAction.setEnabled(False)
+            self.closeAction.setEnabled(False)
+        else:
+            try:
+                writer = self._dataSelections.getWriterForSelection()
+                self.saveAction.setEnabled(True)
+                self.saveAction.setToolTip("Save Selected Nodes")
+            except Exception as ex:
+                self.saveAction.setEnabled(False)
+                self.saveAction.setToolTip(str(ex))
+                logger.debug(str(ex.__class__) + "  " + str(ex) )
+                
     
     @qtCore.pyqtSlot()
     def _configureViewMenuEnable(self):
@@ -211,31 +239,6 @@ class XMCDMainWindow(qtWidgets.QMainWindow):
         self.updatePlotData()
         self._plotWidget.applyRangeSelection(preEdgeRange, postEdgeRange)
         
-#     @qtCore.pyqtSlot(str)
-#     def handleLeftDataSelectionChanged(self, label):
-#         '''
-#         Handle selection on left side of the plot.  Feed selection information 
-#         to the choice widget and then handle any necessary plot changes
-#         '''
-#         logger.debug(METHOD_ENTER_STR % label)
-#         selection = self._plotWidget.getLeftSelectionIndexes(label)
-#         average = self._plotWidget.getLeftSelectionAverage(label)
-#         self._dataSelections.setLeftDataSelection(label, selection, average)
-#         self.updatePlotData()
-        
-#     @qtCore.pyqtSlot(str)
-#     def handleRightDataSelectionChanged(self, label):
-#         '''
-#         Handle selection on right side of the plot.  Feed selection information 
-#         to the choice widget and then handle any necessary plot changes
-#         '''
-#         logger.debug(METHOD_ENTER_STR % label)
-#         selection = self._plotWidget.getRightSelectionIndexes(label)
-#         average = self._plotWidget.getRightSelectionAverage(label)
-#         self._dataSelections.setRightDataSelection(label, selection, average)
-#         self.updatePlotData()
-        
-        
     @qtCore.pyqtSlot(qtCore.QModelIndex, qtCore.QModelIndex)
     def handleNavigatorDataChanged(self, beginIndex, endIndex):
         logger.debug("begin Index %s, endIndex %s" % (beginIndex, endIndex))
@@ -244,22 +247,18 @@ class XMCDMainWindow(qtWidgets.QMainWindow):
         self._dataSelections.setPostionersToDisplay(self.positionersToDisplay)
         self._dataSelections.handleDataSelectionsChanged()
               
-#     def handlePointSelectionReloadPicks(self, preEdgePoints, postEdgePoints):
-#         logger.debug(METHOD_ENTER_STR % ((preEdgePoints, postEdgePoints, "a"),))
-#         self._plotWidget.applyPickPoints(preEdgePoints, postEdgePoints)
-#         if ((len(preEdgePoints) > 0) and (len(postEdgePoints) > 0)):
-#             self.updatePlotData()
-#         logger.debug(METHOD_EXIT_STR)
-        
     @qtCore.pyqtSlot()
     def openFile(self):
         '''
         Open a file, populate the navigator window as appropriate
         '''
         logger.debug(METHOD_ENTER_STR)
+        fOptions = qtWidgets.QFileDialog.Options()
+        fOptions |= qtWidgets.QFileDialog.DontUseNativeDialog
         fileName = qtWidgets.QFileDialog.getOpenFileName(self, 
                                 caption="Open Spec File",
-                                directory=self.currentDirectory)[0]
+                                directory=self.currentDirectory,
+                                options=fOptions)[0]
         specFile = None
         if fileName != "":
             try:
@@ -274,6 +273,10 @@ class XMCDMainWindow(qtWidgets.QMainWindow):
             return
         self._dataNavigator.addSpecDataFileNode(specFile)
         
+    @qtCore.pyqtSlot()
+    def removeSelectedNodes(self):
+        logger.debug(METHOD_ENTER_STR)
+        self._dataNavigator.removeSelectedNodes()
         
     @qtCore.pyqtSlot()
     def saveFile(self):
@@ -287,12 +290,16 @@ class XMCDMainWindow(qtWidgets.QMainWindow):
             folderOfSelected = os.path.dirname(str(selectedName))
             logger.debug("First Selected File %s" % folderOfSelected)
             
-            fileName,junk = qtWidgets.QFileDialog.getSaveFileName(None, 
-                                                    'Save Selected Nodes', 
-                                                    folderOfSelected)
+            fOptions = qtWidgets.QFileDialog.Options()
+            fOptions |= qtWidgets.QFileDialog.DontUseNativeDialog
+            fileName,junk = qtWidgets.QFileDialog.getSaveFileName(None, \
+                                                    'Save Selected Nodes', \
+                                                    folderOfSelected, \
+                                                    options=fOptions)
             
             if fileName != "":
-                writer = IntermediateCSVWriter(str(fileName), \
+                writerClass = self._dataSelections.getWriterForSelection()
+                writer = writerClass(str(fileName), \
                                                selectionWidget=self._dataSelections)
                 
                 selectedScans = self._dataSelections.getSelectedScans()
