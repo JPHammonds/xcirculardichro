@@ -25,9 +25,14 @@ class DataNode(object):
         
     def child(self, row):
         #logger.debug(METHOD_ENTER_STR)
+        logger.debug(METHOD_EXIT_STR % row)
+        logger.debug(METHOD_EXIT_STR % self._children)
         #logger.debug(METHOD_EXIT_STR % self._children[row])
-        return self._children[row]
-    
+        if len(self._children) > 0:
+            return self._children[row]
+        else:
+            return None
+        
     def childCount(self):
         #logger.debug(METHOD_ENTER_STR)
         return len(self._children)
@@ -45,6 +50,15 @@ class DataNode(object):
         #logger.debug(METHOD_ENTER_STR % self._parent)
         return self._parent
     
+    def removeChild(self, node):
+        logging.debug(METHOD_ENTER_STR % node)
+        for child in self._children:
+            if child == node:
+                logging.debug("len(self._children)%s" % len(self._children))
+                self._children.remove(child)
+                logging.debug("len(self._children)%s" % len(self._children))
+                node.setParent(None)
+                            
     def row(self):
         #logger.debug(METHOD_ENTER_STR)
         if self._parent is not None:
