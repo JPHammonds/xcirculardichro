@@ -2,20 +2,15 @@
  Copyright (c) 2017, UChicago Argonne, LLC
  See LICENSE file.
 '''
-from xcirculardichro.data import IntermediateScanNode
 import PyQt5.QtWidgets as qtWidgets
-from xcirculardichro.data import FileDataNode
-from enum import Enum
 from xcirculardichro import METHOD_ENTER_STR
+from xcirculardichro.data import DataSelectionTypes, SELECTED_NODES, \
+    DATA_SELECTION, FileDataNode, IntermediateScanNode
+    
 
 import logging
 import xcirculardichro.writer
 logger = logging.getLogger(__name__)
-
-SELECTED_NODES = 'selectedNodes'
-DATA_SELECTION = 'dataSelection' 
-class DataSelectionTypes(Enum):
-    RAW, AVERAGED, STEP_NORMALIZED, FULL_NORMALIZED = range(4)
 
 class IntermediateDataNode(FileDataNode):
     
