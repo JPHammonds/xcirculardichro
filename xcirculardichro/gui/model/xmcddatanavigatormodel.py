@@ -131,8 +131,23 @@ class XMCDDataNavigatorModel(qtCore.QAbstractItemModel):
         self.dataChanged.emit(firstIndex, lastIndex)
         return True
             
-    def removeRows(self, startRow, numRows, parent=qtCore.QModelIndex()):
+    def removeRow(self, row, parent=qtCore.QModelIndex()):
         logger.debug(METHOD_ENTER_STR)
+        self.beginRemoveRows(parent, row, 1)
+        self._rootNode.removeChild(self._rootNode.child(row))
+        self.endRemoveRows()
+        firstIndex = self.index(0, 0)
+        lastIndex = self.index(self.rowCount()-1,0)
+        self.dataChanged.emit(firstIndex, lastIndex)
+        return True
+        
+    def removeRows(self, row, count, parent=qtCore.QModelIndex()):
+        logger.debug(METHOD_ENTER_STR)
+        self.beginRemoveRows(parent, row, row+count-1)
+        self.endInsertRows()
+        firstIndex = self.index(0, 0)
+        lastIndex = self.index(self.rowCount()-1, 0)
+        self.dataChanged.emit(firstIndex, lastIndex)
         
     def setData(self, index, value, role):
         success = True
