@@ -8,7 +8,7 @@ import PyQt5.QtGui as qtGui
 import PyQt5.QtCore as qtCore
 from xcirculardichro import METHOD_ENTER_STR, METHOD_EXIT_STR
 from platform import node
-from xcirculardichro.data.specscannode import SpecScanNode
+from xcirculardichro.data import SpecScanNode
 
 logger = logging.getLogger(__name__)
 
@@ -55,11 +55,6 @@ class XMCDDataNavigatorModel(qtCore.QAbstractItemModel):
         if role == qtCore.Qt.ToolTipRole:
             return qtCore.QVariant(node.name())
             
-        
-        
-#     def headerData(self, section, orientation, qtCore.Qt.DisplayRole):
-#         logger.debug(METHOD_ENTER_STR)
-        
     def index(self, row, column, parent=qtCore.QModelIndex()):
         logger.debug(METHOD_ENTER_STR)
         node = self.getNode(parent)
