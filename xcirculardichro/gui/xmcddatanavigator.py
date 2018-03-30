@@ -5,11 +5,10 @@
 import PyQt5.QtWidgets as qtWidgets
 import PyQt5.QtCore as qtCore
 from xcirculardichro import METHOD_ENTER_STR, METHOD_EXIT_STR
-from xcirculardichro.gui.model.xmcddatanavigatormodel \
-    import XMCDDataNavigatorModel
-from xcirculardichro.data.datanode import DataNode
-from xcirculardichro.data.specfiledatanode import SpecFileDataNode
-from xcirculardichro.data.intermediatedatanode import IntermediateDataNode,\
+from xcirculardichro.gui import XMCDDataNavigatorModel
+from xcirculardichro.data import DataNode
+from xcirculardichro.data import SpecFileDataNode
+from xcirculardichro.data import IntermediateDataNode,\
     SELECTED_NODES, DATA_SELECTION
 import logging
 logger = logging.getLogger(__name__)
@@ -77,6 +76,14 @@ class XMCDDataNavigator(qtWidgets.QWidget):
         '''
         return self._model
     
+    def removeSelectedNodes(self):
+        
+        logger.debug(METHOD_ENTER_STR)
+        selectedNodes = self.getSelectedNodes()
+        for node in selectedNodes:
+            self.model().removeRow(node.row())
+        
+        
     def rootNode(self):
         '''
         return the root node of the navigator.  This is essentially just a dummy 
