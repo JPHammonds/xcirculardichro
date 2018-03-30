@@ -2,19 +2,20 @@
  Copyright (c) 2017, UChicago Argonne, LLC
  See LICENSE file.
 '''
-from xcirculardichro.data.intermediatescannode import IntermediateScanNode
+from xcirculardichro.data import IntermediateScanNode
 import PyQt5.QtWidgets as qtWidgets
-from xcirculardichro.data.filedatanode import FileDataNode
+from xcirculardichro.data import FileDataNode
 from enum import Enum
 from xcirculardichro import METHOD_ENTER_STR
 
 import logging
+import xcirculardichro.writer
 logger = logging.getLogger(__name__)
 
 SELECTED_NODES = 'selectedNodes'
 DATA_SELECTION = 'dataSelection' 
 class DataSelectionTypes(Enum):
-    RAW, AVERAGED, STEP_NORMALIZED = range(3) 
+    RAW, AVERAGED, STEP_NORMALIZED, FULL_NORMALIZED = range(4)
 
 class IntermediateDataNode(FileDataNode):
     
@@ -30,11 +31,13 @@ class IntermediateDataNode(FileDataNode):
             dataSelection.getNodeContainingScan(selectedNodes[0]).getFileName()
         
         newNodeName = ""
+        newNodeName += selectedNodes[0].shortName().split('-')[0]
+        newNodeName += (" - %s " % option.name)
+        selectedScans = dataSelection.getSelectedScans()
         for node in selectedNodes:
-            newNodeName += node.shortName()
-            newNodeName += (" - %s " % option.name)
-            for scan in dataSelection.getSelectedScans():
-                newNodeName += scan + ", "
+            nodesForScan = node.getScanNodes()
+            for scan in set(nodesForScan).intersection(selectedScans):
+                newNodeName += "- " + scan + ", "
 
         super(IntermediateDataNode, self).__init__(newNodeName, parent=parent)
         self._dataColumns = [[]]
@@ -48,6 +51,8 @@ class IntermediateDataNode(FileDataNode):
             self.insertAveragedData(selectedNodes, dataSelection)
         elif option == DataSelectionTypes.STEP_NORMALIZED:
             self.insertStepNormalizedData(selectedNodes, dataSelection)
+        elif option == DataSelectionTypes.FULL_NORMALIZED:
+            self.insertFullNormalizedData(selectedNodes, dataSelection)
     
 
     def getAverageData(self, dataSelection):
@@ -144,6 +149,7 @@ class IntermediateDataNode(FileDataNode):
             dataOut = []
             for selectedScan in dataSelection.getSelectedScans():
                 data = []
+                logger.debug("Available Scans %s" % node.scans)
                 logger.debug("Adding Scan %s type %s" % (selectedScan, type(selectedScan)))
                 scan = node.scans[selectedScan]
                 self.scans[selectedScan] = IntermediateScanNode(str(scan.scanNum), parent=self)
@@ -171,6 +177,12 @@ class IntermediateDataNode(FileDataNode):
                 axisLabelIndex = dataSelection.getPlotAxisLabelsIndex()
                 self.scans[selectedScan].addData(scan.scanNum, scan.scanCmd, axisLabels, axisLabelIndex, dataOut, counterNames)
 
+    def getWriterClass(self):
+        '''
+        Return a writer class for this type of node.
+        '''
+        return xcirculardichro.writer.IntermediateCSVWriter
+    
     def insertStepNormalizedData(self, selectedNodes, dataSelection):
         logger.debug(METHOD_ENTER_STR % selectedNodes)
         dataAverage = self.getAverageData(dataSelection)
@@ -179,8 +191,8 @@ class IntermediateDataNode(FileDataNode):
         currentSelectedScans = dataSelection.getSelectedScans()
         logger.debug("Average Data %s" % dataAverage)
         logger.debug("CorrectedData %s" % correctedData) 
-        self.scans["%s %s" % (DataSelectionTypes.STEP_NORMALIZED.name, str(currentSelectedScans))] = \
-            IntermediateScanNode("%s %s" % (DataSelectionTypes.STEP_NORMALIZED.name, str(currentSelectedScans)), 
+        self.scans["%s %s" % (DataSelectionTypes.STEP_NORMALIZED.name, ''.join('{0} '.format(k) for k in currentSelectedScans))] = \
+            IntermediateScanNode("%s %s" % (DataSelectionTypes.STEP_NORMALIZED.name, ''.join('{0} '.format(k) for k in currentSelectedScans)), 
                                  parent=self)
         axisLabels = dataSelection.getPlotAxisLabels()
         axisLabelIndex = dataSelection.getPlotAxisLabelsIndex()
@@ -188,14 +200,52 @@ class IntermediateDataNode(FileDataNode):
         logger.debug("axisLabelsIndex %s" % axisLabelIndex)
         logger.debug("counterNames %s" % counterNames )
         correctedData.insert(0, dataAverage[0])
-        self.scans["%s %s" % (DataSelectionTypes.STEP_NORMALIZED.name, str(currentSelectedScans))] \
-            .addData("%s %s" % (DataSelectionTypes.STEP_NORMALIZED.name, str(currentSelectedScans)), 
+        self.scans["%s %s" % (DataSelectionTypes.STEP_NORMALIZED.name, ''.join('{0} '.format(k) for k in currentSelectedScans))] \
+            .addData("%s %s" % (DataSelectionTypes.STEP_NORMALIZED.name, ''.join('{0} '.format(k) for k in currentSelectedScans)), 
                      "shared", 
                      axisLabels, 
                      axisLabelIndex, 
                      correctedData, 
                      counterNames)
             
+    def insertFullNormalizedData(self, selectedNodes, dataSelection):
+        logger.debug(METHOD_ENTER_STR )
+        logger.debug("SelectedNodes %s" % selectedNodes)
+        logger.debug("dataSelection %s" % dataSelection)
+        selectedScans = dataSelection.getSelectedScans()
+        if (len(selectedScans) == 2):
+            logger.debug("selectedScans %s" % selectedScans)
+            data = {}
+            dataOut = {}
+            normalizedData = []
+            if len(selectedScans) == 2:
+                for scan in selectedScans:
+                    data[scan] =[]
+                    dataOut[scan] = []
+                    node = dataSelection.getNodeContainingScan(scan)
+                    thisScan = node.scans[scan]
+                    logger.debug (thisScan.data)
+                    data[scan] = thisScan.data
+            logger.debug("data %s" % data)
+            counters, counterNames = dataSelection.getSelectedCounterInfo()
+            normalizedXAS = (data[selectedScans[0]]['XAS'] + data[selectedScans[1]]['XAS'])/2
+            normalizedXMCD = (data[selectedScans[0]]['XMCD'] - data[selectedScans[1]]['XMCD'])                                              
+            dataLabels = list(data[selectedScans[0]].keys())
+            logger.debug("Data Labels %s" % dataLabels)
+            self.scans['Full Normalized'] = IntermediateScanNode("Full Normalized", parent = self)
+            self.scans['Full Normalized'].addData("Full Normalized",
+                                                  "shared",
+                                                  dataLabels,
+                                                  [1,2,1,2],
+                                                  [data[selectedScans[0]]['Energy'], normalizedXAS, normalizedXMCD],
+                                                  counterNames)
+        else:
+            logger.warning("You have elected to display/save " + \
+                           "Normalized Data.  This requires 2 " + \
+                           "selected scans but there are currently " +\
+                           "%d scans selected" % len(selectedScans))                                      
+            
+    
     def shortName(self):
         return self._name
     
