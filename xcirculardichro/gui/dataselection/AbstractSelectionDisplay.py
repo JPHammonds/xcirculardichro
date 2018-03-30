@@ -3,7 +3,7 @@
  See LICENSE file.
 '''
 import logging
-from abc import ABC, abstractmethod, ABCMeta
+from abc import abstractmethod
 from PyQt5 import QtWidgets
 import PyQt5.QtCore as qtCore
 from xcirculardichro import METHOD_ENTER_STR, METHOD_EXIT_STR
@@ -153,14 +153,6 @@ class AbstractSelectionDisplay(QtWidgets.QSplitter):
         
     def selectedNodes(self):
         return self._selectedNodes
-    
-#     @abstractmethod
-#     def setLeftDataSelection(self, label, selection, average):
-#         raise NotImplementedError(OVERRIDE_METHOD_STR)
-    
-#     @abstractmethod
-#     def setRightDataSelection(self, label, selection, average):
-#         raise NotImplementedError(OVERRIDE_METHOD_STR)
     
     def setSelectedNodes(self, selectedNodes):
         logger.debug(METHOD_ENTER_STR % self)
