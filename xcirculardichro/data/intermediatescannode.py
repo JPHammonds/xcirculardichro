@@ -3,7 +3,7 @@
  See LICENSE file.
 '''
 import logging
-from xcirculardichro.data.scandatanode import ScanDataNode
+from xcirculardichro.data import ScanDataNode
 from xcirculardichro import METHOD_ENTER_STR
 
 logger = logging.getLogger(__name__)
