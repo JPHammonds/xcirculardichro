@@ -5,5 +5,6 @@ from .datanode import DataNode
 from .filedatanode import FileDataNode
 from .intermediatedatanode import IntermediateDataNode
 from .intermediatescannode import IntermediateScanNode
+from .scandatanode import ScanDataNode
 from .specfiledatanode import SpecFileDataNode
 from .specscannode import SpecScanNode
