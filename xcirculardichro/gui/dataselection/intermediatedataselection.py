@@ -134,12 +134,11 @@ class IntermediateDataSelection(AbstractSelectionDisplay):
         return False
         
     def plotNormalizedData(self):
-        return self.subChoices.plotNormalizedData()
+        if self.subChoices.plotNormalizedData():
+            return self.subChoices.plotNormalizedData()
         
-#     def setLeftDataSelection(self, label, selection, average):
-#         logger.debug(METHOD_ENTER_STR % ((label, selection, average),))
-#         self.pointSelectionInfo.setSelectionAverage(RangeSelectionInfo.POINT_SELECTIONS[0], average)
-#         self.pointSelectionInfo.setSelectionIndices(RangeSelectionInfo.POINT_SELECTIONS[0], selection)
+        else:
+            return False
     
     def setDefSelectedScansRange(self):
         logger.debug(METHOD_ENTER_STR)
@@ -207,11 +206,6 @@ class IntermediateDataSelection(AbstractSelectionDisplay):
         self.scanBrowser.setPositionersToDisplay(positioners)
         
         
-#     def setRightDataSelection(self, label, selection, average):
-#         logger.debug(METHOD_ENTER_STR % ((label, selection, average),))
-#         self.pointSelectionInfo.setSelectionAverage(RangeSelectionInfo.POINT_SELECTIONS[1], average)
-#         self.pointSelectionInfo.setSelectionIndices(RangeSelectionInfo.POINT_SELECTIONS[1], selection)
-    
     def setupDisplayWithSelectedNodes(self):
         self.scanBrowser.clearBrowser()
         for node in self._selectedNodes:
