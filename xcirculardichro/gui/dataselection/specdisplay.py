@@ -7,16 +7,18 @@ import logging
 import numpy as np
 import PyQt5.QtWidgets as qtWidgets
 import PyQt5.QtCore as qtCore
+from PyQt5.QtWidgets import QAbstractItemView
 from specguiutils.scantypeselector import ScanTypeSelector, SCAN_TYPES
 from specguiutils.scanbrowser import ScanBrowser
 from specguiutils.counterselector import CounterSelector
-from xcirculardichro.gui.choices.choiceholder import ChoiceHolder
+
 from xcirculardichro import METHOD_ENTER_STR,\
     METHOD_EXIT_STR
-from xcirculardichro.gui.dataselection.AbstractSelectionDisplay import AbstractSelectionDisplay,\
-    SelectionTypeNames
-from PyQt5.QtWidgets import QAbstractItemView
-from xcirculardichro.gui.dataselection.rangeselectioninfo import RangeSelectionInfo
+from xcirculardichro.gui.dataselection import RangeSelectionInfo
+from xcirculardichro.gui.dataselection import SelectionTypeNames
+from xcirculardichro.gui.dataselection import AbstractSelectionDisplay
+from xcirculardichro.gui.choices import ChoiceHolder
+    
 
 logger = logging.getLogger(__name__)
 

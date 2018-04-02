@@ -5,14 +5,12 @@
 import logging
 import PyQt5.QtWidgets as qtWidgets
 import PyQt5.QtCore as qtCore
-from xcirculardichro.gui.dataselection.dummyselectiondisplay import \
-    DummySelectionDisplay
-from xcirculardichro.gui.dataselection.specdisplay import SpecDisplay
-from xcirculardichro.gui.dataselection.intermediatedataselection import \
-    IntermediateDataSelection
 from xcirculardichro import METHOD_ENTER_STR, METHOD_EXIT_STR
-from xcirculardichro.data.specfiledatanode import SpecFileDataNode
-from xcirculardichro.data.intermediatedatanode import IntermediateDataNode
+from xcirculardichro.gui.dataselection import DummySelectionDisplay
+from xcirculardichro.gui.dataselection import SpecDisplay
+from xcirculardichro.gui.dataselection import IntermediateDataSelection
+from xcirculardichro.data import SpecFileDataNode
+from xcirculardichro.data import IntermediateDataNode
 logger = logging.getLogger(__name__)
 
 

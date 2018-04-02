@@ -3,10 +3,12 @@
  See LICENSE file.
 '''
 import logging
-from xcirculardichro.gui.dataselection.AbstractSelectionDisplay import AbstractSelectionDisplay,\
-    SelectionTypeNames
 import PyQt5.QtWidgets as qtWidget
+
 from xcirculardichro import METHOD_ENTER_STR
+from xcirculardichro.gui.dataselection import SelectionTypeNames, \
+    AbstractSelectionDisplay
+    
 logger = logging.getLogger(__name__)
 
 DUMMY_STR = "No action taken here"

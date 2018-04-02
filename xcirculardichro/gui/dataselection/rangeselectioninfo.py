@@ -273,8 +273,8 @@ class RangeSetInfo(qtWidgets.QWidget):
         self.rangeMaximum.setText(str(dataRange[1]))
     
 
-class PointSetSelector(qtWidgets.QDialog):
+class RangeSetSelector(qtWidgets.QDialog):
     
     def __init__(self, parent=None):
-        super(PointSetSelector, self).__init__(parent=parent)
+        super(RangeSetSelector, self).__init__(parent=parent)
         

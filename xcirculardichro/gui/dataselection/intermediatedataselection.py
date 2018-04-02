@@ -4,14 +4,15 @@
 '''
 import numpy as np
 import logging
-from xcirculardichro.gui.dataselection.AbstractSelectionDisplay import AbstractSelectionDisplay,\
-    SelectionTypeNames
 import PyQt5.QtWidgets as qtWidgets
 import PyQt5.QtGui as qtGui
 import PyQt5.QtCore as qtCore
+
+from xcirculardichro.gui.dataselection import SelectionTypeNames,\
+    AbstractSelectionDisplay
 from xcirculardichro import METHOD_ENTER_STR
-from xcirculardichro.gui.choices.intermediatechoices import IntermediateChoices
-from xcirculardichro.gui.dataselection.rangeselectioninfo import RangeSelectionInfo
+from xcirculardichro.gui.choices import IntermediateChoices
+from xcirculardichro.gui.dataselection import RangeSelectionInfo
 
 SCAN_COL = 0
 CMD_COL = 1
