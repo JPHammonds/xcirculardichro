@@ -270,18 +270,6 @@ class SpecDisplay(AbstractSelectionDisplay):
             self.currentSelections[newScanType])
         self.dataSelectionsChanged.emit()
         self.validateRangeSelection()
-#         if (self.rangeSelectionInfo.edgeRangesAtDummyValues()):
-#             logging.debug("Current edges at dummy values")
-#             self.setDefSelectedScansRange()
-#         else:
-#             currentPreEdgeRange, currentPostEdgeRange = \
-#                 self.getSelectedEdgeRangeData()
-#             currentSelectedScanRange = self.getSelectedScansRange()
-#             if (currentPreEdgeRange[0] < currentSelectedScanRange[0]) or \
-#                 (currentPostEdgeRange[1] > currentSelectedScanRange[1]):
-#                 logging.debug("Current edge values %s outside range of current selection %s" % \
-#                               ((currentPreEdgeRange, currentPostEdgeRange), currentSelectedScanRange))
-#                 self.setDefSelectedScansRange()
         
         
     '''
@@ -488,23 +476,17 @@ class SpecDisplay(AbstractSelectionDisplay):
         self.rangeValuesChanged.emit(self.getPreEdgeRange(), 
                                      self.getPostEdgeRange())
         
-#     def setLeftDataSelection(self, label, selection, average):
-#         logger.debug(METHOD_ENTER_STR % ((label, selection, average),))
-#         self.pointSelectionInfo.setSelectionAverage(RangeSelectionInfo.POINT_SELECTIONS[0], average)
-#         self.pointSelectionInfo.setSelectionIndices(RangeSelectionInfo.POINT_SELECTIONS[0], selection)
-        
     def setPositionersToDisplay(self, positioners):
         logger.debug(METHOD_ENTER_STR, positioners)
         self.scanBrowser.setPositionersToDisplay(positioners)
         
-#     def setRightDataSelection(self, label, selection, average):
-#         logger.debug(METHOD_ENTER_STR % ((label, selection, average),))
-#         self.pointSelectionInfo.setSelectionAverage(RangeSelectionInfo.POINT_SELECTIONS[1], average)
-#         self.pointSelectionInfo.setSelectionIndices(RangeSelectionInfo.POINT_SELECTIONS[1], selection)
-  
     def setUserParamsToDisplay(self, userParams):
         logger.debug(METHOD_ENTER_STR, userParams)
         self.scanBrowser.setUserParamsToDisplay(userParams)
+        
+    def setTemperatureParamsToDisplay(self, temperatureParams):
+        logger.debug(METHOD_ENTER_STR, temperatureParams)
+        self.scanBrowser.setTemperatureParamsToDisplay(temperatureParams)
         
     def storePlotSelections(self, typeName):
         if not (typeName in self.currentSelections.keys()):

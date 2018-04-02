@@ -69,24 +69,18 @@ class DummySelectionDisplay(AbstractSelectionDisplay):
     def setupDisplayWithSelectedNodes(self):
         logger.debug(METHOD_ENTER_STR % DUMMY_STR)
         
-#     def setLeftDataSelection(self, label, selection, average):
-#         '''
-#         Dummy override that does nothing
-#         '''
-#         logger.debug(METHOD_ENTER_STR % DUMMY_STR)
-    
     def setPositionersToDisplay(self, positioners):
         '''
         Dummy override that does nothing
         '''
         logger.debug(METHOD_ENTER_STR % DUMMY_STR)
 
-#     def setRightDataSelection(self, label, selection, average):
-#         '''
-#         Dummy override that does nothing
-#         '''
-#         logger.debug(METHOD_ENTER_STR % DUMMY_STR)
-    
+    def setTemperatureParamsToDisplay(self, userParams):
+        '''
+        Dummy override that does nothing
+        '''
+        logger.debug(METHOD_ENTER_STR % DUMMY_STR)
+
     def setUserParamsToDisplay(self, userParams):
         '''
         Dummy override that does nothing

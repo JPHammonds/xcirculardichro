@@ -182,14 +182,6 @@ class SelectionHolder(qtWidgets.QWidget):
     def plotNormalizedData(self):
         return self._selectionWidget.plotNormalizedData()
         
-#     def setLeftDataSelection(self, label, selection, average):
-#         logger.debug(METHOD_ENTER_STR % ((label, selection, average),))
-#         self._selectionWidget.setLeftDataSelection(label, selection, average)
-        
-#     def setRightDataSelection(self, label, selection, average):
-#         logger.debug(METHOD_ENTER_STR % ((label, selection, average),))
-#         self._selectionWidget.setRightDataSelection(label, selection, average)
-        
     def setDisplayWidget(self, newDisplay):
         logger.debug(METHOD_ENTER_STR)
         if isinstance(newDisplay, self._selectionWidget.__class__):
@@ -233,8 +225,11 @@ class SelectionHolder(qtWidgets.QWidget):
             self.setDisplayWidget(IntermediateDataSelection())
             self._selectionWidget.setSelectedNodes(self._selectedNodes)
 
-    def setUserParamsToDisplay(self, positioners):
-        self._selectionWidget.setUserParamsToDisplay(positioners)
+    def setUserParamsToDisplay(self, userParams):
+        self._selectionWidget.setUserParamsToDisplay(userParams)
+        
+    def setTemperatureParamsToDisplay(self, temperatureParams):
+        self._selectionWidget.setTemperatureParamsToDisplay(temperatureParams)
         
     def updateEdgeRanges(self):
         self._selectionWidget.updateEdgeRanges()

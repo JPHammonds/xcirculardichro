@@ -74,9 +74,6 @@ class IntermediateDataSelection(AbstractSelectionDisplay):
             raise(ex)
         return node.scans[self.selectedScans[0]].axisLabels
         
-#     def getDataLabels(self):
-#         AbstractSelectionDisplay.getDataLabels(self)
-        
     def getPlotAxisLabelsIndex(self):
         if (len(self.selectedScans) > 0):
             node = self.getNodeContainingScan(self.selectedScans[0])
@@ -276,5 +273,8 @@ class ScanBrowser(qtWidgets.QDialog):
     def setPositionersToDisplay(self, positioners):
         self.positionersToShow = positioners
         
+    def setTemperatureParamsToDisplay(self, temperatureParams):
+        self.temperatureParamsToShow = temperatureParams        
+
     def setUserParamsToDisplay(self, userParams):
         self.userParamsToShow = userParams
