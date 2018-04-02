@@ -26,18 +26,24 @@ class IntermediateChoices(AbstractChoices):
     
     def plotIndividualData(self):
         '''
-        Logical to return if individually selected data sets should be plotted
+        Logical to return if individually selected data sets should be 
+        plotted
         '''
-        if (str(self.plotDataChoice.currentText()) == self.PLOT_OPTIONS[0]) or \
-            (str(self.plotDataChoice.currentText()) == self.PLOT_OPTIONS[1]) or \
-            (str(self.plotDataChoice.currentText()) == self.PLOT_OPTIONS[3]):
+        if (str(self.plotDataChoice.currentText()) == \
+            self.PLOT_OPTIONS[0]) or \
+            (str(self.plotDataChoice.currentText()) == \
+             self.PLOT_OPTIONS[1]) or \
+            (str(self.plotDataChoice.currentText()) == \
+             self.PLOT_OPTIONS[3]):
             return True
         else:
             return False
         
     def plotNormalizedData(self):
-        if (str(self.plotDataChoice.currentText()) == self.PLOT_OPTIONS[3]) or \
-           (str(self.plotDataChoice.currentText()) == self.PLOT_OPTIONS[4]):
+        if (str(self.plotDataChoice.currentText()) == \
+            self.PLOT_OPTIONS[3]) or \
+           (str(self.plotDataChoice.currentText()) == \
+            self.PLOT_OPTIONS[4]):
             return True
         else:
             return False
