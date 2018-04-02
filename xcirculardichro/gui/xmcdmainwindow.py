@@ -87,8 +87,11 @@ class XMCDMainWindow(qtWidgets.QMainWindow):
             qtWidgets.QAction("SelectPositionerParameters", self)
         self.selectUserParams = \
             qtWidgets.QAction("SelectUserParameters", self)
+        self.selectTemperatureParams = \
+            qtWidgets.QAction("SelectTemperatureParameters", self)
         self.selectPositionerParams.triggered.connect(self._selectPositionerParameters)
         self.selectUserParams.triggered.connect(self._selectUserParameters)
+        self.selectTemperatureParams.triggered.connect(self._selectTemperatureParameters)
 
         self.captureCurrentAction = \
             qtWidgets.QAction("Capture Current", self)
@@ -123,6 +126,7 @@ class XMCDMainWindow(qtWidgets.QMainWindow):
         
         viewMenu.addAction(self.selectPositionerParams)
         viewMenu.addAction(self.selectUserParams)
+        viewMenu.addAction(self.selectTemperatureParams)
         
         dataMenu.addAction(self.captureCurrentAction)
         dataMenu.addAction(self.captureCurrentAverageAction)
@@ -187,9 +191,11 @@ class XMCDMainWindow(qtWidgets.QMainWindow):
         if self._dataSelections.isSelectionType(SelectionTypeNames.SPEC_SELECTION):
             self.selectPositionerParams.setEnabled(True)
             self.selectUserParams.setEnabled(True)
+            self.selectTemperatureParams.setEnabled(True)
         else:
             self.selectPositionerParams.setEnabled(False)
             self.selectUserParams.setEnabled(False)
+            self.selectTemperatureParams.setEnabled(False)
         
     @qtCore.pyqtSlot() 
     def captureCurrent(self):
@@ -324,6 +330,35 @@ class XMCDMainWindow(qtWidgets.QMainWindow):
         self._dataSelections.setPostionersToDisplay(self.positionersToDisplay)
         
     @qtCore.pyqtSlot()
+    def _selectTemperatureParameters(self):
+        '''
+        set up a dialog to allow the user to select parameters defined 
+        in the #X fields in a scan.  From this selection, the selected 
+        parameters will be added to the scanBrowser table to provide 
+        the user with more information as selection criteria for which 
+        scans to select for processing
+        '''
+        logger.debug(METHOD_ENTER_STR)
+        selectedScans = self._dataSelections.getSelectedScans()
+        firstNode = self._dataSelections.getNodeContainingScan(selectedScans[0])
+        specScan = firstNode.scans[selectedScans[0]]
+        parameters = specScan.X.keys()
+        logger.debug("Parameters %s" % parameters)
+        try:
+            self.tempParamsToDisplay = PositionerSelector.getPositionSelectorModalDialog(specScan.X)
+        except :
+            warningMessage = "No user parameters were found for the " \
+                    + "selected scans.  Either no #X lines were found in "\
+                    + "the spec file or no plugin was found to parse " \
+                    + "the #X"
+            qtWidgets.QMessageBox.warning(self, \
+                                          "Temperature Parameters Not Found", \
+                                          warningMessage)
+            return
+        logger.debug("Temperatures %s" % self.tempParamsToDisplay)
+        self._dataSelections.setTemperatureParamsToDisplay(self.tempParamsToDisplay)
+        
+    @qtCore.pyqtSlot()
     def _selectUserParameters(self):
         '''
         set up a dialog to allow the user to select parameters defined 
@@ -349,7 +384,7 @@ class XMCDMainWindow(qtWidgets.QMainWindow):
                                           "User Parameters Not Found", \
                                           warningMessage)
             return
-        logger.debug("Positioners %s" % self.userParamsToDisplay)
+        logger.debug("UserParams %s" % self.userParamsToDisplay)
         self._dataSelections.setUserParamsToDisplay(self.userParamsToDisplay)
         
     def updatePlotData(self):
