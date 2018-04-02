@@ -2,6 +2,7 @@
  Copyright (c) 2017, UChicago Argonne, LLC
  See LICENSE file.
 '''
+import os
 import logging
 
 import PyQt5.QtWidgets as qtWidgets
@@ -11,12 +12,9 @@ from spec2nexus.spec import SpecDataFile, NotASpecDataFile
 from xcirculardichro import METHOD_ENTER_STR, METHOD_EXIT_STR
 from xcirculardichro.gui.xmcddatanavigator import XMCDDataNavigator
 from xcirculardichro.gui.plotwidget import PlotWidget
-from xcirculardichro.gui.dataselection.selectionholder import SelectionHolder
-from xcirculardichro.data.intermediatedatanode import SELECTED_NODES,\
-    DataSelectionTypes
-import os
-from xcirculardichro.writer.intermediatecsvwriter import IntermediateCSVWriter
-from xcirculardichro.gui.dataselection.AbstractSelectionDisplay import SelectionTypeNames
+from xcirculardichro.gui.dataselection import SelectionTypeNames
+from xcirculardichro.gui.dataselection import SelectionHolder
+from xcirculardichro.data import DataSelectionTypes
 from specguiutils.positionerselector import PositionerSelector
 
 logger = logging.getLogger(__name__)

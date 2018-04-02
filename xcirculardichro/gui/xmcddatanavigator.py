@@ -5,7 +5,7 @@
 import PyQt5.QtWidgets as qtWidgets
 import PyQt5.QtCore as qtCore
 from xcirculardichro import METHOD_ENTER_STR, METHOD_EXIT_STR
-from xcirculardichro.gui import XMCDDataNavigatorModel
+from xcirculardichro.gui.model import XMCDDataNavigatorModel
 from xcirculardichro.data import DataNode
 from xcirculardichro.data import SpecFileDataNode
 from xcirculardichro.data import IntermediateDataNode,\
