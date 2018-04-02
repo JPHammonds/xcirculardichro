@@ -2,17 +2,14 @@
  Copyright (c) 2017, UChicago Argonne, LLC
  See LICENSE file.
 '''
-import logging
 from abc import abstractmethod
+import logging
 from PyQt5 import QtWidgets
 import PyQt5.QtCore as qtCore
 from xcirculardichro import METHOD_ENTER_STR, METHOD_EXIT_STR
 from specguiutils import XMCDException
-from enum import Enum
-logger = logging.getLogger(__name__)
 
-class SelectionTypeNames(Enum):
-    DUMMY_SELECTION, SPEC_SELECTION, INTERMEDIATE_SELECTION = range(3)
+logger = logging.getLogger(__name__)
 
 OVERRIDE_METHOD_STR ="Must subclass this and override this method"
 
