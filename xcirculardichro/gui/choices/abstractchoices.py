@@ -38,43 +38,48 @@ class AbstractChoices(qtWidgets.QDialog):
 
     def plotIndividualData(self):
         '''
-        Logical to return if individually selected data sets should be plotted
+        Logical to return if individually selected data sets should be 
+        plotted
         '''
-        if (str(self.plotDataChoice.currentText()) == self.PLOT_OPTIONS[0]) or \
-            (str(self.plotDataChoice.currentText()) == self.PLOT_OPTIONS[1]):
+        if (str(self.plotDataChoice.currentText()) == \
+            self.PLOT_OPTIONS[0]) or \
+            (str(self.plotDataChoice.currentText()) == \
+             self.PLOT_OPTIONS[1]):
             return True
         else:
             return False
         
     def plotAverageData(self):
         '''
-        Logical to return if simple average of selected data sets should be 
-        displayed
+        Logical to return if simple average of selected data sets should 
+        be displayed
         '''
-        if (str(self.plotDataChoice.currentText()) == self.PLOT_OPTIONS[0]) or \
-            (str(self.plotDataChoice.currentText()) == self.PLOT_OPTIONS[2]):
+        if (str(self.plotDataChoice.currentText()) == \
+            self.PLOT_OPTIONS[0]) or \
+            (str(self.plotDataChoice.currentText()) == \
+             self.PLOT_OPTIONS[2]):
             return True
         else:
             return False
         
     def plotCorrectedData(self):
         '''
-        Logical to return if This data type can return "Corrected" data such
-        as Step-Normalized data
+        Logical to return if This data type can return "Corrected" data 
+        such as Step-Normalized data
         '''
         return False
         
     def plotNormalizedData(self):
         '''
-        Logical to return if This data type can return "Normalized" should be 
-        returned (Average of 2 selected XAS & Difference of 2 XMCD) sets
-        return False
+        Logical to return if This data type can return "Normalized" 
+        should be returned (Average of 2 selected XAS & Difference of 
+        2 XMCD) sets return False
         '''
         return False
         
     @qtCore.pyqtSlot(int)
     def handlePlotChoiceChanged(self, index):
-        logger.debug("Enter")
+        logger.debug(METHOD_ENTER_STR)
         self.plotOptionChanged.emit()
         
         
