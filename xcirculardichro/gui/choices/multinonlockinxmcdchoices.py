@@ -69,11 +69,6 @@ class MultiNonLockinXMCDChoices(AbstractChoices):
         logger.debug(METHOD_ENTER_STR)
         layout = self.layout()
         
-#         choiceLayout = qtWidgets.QHBoxLayout()
-#         label = qtWidgets.QLabel("DataType: ")
-#         self.choiceSelector = qtWidgets.QComboBox()
-#         self.choiceSelector.insertItems(0, CHOICES)
-
         plotLayout = QHBoxLayout()
         label = qtWidgets.QLabel("Plot Type: ")
         self.plotSelector = qtWidgets.QComboBox()
@@ -85,6 +80,22 @@ class MultiNonLockinXMCDChoices(AbstractChoices):
         
         self.plotSelector.currentIndexChanged[int]. \
             connect(self.plotSelectorChanged)
+
+        dataSelectorLayout = qtWidgets.QHBoxLayout()
+        self.dataSelector = {}
+        label = qtWidgets.QLabel("Data Selection")
+        self.dataSelector[TEY_STR] = qtWidgets.QCheckBox("TEY_STR")
+        self.dataSelector[TFY_STR] = qtWidgets.QCheckBox("TFY_STR")
+        self.dataSelector[REF_STR] = qtWidgets.QCheckBox("REF_STR")
+        dataSelectorLayout.addWidget(label)
+        dataSelectorLayout.addWidget(self.dataSelector[TEY_STR])
+        dataSelectorLayout.addWidget(self.dataSelector[TFY_STR])
+        dataSelectorLayout.addWidget(self.dataSelector[REF_STR])
+        self.dataSelector[TEY_STR].stateChanged.connect(self.handleDataSelector)
+        self.dataSelector[TFY_STR].stateChanged.connect(self.handleDataSelector)
+        self.dataSelector[REF_STR].stateChanged.connect(self.handleDataSelector)
+        
+        layout.addLayout(dataSelectorLayout)
 
         self.setLayout(layout)
         self.plotSelections = DEFAULT_SELECTIONS
@@ -123,17 +134,34 @@ class MultiNonLockinXMCDChoices(AbstractChoices):
         retData = None
         logger.debug("PlotSelector " + self.plotSelector.currentText())
         logger.debug(PLOT_CHOICES[PlotChoiceId.xasXmcd.value])
+
+        xas = []
+        xmcd = []
+        xasChiral = []
+        if self.useTEY():
+            xas.append(xasTey)
+            xmcd.append(xmcdTey)
+            xasChiral.extend([xasTeyRCP, xasTeyLCP])
+        if self.useTFY():
+            xas.append(xasTfy)
+            xmcd.append(xmcdTfy)
+            xasChiral.extend([xasTfyRCP, xasTfyLCP])
+        if self.useREF():
+            xas.append(xasRef)
+            xmcd.append(xmcdRef)
+            xasChiral.extend([xasRefRCP, xasRefLCP])
         
         if str(self.plotSelector.currentText()) == str(PLOT_CHOICES[PlotChoiceId.xasXmcd.value]) :
-            retData = [energy, xasTey, xasTfy, xasRef,
-                       xmcdTey, xmcdTfy, xmcdRef]
+            retData = [energy,]
+            retData.extend(xas)
+            retData.extend(xmcd)
         elif str(self.plotSelector.currentText()) == PLOT_CHOICES[PlotChoiceId.xasRcpLcpXasXmcd.value]:
             retData = [energy, xasTeyRCP,xasTeyLCP, xasTfyRCP,xasTfyLCP, \
                     xasRefRCP,xasRefLCP, xasTey, xasTfy, xasRef, \
                     xmcdTey, xmcdTfy, xmcdRef]
         elif str(self.plotSelector.currentText()) == PLOT_CHOICES[PlotChoiceId.xasRcpLcp.value ]:
-            retData = [energy, xasTeyRCP,xasTeyLCP, xasTfyRCP,xasTfyLCP, \
-                    xasRefRCP,xasRefLCP]
+            retData = [energy, ]
+            retData.extend(xasChiral)
         elif str(self.plotSelector.currentText()) == PLOT_CHOICES[PlotChoiceId.teyRcpLcp.value] :
             retData = [energy, teyRCP, teyLCP]
         elif str(self.plotSelector.currentText()) == PLOT_CHOICES[PlotChoiceId.tfyRcpLcp.value] :
@@ -153,61 +181,92 @@ class MultiNonLockinXMCDChoices(AbstractChoices):
         '''
         logger.debug(METHOD_ENTER_STR, ((data, preEdge, postEdge),))
         
+
+    def getI0ChiralLabels(self):
+        I0RCPStr = "".join([I0_STR, UNDERSCORE_STR, RCP_STR])
+        I0LCPStr = "".join([I0_STR, UNDERSCORE_STR, LCP_STR])
+        return I0RCPStr, I0LCPStr
+
+    def getTeyChiralLabels(self):
+        xasTeyRCPStr = "".join([XAS_STR, UNDERSCORE_STR, TEY_STR, \
+                                UNDERSCORE_STR, RCP_STR])
+        xasTeyLCPStr = "".join([XAS_STR, UNDERSCORE_STR, TEY_STR, \
+                                UNDERSCORE_STR, LCP_STR])
+        return xasTeyRCPStr, xasTeyLCPStr
+
+
+    def getTfyChiralLabels(self):
+        xasTfyRCPStr = "".join([XAS_STR, UNDERSCORE_STR, TFY_STR, \
+                                UNDERSCORE_STR, RCP_STR])
+        xasTfyLCPStr = "".join([XAS_STR, UNDERSCORE_STR, TFY_STR, \
+                                UNDERSCORE_STR, LCP_STR])
+        return xasTfyRCPStr, xasTfyLCPStr
+
+
+    def getRefChiralLabels(self):
+        xasRefRCPStr = "".join([XAS_STR, UNDERSCORE_STR, TFY_STR, \
+                                UNDERSCORE_STR, RCP_STR])
+        xasRefLCPStr = "".join([XAS_STR, UNDERSCORE_STR, TFY_STR, \
+                                UNDERSCORE_STR, LCP_STR])
+        return xasRefRCPStr, xasRefLCPStr
+
+    def getFunctionLabels(self):
+        xasTeyStr = "".join([XAS_STR, UNDERSCORE_STR, TEY_STR])
+        xasTfyStr = "".join([XAS_STR, UNDERSCORE_STR, TFY_STR])
+        xasRefStr = "".join([XAS_STR, UNDERSCORE_STR, REF_STR])
+        xmcdTeyStr = "".join([XMCD_STR, UNDERSCORE_STR, TEY_STR])
+        xmcdTfyStr = "".join([XMCD_STR, UNDERSCORE_STR, TFY_STR])
+        xmcdRefStr = "".join([XMCD_STR, UNDERSCORE_STR, REF_STR])
+        xasTeyRCPStr, xasTeyLCPStr = self.getTeyChiralLabels()
+        xasTfyRCPStr, xasTfyLCPStr = self.getTfyChiralLabels()
+        xasRefRCPStr, xasRefLCPStr = self.getRefChiralLabels()
+        xasLabels = []
+        xmcdLabels = []
+        xasChiral = []
+        if self.useTEY():
+            xasLabels.append(xasTeyStr)
+            xmcdLabels.append(xmcdTeyStr)
+            xasChiral.extend([xasTeyRCPStr, xasTeyLCPStr])
+        if self.useTFY():
+            xasLabels.append(xasTfyStr)
+            xmcdLabels.append(xmcdTfyStr)
+            xasChiral.extend([xasTfyRCPStr, xasTfyLCPStr])
+        if self.useREF():
+            xasLabels.append(xasRefStr)
+            xmcdLabels.append(xmcdRefStr)
+            xasChiral.extend([xasRefRCPStr, xasRefLCPStr])
+        return xasLabels, xmcdLabels, xasChiral
+
     def getPlotAxisLabels(self):
         labels = ["Energy",]
-#        labels.extend(str(self.plotSelector.currentText()).split('/'))
 
+        xasLabels, xmcdLabels, xasChiral = self.getFunctionLabels()
+        yLabels = []    
         if str(self.plotSelector.currentText()) == str(PLOT_CHOICES[PlotChoiceId.xasXmcd.value]) :
-            yLabels = ["".join([XAS_STR, UNDERSCORE_STR, TEY_STR]), 
-                       "".join([XAS_STR, UNDERSCORE_STR, TFY_STR]),
-                       "".join([XAS_STR, UNDERSCORE_STR, REF_STR]),
-                       "".join([XMCD_STR, UNDERSCORE_STR, TEY_STR]),
-                       "".join([XMCD_STR, UNDERSCORE_STR, TFY_STR]),
-                       "".join([XMCD_STR, UNDERSCORE_STR, REF_STR])]
+            yLabels.extend(xasLabels)
+            yLabels.extend(xmcdLabels)
         elif str(self.plotSelector.currentText()) == PLOT_CHOICES[PlotChoiceId.xasRcpLcpXasXmcd.value]:
-            yLabels = ["".join([XAS_STR, UNDERSCORE_STR, TEY_STR, \
-                                UNDERSCORE_STR, RCP_STR]), \
-                       "".join([XAS_STR, UNDERSCORE_STR, TEY_STR, \
-                                UNDERSCORE_STR, LCP_STR]), \
-                       "".join([XAS_STR, UNDERSCORE_STR, TFY_STR, \
-                                UNDERSCORE_STR, RCP_STR]), \
-                       "".join([XAS_STR, UNDERSCORE_STR, TFY_STR, \
-                                UNDERSCORE_STR, LCP_STR]), \
-                       "".join([XAS_STR, UNDERSCORE_STR, REF_STR, \
-                                UNDERSCORE_STR, RCP_STR]), \
-                       "".join([XAS_STR, UNDERSCORE_STR, REF_STR, \
-                                UNDERSCORE_STR, LCP_STR]), \
-                       "".join([XAS_STR, UNDERSCORE_STR, TEY_STR]), 
-                       "".join([XAS_STR, UNDERSCORE_STR, TFY_STR]),
-                       "".join([XAS_STR, UNDERSCORE_STR, REF_STR]),
-                       "".join([XMCD_STR, UNDERSCORE_STR, TEY_STR]),
-                       "".join([XMCD_STR, UNDERSCORE_STR, TFY_STR]),
-                       "".join([XMCD_STR, UNDERSCORE_STR, REF_STR])]
+            yLabels.extend(xasChiral)
+            yLabels.extend(xasLabels)
+            yLabels.extend(xmcdLabels)
         elif str(self.plotSelector.currentText()) == PLOT_CHOICES[PlotChoiceId.xasRcpLcp.value ]:
-            yLabels = ["".join([XAS_STR, UNDERSCORE_STR, TEY_STR, \
-                                UNDERSCORE_STR, RCP_STR]), \
-                       "".join([XAS_STR, UNDERSCORE_STR, TEY_STR, \
-                                UNDERSCORE_STR, LCP_STR]), \
-                       "".join([XAS_STR, UNDERSCORE_STR, TFY_STR, \
-                                UNDERSCORE_STR, RCP_STR]), \
-                       "".join([XAS_STR, UNDERSCORE_STR, TFY_STR, \
-                                UNDERSCORE_STR, LCP_STR]), \
-                       "".join([XAS_STR, UNDERSCORE_STR, REF_STR, \
-                                UNDERSCORE_STR, RCP_STR]), \
-                       "".join([XAS_STR, UNDERSCORE_STR, REF_STR, \
-                                UNDERSCORE_STR, LCP_STR])]
+            yLabels.extend(xasChiral)
         elif str(self.plotSelector.currentText()) == PLOT_CHOICES[PlotChoiceId.teyRcpLcp.value] :
-            yLabels = ["".join([TEY_STR, UNDERSCORE_STR, RCP_STR]), \
-                       "".join([TEY_STR, UNDERSCORE_STR, LCP_STR])]
+            xasTeyRCPStr, xasTeyLCPStr = self.getTeyChiralLabels()
+            yLabels.append(xasTeyRCPStr)
+            yLabels.append(xasTeyLCPStr)
         elif str(self.plotSelector.currentText()) == PLOT_CHOICES[PlotChoiceId.tfyRcpLcp.value] :
-            yLabels = ["".join([TFY_STR, UNDERSCORE_STR, RCP_STR]), \
-                       "".join([TFY_STR, UNDERSCORE_STR, LCP_STR])]
+            xasTfyRCPStr, xasTfyLCPStr = self.getTfyChiralLabels()
+            yLabels.append(xasTfyRCPStr)
+            yLabels.append(xasTfyLCPStr)
         elif str(self.plotSelector.currentText()) == PLOT_CHOICES[PlotChoiceId.refRcpLcp.value] :
-            yLabels = ["".join([REF_STR, UNDERSCORE_STR, RCP_STR]), \
-                       "".join([REF_STR, UNDERSCORE_STR, LCP_STR])]
+            xasRefRCPStr, xasRefLCPStr = self.getRefChiralLabels()
+            yLabels.append(xasRefRCPStr)
+            yLabels.append(xasRefLCPStr)
         elif str(self.plotSelector.currentText()) == PLOT_CHOICES[PlotChoiceId.i0RcpLcp.value]:
-            yLabels = ["".join([I0_STR, UNDERSCORE_STR, RCP_STR]), \
-                       "".join([I0_STR, UNDERSCORE_STR, LCP_STR])]
+            i0RCPStr, i0LCPStr = self.getI0ChiralLabels()
+            yLabels.append(i0RCPStr)
+            yLabels.append(i0LCPStr)
         else:
             raise LookupError(" No data selection for " + \
                               str(self.plotSelector.currentText()))
@@ -221,55 +280,50 @@ class MultiNonLockinXMCDChoices(AbstractChoices):
         
     def getPlotLabels(self):
         labels = ["Energy",]
-        addLabels = None
+        addLabels = []
+
         if str(self.plotSelector.currentText()) == \
                                     PLOT_CHOICES[PlotChoiceId.xasXmcd]:
-            addLabels = [XAS_STR + SPACE_STR + TEY_STR, \
-                         XAS_STR + SPACE_STR + TFY_STR, \
-                         XAS_STR + SPACE_STR + REF_STR, \
-                         XMCD_STR + SPACE_STR + TEY_STR, \
-                         XMCD_STR + SPACE_STR + TFY_STR, \
-                         XMCD_STR + SPACE_STR + REF_STR]        
+            xasLabels, xmcdLabels, xasChiral = self.getFunctionLabels()
+            addLabels.extend(xasLabels)
+            addLabels.extend(xmcdLabels)
         elif str(self.plotSelector.currentText()) == \
                                 PLOT_CHOICES[PlotChoiceId.xasRcpLcpXasXmcd]:
-            addLabels = [XAS_STR + SPACE_STR + TEY_STR + SPACE_STR + RCP_STR,\
-                         XAS_STR + SPACE_STR + TEY_STR + SPACE_STR + LCP_STR, \
-                         XAS_STR + SPACE_STR + TFY_STR + SPACE_STR + RCP_STR,\
-                         XAS_STR + SPACE_STR + TFY_STR + SPACE_STR + LCP_STR, \
-                         XAS_STR + SPACE_STR + REF_STR + SPACE_STR + RCP_STR,\
-                         XAS_STR + SPACE_STR + REF_STR + SPACE_STR + LCP_STR, \
-                         XAS_STR + SPACE_STR + TEY_STR, \
-                         XAS_STR + SPACE_STR + TFY_STR, \
-                         XAS_STR + SPACE_STR + REF_STR, \
-                         XMCD_STR + SPACE_STR + TEY_STR, \
-                         XMCD_STR + SPACE_STR + TFY_STR, \
-                         XMCD_STR + SPACE_STR + REF_STR]        
+            xasLabels, xmcdLabels, xasChiral = self.getFunctionLabels()
+            addLabels.extend(xasChiral)
+            addLabels.extend(xasLabels)
+            addLabels.extend(xmcdLabels)
         elif str(self.plotSelector.currentText()) == \
                                         PLOT_CHOICES[PlotChoiceId.xasRcpLcp]:
-            addLabels = [XAS_STR + SPACE_STR + TEY_STR + SPACE_STR + RCP_STR,\
-                         XAS_STR + SPACE_STR + TEY_STR + SPACE_STR + LCP_STR, \
-                         XAS_STR + SPACE_STR + TFY_STR + SPACE_STR + RCP_STR,\
-                         XAS_STR + SPACE_STR + TFY_STR + SPACE_STR + LCP_STR, \
-                         XAS_STR + SPACE_STR + REF_STR + SPACE_STR + RCP_STR,\
-                         XAS_STR + SPACE_STR + REF_STR + SPACE_STR + LCP_STR]
+            xasLabels, xmcdLabels, xasChiral = self.getFunctionLabels()
+            addLabels.extend(xasChiral)
         elif str(self.plotSelector.currentText()) == \
                                         PLOT_CHOICES[PlotChoiceId.teyRcpLcp]:
-            addLabels = [TEY_STR + SPACE_STR + RCP_STR,\
-                         TEY_STR + SPACE_STR + LCP_STR]
+        
+            xasTeyRCPStr, xasTeyLCPStr = self.getTeyChiralLabels()
+            addLabels.append(xasTeyRCPStr)
+            addLabels.append(xasTeyLCPStr)
         elif str(self.plotSelector.currentText()) == \
                                         PLOT_CHOICES[PlotChoiceId.tfyRcpLcp]:
-            addLabels = [TFY_STR + SPACE_STR + RCP_STR,\
-                         TFY_STR + SPACE_STR + LCP_STR]
+            xasTfyRCPStr, xasTfyLCPStr = self.getTfyChiralLabels()
+            addLabels.append(xasTfyRCPStr)
+            addLabels.append(xasTfyLCPStr)
         elif str(self.plotSelector.currentText()) == \
                                         PLOT_CHOICES[PlotChoiceId.refRcpLcp]:
-            addLabels = [REF_STR + SPACE_STR + RCP_STR,\
-                         REF_STR + SPACE_STR + LCP_STR]
+            xasRefRCPStr, xasRefLCPStr = self.getRefChiralLabels()
+            addLabels.append(xasRefRCPStr)
+            addLabels.append(xasRefLCPStr)
         elif str(self.plotSelector.currentText()) == \
                                         PLOT_CHOICES[PlotChoiceId.i0RcpLcp]:
-            addLabels = [I0_STR + SPACE_STR + RCP_STR,\
-                         I0_STR + SPACE_STR + LCP_STR]
+            i0RCPStr, i0LCPStr = self.getI0ChiralLabels()
+            addLabels.append(i0RCPStr)
+            addLabels.append(i0LCPStr)
         labels.extend(addLabels)
         return labels
+        
+    def handleDataSelector(self, state):
+        logger.debug(METHOD_ENTER_STR % state)
+        self.plotOptionChanged.emit()
         
     def setDefaultSelectionsFromCounterNames(self, names):
         logger.debug(METHOD_ENTER_STR, names)
@@ -310,5 +364,23 @@ class MultiNonLockinXMCDChoices(AbstractChoices):
         DEFAULT_SELECTIONS[0][0] = xName
         DEFAULT_SELECTIONS[1][0] = xName
     
+        
+    def useTEY(self):
+        '''
+        Use TEY in plots and calculations
+        '''
+        return self.dataSelector[TEY_STR].isChecked()
+        
+    def useTFY(self):
+        '''
+        Use TFY in plots and calculations
+        '''
+        return self.dataSelector[TFY_STR].isChecked()
+        
+    def useREF(self):
+        '''
+        Use REF in plots and calculations
+        '''
+        return self.dataSelector[REF_STR].isChecked()
         
         
