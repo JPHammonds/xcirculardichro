@@ -372,6 +372,10 @@ class SpecDisplay(AbstractSelectionDisplay):
         self.scanBrowser.scanList.setCurrentCell(0, 0)
         self.scanBrowser.scanList.selectRow(0)
         #force this since we have changed the underlying data
+        if names[newType] == 'XMCDvsE':
+            self.counterSelector.setVisible(False)
+        else:
+            self.counterSelector.setVisible(True)
         self.scanBrowser.scanList.itemSelectionChanged.emit()
         self.dataSelectionsChanged.emit()            
         
