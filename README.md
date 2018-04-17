@@ -55,3 +55,22 @@ Version 0.8.rc5 2018-01-10
     - Initial code added for reading files from David Keavney.  Problems exist with data display after reading which crash the application. This data has multiple XAS and XMCD per file.  This causes a problem with the code bit that allows selection of points for step normalization.
     - Add code for selecting parameters from the positioner list.   This is used to add columns to the ScanBrowser for extra data selection information.
     - Add code for the user parameters at sector 4 to display in the scan browser table.
+
+Version 0.9 2018-04-16
+    - Changes based on meeting with Beamline group
+    - Change in how the selection for step correction range is done.  
+    now instead of selecting a group of points on each side to use a
+    range of values on each side are selected and points that lie inside 
+    that range are used.  An option for automatic selection of a few 
+    percent on either side is possible.  Sometimes still the user needs 
+    to apply this range to get the proper corrections done but now this 
+    is a bit more straightforward.
+    - Have improved capture and file saving for different combinations of
+    data.  There were issues selecting data from several intermediate data 
+    sets or in saving the final combination of data.
+    - For 4-ID-C added options to select (and/or) TEY/TFY/REF data.  With
+    all of these chosen, it seems to get fairly complicated having individual
+    plots for each of these showing up and tracking these in a legend, etc.
+    If we can deal with these more one at a time then it will hpefully be 
+    more straightforward for the user.  Still need to go through more on 
+    how this data will be processed.

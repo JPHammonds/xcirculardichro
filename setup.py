@@ -7,7 +7,7 @@ from setuptools import find_packages
 import xcirculardichro
 PACKAGE_NAME = 'xcirculardichro'
 setup(name=PACKAGE_NAME,
-      version='0.8rc5',
+      version='0.9',
       description='Library to provide PyQt5 widgets to display spec file information read using ' +
                    'spec2nexus.spec file library',
       author = 'John Hammonds',
