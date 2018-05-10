@@ -11,7 +11,7 @@ import logging
 from xcirculardichro import METHOD_ENTER_STR, METHOD_EXIT_STR
 logger = logging.getLogger(__name__)
 
-CHOICES = ['Flourescence', 'Transmission']
+CHOICES = ['Fluorescence', 'Transmission']
 DEFAULT_SELECTIONS = [["Energy", "SCAtot2(+)", "SCAtot2(-)", "IC3(+)", "IC3(-)"], 
                       ["Energy", "IC5(+)", "IC5(-)", "IC4(+)", "IC5(-)"] ]
 PLOT_CHOICES = ["XAS/XMCD", "XAS+/XAS-/XAS/XMCD", "XAS+/XAS-", "D+/D-", "M+/M-"]
