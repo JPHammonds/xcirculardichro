@@ -36,6 +36,8 @@ class SpecDisplay(AbstractSelectionDisplay):
         self.counterSelector = CounterSelector(
             counterOpts = self.subChoices.choiceWidget.COUNTER_OPTS)
         self.scanBrowser.scanList.setSelectionMode(QAbstractItemView.SingleSelection)
+        self.scanBrowser.setToolTipOnCells("Select a scan type above to "
+                                    "enable multiple selection")
         self.rangeSelectionInfo = RangeSelectionInfo()
         
         self.addWidget(self.typeSelector)
@@ -284,7 +286,15 @@ class SpecDisplay(AbstractSelectionDisplay):
         logger.debug("scanTypes: %s" % scanTypes)
         if newFile:
             self.typeSelector.loadScans(scanTypes)
+        if self.typeSelector.getTypeIndexFromName(self.typeSelector.getCurrentType()) == 0:
+            self.scanBrowser.setToolTipOnCells("Select a scan type above to "
+                                        "enable multiple selection")
+        else:
+            self.scanBrowser.setToolTipOnCells("")
+
         self.scanBrowser.setCurrentScan(0)
+#         self.scanBrowser.setToolTipOnCells("Select a scan type above to "
+#                                     "enable multiple selection")
         self.counterSelector.setCurrentCounter(0)
         self.dataSelectionsChanged.emit()
         
@@ -344,11 +354,12 @@ class SpecDisplay(AbstractSelectionDisplay):
     @qtCore.pyqtSlot(int)
     def scanTypeSelected(self, newType, suppressFilter=False):
         '''
-        Called when the user selects a scan type from the ScanTypeSelector
-        This should should modify the list shown in the ScanBrowser so that 
-        only that type of scan is shown in the browser.  This user should be 
-        able to change between specific types or all types.  This should also
-        switch the browser in/out of multi selection mode.
+        Called when the user selects a scan type from the 
+        ScanTypeSelector This should should modify the list shown in the 
+        ScanBrowser so that only that type of scan is shown in the 
+        browser.  This user should be able to change between specific 
+        types or all types.  This should also switch the browser in/out 
+        of multi selection mode.
         '''
         names = self.typeSelector.getTypeNames()
         logger.debug(METHOD_ENTER_STR % names[newType])
@@ -357,10 +368,13 @@ class SpecDisplay(AbstractSelectionDisplay):
                       (newType, str(names)))
         if names[newType] == SCAN_TYPES[0]:  # all types
             types = names[1:]
+            self.scanBrowser.setToolTipOnCells("Select a scan type above "
+                                        "to enable multiple selection")
             self.scanBrowser.scanList. \
                 setSelectionMode(qtWidgets.QAbstractItemView.SingleSelection)
         else:
             types = (names[newType],)
+            self.scanBrowser.setToolTipOnCells("")
             self.scanBrowser.scanList. \
                 setSelectionMode(qtWidgets.QAbstractItemView.ExtendedSelection)
         logger.debug ("filter for type %d from scan types %s" % \
@@ -393,7 +407,8 @@ class SpecDisplay(AbstractSelectionDisplay):
                 logger.debug("dataThisScan %s" % dataThisScan)
                 if dataThisScan is not None and len(dataThisScan) > 1:
                     if self.isDataIncreasingX(dataThisScan):
-                        logger.debug("Evaluate for increasing X %s, %s, %s" \
+                        logger.debug("Evaluate for increasing X %s, %s,"
+                                     " %s" \
                                      % (range, dataThisScan[0], \
                                       dataThisScan[-1]))
                         if ((range[0] >= dataThisScan[0]) and \
@@ -403,7 +418,8 @@ class SpecDisplay(AbstractSelectionDisplay):
                               (range[1] <= dataThisScan[-1])):
                             scansOverlap = True
                     else:
-                        logger.debug("Evalueate for Decreasing X %s, %s, %s" \
+                        logger.debug("Evalueate for Decreasing X %s, "
+                                     "%s, %s" \
                                      % (range, dataThisScan[0], \
                                       dataThisScan[-1]))
                         if ((range[0] >= dataThisScan[-1]) and \
