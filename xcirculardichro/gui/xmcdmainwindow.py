@@ -16,6 +16,8 @@ from xcirculardichro.gui.dataselection import SelectionTypeNames
 from xcirculardichro.gui.dataselection import SelectionHolder
 from xcirculardichro.data import DataSelectionTypes
 from specguiutils.positionerselector import PositionerSelector
+from xcirculardichro.data.specfiledatanode import SpecFileDataNode
+import gc
 
 logger = logging.getLogger(__name__)
 
@@ -28,6 +30,8 @@ class XMCDMainWindow(qtWidgets.QMainWindow):
     
     def __init__(self, parent=None):
         super(XMCDMainWindow, self).__init__(parent)
+        gc.enable()
+        
         logger.debug(METHOD_ENTER_STR)
         self.currentDirectory =str( os.path.dirname(os.path.realpath(__file__)))
         self.setAttribute(qtCore.Qt.WA_DeleteOnClose)
@@ -107,6 +111,9 @@ class XMCDMainWindow(qtWidgets.QMainWindow):
         self.captureCurrentFullNormalizedAction = qtWidgets.QAction("Capture Current Full Normalized", self)
         self.captureCurrentFullNormalizedAction.triggered.connect(self.captureCurrentFullNormalized)
         
+        self.reloadSpecFileAction = qtWidgets.QAction("Reload Spec File", self)
+        self.reloadSpecFileAction.triggered.connect(self.reloadSpecFile)
+        
         self.removeSelectedAction = qtWidgets.QAction("Remove Selected", self)
         self.removeSelectedAction.triggered.connect(self.removeSelectedNodes)
         
@@ -133,6 +140,8 @@ class XMCDMainWindow(qtWidgets.QMainWindow):
         dataMenu.addAction(self.captureCurrentCorrectedAction)
         dataMenu.addAction(self.captureCurrentFullNormalizedAction)
         dataMenu.addSeparator()
+        dataMenu.addAction(self.reloadSpecFileAction)
+        dataMenu.addSeparator()
         dataMenu.addAction(self.removeSelectedAction)
         
         fileMenu.aboutToShow.connect(self._configureFileMenuEnable)
@@ -155,11 +164,29 @@ class XMCDMainWindow(qtWidgets.QMainWindow):
             elif not self._dataSelections.isMultipleScansSelected():
                 self.captureCurrentAverageAction.setEnabled(False)
             if not self._dataSelections.hasValidRangeSelectionInfo():
+                self.captureCurrentAction.setEnabled(False)
+                self.captureCurrentAverageAction.setEnabled(False)
                 self.captureCurrentCorrectedAction.setEnabled(False)
+                self.captureCurrentFullNormalizedAction.setEnabled(False)
         except NotImplementedError:
             self.captureCurrentAction.setEnabled(False)
             self.captureCurrentAverageAction.setEnabled(False)
             self.captureCurrentCorrectedAction.setEnabled(False)
+        try:
+            selectedNodes = self._dataNavigator.getSelectedNodes()
+            if len(selectedNodes) == 1:
+                if isinstance(selectedNodes[0], SpecFileDataNode):
+                    self.reloadSpecFileAction.setEnabled(True)
+                    self.removeSelectedAction.setEnabled(True)
+                else:
+                    self.reloadSpecFileAction.setEnabled(False)
+                    self.removeSelectedAction.setEnabled(True)
+
+            else:
+                self.reloadSpecFileAction.setEnabled(False)
+        except Exception as ex:
+            self.reloadSpecFileAction.setEnabled(False)
+                
             
     @qtCore.pyqtSlot()
     def _configureFileMenuEnable(self):
@@ -276,6 +303,11 @@ class XMCDMainWindow(qtWidgets.QMainWindow):
         else:
             return
         self._dataNavigator.addSpecDataFileNode(specFile)
+        
+    @qtCore.pyqtSlot()
+    def reloadSpecFile(self):
+        logger.debug(METHOD_ENTER_STR)
+        self._dataNavigator.reloadSpecFile()
         
     @qtCore.pyqtSlot()
     def removeSelectedNodes(self):
