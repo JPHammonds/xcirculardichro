@@ -11,8 +11,8 @@ from xcirculardichro.data import SpecFileDataNode
 from xcirculardichro.data import IntermediateDataNode,\
     SELECTED_NODES, DATA_SELECTION
 import logging
+import gc
 logger = logging.getLogger(__name__)
-
 
 class XMCDDataNavigator(qtWidgets.QWidget):
     
@@ -28,7 +28,7 @@ class XMCDDataNavigator(qtWidgets.QWidget):
         self._view = qtWidgets.QTreeView()
         self._view.setHeaderHidden(True)
         self._view.setModel(self._model)
-        self._view.setSelectionMode(qtWidgets.QAbstractItemView.SingleSelection)
+        self._view.setSelectionMode(qtWidgets.QAbstractItemView.NoSelection)
         self._view.setMinimumWidth(200)
         layout.addWidget(self._view)
         self.setLayout(layout)
@@ -63,6 +63,7 @@ class XMCDDataNavigator(qtWidgets.QWidget):
         self._model.insertRows(numCurrentNodes, 1)
         
     def getSelectedNodes(self):
+        logger.debug(METHOD_ENTER_STR)
         root = self._rootNode
         selectedNodes = []
         for node in root._children:
@@ -76,11 +77,27 @@ class XMCDDataNavigator(qtWidgets.QWidget):
         '''
         return self._model
     
+    def reloadSpecFile(self):
+        logger.debug(METHOD_ENTER_STR)
+        selectedNodes = self.getSelectedNodes()
+        if len(selectedNodes) == 1 and \
+            isinstance(selectedNodes[0], SpecFileDataNode):
+            logger.debug("Yes we need to reload a Spec node")
+            selectedNodes[0].reload()
+            gc.collect()
+            self._model.dataChanged.emit(self._model.index(selectedNodes[0].row(),0),
+                                         self._model.index(selectedNodes[0].row(),0))
+        else:
+            logger.debug("Somehow managed to ask to reload a spec node" +
+                         "without selecting one")
+               
     def removeSelectedNodes(self):
         
         logger.debug(METHOD_ENTER_STR)
         selectedNodes = self.getSelectedNodes()
         for node in selectedNodes:
+            logger.debug("REMOVING NODE %s" % node)
+            node.setChecked(False)
             self.model().removeRow(node.row())
         
         
