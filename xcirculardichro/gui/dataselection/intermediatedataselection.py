@@ -13,6 +13,7 @@ from xcirculardichro.gui.dataselection import SelectionTypeNames,\
 from xcirculardichro import METHOD_ENTER_STR
 from xcirculardichro.gui.choices import IntermediateChoices
 from xcirculardichro.gui.dataselection import RangeSelectionInfo
+from xcirculardichro.gui.choices.multinonlockinxmcdchoices import XMCD_STR
 
 SCAN_COL = 0
 CMD_COL = 1
@@ -35,6 +36,7 @@ class IntermediateDataSelection(AbstractSelectionDisplay):
         self.show()
         
         self.scanBrowser.scanSelected[list].connect(self.handleScanSelection)
+        self.scanBrowser.invertSelectedScan[int, int].connect(self.invertSelectedScan)
         self.subChoices.plotOptionChanged.connect(self.plotOptionChanged)
         self.rangeSelectionInfo.selectorTypeChanged[int].connect(self.handleSelectorTypeChanged)
         self.rangeSelectionInfo.selectorAxisChanged[int].connect(self.handleSelectorAxisChanged)
@@ -63,7 +65,19 @@ class IntermediateDataSelection(AbstractSelectionDisplay):
         return self.subChoices.calcStepCorrectedData(y, \
                                                  preEdge=preEdgeRange, \
                                                  postEdge=postEdgeRange)
-        
+
+    def getNodeForBrowserRow(self, row):
+        logger.debug(METHOD_ENTER_STR % row)
+        if len(self._selectedNodes) == 1:
+            return self._selectedNodes[0]
+        else:
+            priorScans = 0
+            for node in self._selectedNodes:
+                if row < priorScans + len(node.scans):
+                    return node
+                else:
+                    priorScans += len(node.scans)
+                
     def getPlotAxisLabels(self):
         logger.debug(METHOD_ENTER_STR)
         logger.debug("selectedScans" % self.selectedScans)
@@ -122,6 +136,21 @@ class IntermediateDataSelection(AbstractSelectionDisplay):
     def hasValidRangeSelectionData(self):
         return self.rangeSelectionInfo.hasValidRangeSelectionData()
     
+    def invertSelectedScan(self, row, column):
+        logger.debug(METHOD_ENTER_STR % ((row, column),))
+        logger.debug("Available scans %s" % \
+                     [node.scans for node in self._selectedNodes])
+        invertedValue = \
+            self.scanBrowser.scanList.item(row,column).checkState() == \
+                qtCore.Qt.Checked
+        logger.debug("setting scan to inverted %s" % invertedValue)
+        node = self.getNodeForBrowserRow(row)
+        logger.debug("Setting invert for node %s" % node)
+        scanNo = self.scanBrowser.scanList.item(row,0).text()
+        logger.debug("Data to invert %s" % node.scans[scanNo].data['XMCD'])
+        node.setInvertScanData(scanNo, invertedValue)
+        self.dataSelectionsChanged.emit()
+        
     def plotIndividualData(self):
         return self.subChoices.plotIndividualData()
         
@@ -213,6 +242,7 @@ class IntermediateDataSelection(AbstractSelectionDisplay):
 
 class ScanBrowser(qtWidgets.QDialog):
     scanSelected = qtCore.pyqtSignal(list, name="scanSelected")
+    invertSelectedScan = qtCore.pyqtSignal(int, int, name='invertSelectedScan')
     
     def __init__(self, parent=None):
         super(ScanBrowser, self).__init__(parent=parent)
@@ -251,14 +281,29 @@ class ScanBrowser(qtWidgets.QDialog):
             self.scanList.setItem(row, 
                                   CMD_COL, 
                                   qtWidgets.QTableWidgetItem(str(node.scans[scanItem].scanCmd)))
-            self.scanList.setCellWidget(row,
+            checkItem = qtWidgets.QTableWidgetItem()
+            checkItem.setCheckState(qtCore.Qt.Unchecked)
+            self.scanList.setItem(row,
                                   INVERT_COL,
-                                  qtWidgets.QCheckBox())
+                                  checkItem)
+            self.scanList.itemChanged.connect(self.invertSelected)
         
     def clearBrowser(self):
         for row in range(self.scanList.rowCount()):
             self.scanList.setItem(row, SCAN_COL, None)
         self.scanList.setRowCount(0)
+        
+#     def getInvertedScans(self):
+#         logger.debug(METHOD_ENTER_STR)
+#         
+        
+    def invertSelected(self, item):
+        logger.debug(METHOD_ENTER_STR % item.checkState())
+        
+        row = item.row()
+        column = item.column()
+        if column == INVERT_COL:
+            self.invertSelectedScan.emit(row,column)
         
     def scanSelectionChanged(self):
         logger.debug(METHOD_ENTER_STR)
