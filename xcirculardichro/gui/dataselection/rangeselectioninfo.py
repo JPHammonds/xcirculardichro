@@ -54,10 +54,6 @@ class RangeSelectionInfo(qtWidgets.QWidget):
         self.postEdgeRangeSelection.dataRangeChanged.connect(self.handleRangeChanged)
         
         
-#         for selection in self.POINT_SELECTIONS:
-#             self.pointSelections[selection] = PointSetInfo(selection)
-#             layout.addWidget(self.pointSelections[selection])
-#             self.pointSelections[selection].dataRangeChanged.connect(self.handleRangeChanged)
         self.grabRangeButton = qtWidgets.QPushButton("Grab Range From Data")
         layout.addWidget(self.grabRangeButton)
         
@@ -81,20 +77,6 @@ class RangeSelectionInfo(qtWidgets.QWidget):
     def getPointSetType(self):
         return self.pointSetSelector.currentIndex()
     
-#     def getPointSetAverageLeft(self):
-#         return self.preEdgeRangeSelection.getAverage()
-    
-#     def getPointSetAverageRight(self):
-#         return self.postEdgeRangeSelection.getAverage()
-    
-#     def getPointSetLeftPoints(self):
-#         infoSet = self.preEdgeRangeSelection.getIndices()
-#         return infoSet
-        
-#     def getPointSetRightPoints(self):
-#         infoSet = self.postEdgeRangeSelection.getIndices()
-#         return infoSet
-    
     def getPostEdgeRange(self):
         logger.debug(METHOD_ENTER_STR)
         return self.postEdgeRangeSelection.getRange()
@@ -112,10 +94,17 @@ class RangeSelectionInfo(qtWidgets.QWidget):
                      ((self.getPreEdgeRange(),
                        self.getPostEdgeRange()),))
         retValue = False
-        if ((len(self.getPreEdgeRange()) == 0) or \
-            (len(self.getPostEdgeRange()) == 0)):
+        preRange = self.getPreEdgeRange()
+        postRange = self.getPostEdgeRange()
+        # Ranges have been  defined
+        if ((len(preRange) == 0) or \
+            (len(postRange) == 0)):
             #logger
             retValue = False
+        # maxes need to be more tha mins
+        elif preRange[1] < preRange[0] or \
+            postRange[1] < postRange[0]:
+            retValue = False 
         else:
             retValue = True
         logger.debug(METHOD_EXIT_STR % retValue)
@@ -142,14 +131,6 @@ class RangeSelectionInfo(qtWidgets.QWidget):
     def setPointSetType(self, setNum):
         self.pointSetSelector.setCurrentIndex(setNum)
     
-#     def setSelectionIndices(self, selectionType, indices):
-#         logger.debug(METHOD_ENTER_STR % ((selectionType,indices),))
-#         self.pointSelections[selectionType].setIndices(indices)
-        
-#     def setSelectionAverage(self, selectionType, average):
-#         logger.debug(METHOD_ENTER_STR % ((selectionType,average),))
-#         self.pointSelections[selectionType].setAverage(average)
- 
     def setOverallRange(self, range):
         self.overallRange = range
     
@@ -182,6 +163,7 @@ class RangeSetInfo(qtWidgets.QWidget):
         self.rangeMaxValidator = qtGui.QDoubleValidator()
         self.rangeMaximum.setValidator(self.rangeMaxValidator)
         layout.addWidget(self.rangeMaximum)
+        self.setRangeStatusColors("red")
         
         self.rangeMinimum.editingFinished.connect(self.handleMinValueChanged)
         self.rangeMinimum.textChanged.connect(self.handleMinValueTextChanged)
@@ -189,24 +171,6 @@ class RangeSetInfo(qtWidgets.QWidget):
         self.rangeMaximum.textChanged.connect(self.handleMaxValueTextChanged)
         
         self.setLayout(layout)
-
-#     def getIndices(self):
-#         indices = []
-# #         indTxt = self.pointSetIndices.text()
-# #         logger.debug(METHOD_ENTER_STR % indTxt)
-# #         logger.debug("as a list of strings %s" % indTxt[1:-1])
-# #         indicesStr = indTxt[1:-1].split(',')
-# #         logger.debug("as a list of strings %s" % indicesStr)
-# #         indices = []
-# #         if len(indicesStr) > 0 and indicesStr[0] != '':
-# #             indices = list(map(int, indicesStr))
-# #             indices.sort()
-# #         logger.debug(METHOD_EXIT_STR %indices)
-#         return indices
-    
-#     def getAverage(self):
-#         average = 0
-#         return float(average)
     
     def getRange(self):
         logger.debug(METHOD_ENTER_STR % ((str(self.rangeMinimum.text()),
@@ -243,6 +207,15 @@ class RangeSetInfo(qtWidgets.QWidget):
             qtWidgets.QToolTip.showText(self.rangeMaximum.mapToGlobal(qtCore.QPoint()), 'Invalid Input')
         else:
             qtWidgets.QToolTip.hideText()
+        range = self.getRange()
+        if range[0] > range[1]:
+            self.setRangeStatusColors("red")
+        else:
+            self.setRangeStatusColors("white")
+            
+    def setRangeStatusColors(self, color):
+        self.rangeMinimum.setStyleSheet("QLineEdit {background-color: %s}" % color)
+        self.rangeMaximum.setStyleSheet("QLineEdit {background-color: %s}" % color)
         
     def rangeAtDummyValues(self):
         '''
@@ -255,14 +228,6 @@ class RangeSetInfo(qtWidgets.QWidget):
             retValue = True
         logger.debug(METHOD_EXIT_STR % retValue)
         return retValue
-        
-#     def setIndices(self, indices):
-#         logger.debug(METHOD_ENTER_STR % indices)
-#         #self.pointSetIndices.setText(str(indices))
-        
-#     def setAverage(self, average):
-#         logger.debug(METHOD_ENTER_STR % average)
-#         #self.pointSetAverage.setText(str(average))
         
     def setRange(self, dataRange, overallRange):
         self.rangeMinValidator.setBottom(overallRange[0])
