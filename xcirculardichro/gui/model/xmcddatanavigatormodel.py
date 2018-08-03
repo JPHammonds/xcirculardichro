@@ -9,6 +9,7 @@ import PyQt5.QtCore as qtCore
 from xcirculardichro import METHOD_ENTER_STR, METHOD_EXIT_STR
 from platform import node
 from xcirculardichro.data import SpecScanNode
+import traceback
 
 logger = logging.getLogger(__name__)
 
@@ -27,12 +28,12 @@ class XMCDDataNavigatorModel(qtCore.QAbstractItemModel):
         return 1
     
     def rowCount(self, parent=qtCore.QModelIndex()):
-        #logger.debug(METHOD_ENTER_STR)
+        logger.debug(METHOD_ENTER_STR % traceback.extract_stack())
         if not parent.isValid():
             node = self._rootNode
         else:
             node = parent.internalPointer()
-        #logger.debug(METHOD_EXIT_STR % node.childCount())
+        logger.debug(METHOD_EXIT_STR % node.childCount())
         return node.childCount()
     
     def data(self, index, role=qtCore.Qt.DisplayRole):
@@ -56,7 +57,7 @@ class XMCDDataNavigatorModel(qtCore.QAbstractItemModel):
             return qtCore.QVariant(node.name())
             
     def index(self, row, column, parent=qtCore.QModelIndex()):
-        logger.debug(METHOD_ENTER_STR)
+        logger.debug(METHOD_ENTER_STR, ((row, column, parent),))
         node = self.getNode(parent)
         childItem = node.child(row)
         if childItem:
@@ -115,10 +116,6 @@ class XMCDDataNavigatorModel(qtCore.QAbstractItemModel):
         
         self.beginInsertRows(parent, row, row + count - 1)
         
-#         for i in range(count):
-#             childCount = node.childCount()
-#             childNode = DataNode("untitled %s" + str(childCount))
-#             #success = node.addChild(row, childNode)
             
         self.endInsertRows()
         firstIndex = self.index(0, 0)
@@ -128,12 +125,18 @@ class XMCDDataNavigatorModel(qtCore.QAbstractItemModel):
             
     def removeRow(self, row, parent=qtCore.QModelIndex()):
         logger.debug(METHOD_ENTER_STR)
-        self.beginRemoveRows(parent, row, 1)
+        numRows = self.rowCount()
+        logger.debug("numRows %d" % numRows)
+        logger.debug("start with beginRemoveRows")
+        self.beginRemoveRows(parent, row, row)
         self._rootNode.removeChild(self._rootNode.child(row))
         self.endRemoveRows()
+        logger.debug("Done with endRemoveRows")
         firstIndex = self.index(0, 0)
-        lastIndex = self.index(self.rowCount()-1,0)
-        self.dataChanged.emit(firstIndex, lastIndex)
+        lastIndex = self.index(numRows-2,0)
+#         logger.debug("About to emit signal dataChanged")
+#         self.dataChanged.emit(firstIndex, lastIndex)
+        logger.debug(METHOD_EXIT_STR)
         return True
         
     def removeRows(self, row, count, parent=qtCore.QModelIndex()):
@@ -142,7 +145,9 @@ class XMCDDataNavigatorModel(qtCore.QAbstractItemModel):
         self.endInsertRows()
         firstIndex = self.index(0, 0)
         lastIndex = self.index(self.rowCount()-1, 0)
+        #logger.debug("firstIndex %s. lastIndex %s" %(firstIndex, lastIndex))
         self.dataChanged.emit(firstIndex, lastIndex)
+        return True
         
     def setData(self, index, value, role):
         success = True
