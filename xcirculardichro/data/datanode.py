@@ -5,7 +5,7 @@
 
 import logging
 from xcirculardichro import METHOD_ENTER_STR, METHOD_EXIT_STR
-
+import traceback
 logger = logging.getLogger(__name__)
 
 class DataNode(object):
@@ -24,15 +24,25 @@ class DataNode(object):
             self._parent.addChild(self)
         
     def child(self, row):
-        #logger.debug(METHOD_ENTER_STR)
-        logger.debug(METHOD_EXIT_STR % row)
-        logger.debug(METHOD_EXIT_STR % self._children)
-        #logger.debug(METHOD_EXIT_STR % self._children[row])
-        if len(self._children) > 0:
-            return self._children[row]
-        else:
-            return None
+        logger.debug(METHOD_ENTER_STR % row)
         
+        logger.debug("Children of %s:\n%s" % (self, self._children))
+        for child in self._children:
+            logger.debug("Child:%s" % (child))
+        logger.debug("_children %s" % self._children)
+        if row > len(self._children):
+            logger.debug(traceback.extract_stack())
+            raise ValueError("Tried to retrieve Row %d  when there "
+                             "are only %d rows" % (row,len(self._children)))
+            
+        retVal = None
+        if len(self._children) > 0:
+            retVal = self._children[row]
+        else:
+            retVal = None
+        logger.debug(METHOD_EXIT_STR % retVal)
+        return retVal
+
     def childCount(self):
         #logger.debug(METHOD_ENTER_STR)
         return len(self._children)
@@ -58,6 +68,7 @@ class DataNode(object):
                 self._children.remove(child)
                 logging.debug("len(self._children)%s" % len(self._children))
                 node.setParent(None)
+                child = None
                             
     def row(self):
         #logger.debug(METHOD_ENTER_STR)
@@ -77,7 +88,7 @@ class DataNode(object):
         return self._isChecked
     
     def setChecked(self, checked):
-        #logger.debug(METHOD_ENTER_STR % checked)
+        logger.debug(METHOD_ENTER_STR % checked)
         self._isChecked = checked
 
     def shortName(self):

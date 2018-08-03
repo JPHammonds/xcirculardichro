@@ -241,6 +241,10 @@ class IntermediateDataNode(FileDataNode):
                            "%d scans selected" % len(selectedScans))                                      
             
     
+    def setInvertScanData(self, scan, invert):
+        logger.debug(METHOD_ENTER_STR % ((scan, invert),))
+        self.scans[scan].setInverted(invert)
+        
     def shortName(self):
         return self._name
     
