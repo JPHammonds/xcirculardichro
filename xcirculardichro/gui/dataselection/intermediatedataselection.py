@@ -10,7 +10,7 @@ import PyQt5.QtCore as qtCore
 
 from xcirculardichro.gui.dataselection import SelectionTypeNames,\
     AbstractSelectionDisplay
-from xcirculardichro import METHOD_ENTER_STR
+from xcirculardichro import METHOD_ENTER_STR, METHOD_EXIT_STR
 from xcirculardichro.gui.choices import IntermediateChoices
 from xcirculardichro.gui.dataselection import RangeSelectionInfo
 from xcirculardichro.gui.choices.multinonlockinxmcdchoices import XMCD_STR
@@ -56,15 +56,29 @@ class IntermediateDataSelection(AbstractSelectionDisplay):
         return retData
         
         
+    def getAverageFromRange(self, x, y, range):
+        logger.debug(METHOD_ENTER_STR)
+        logger.debug(x)
+        logger.debug(y)
+        logger.debug(range)
+        valsInRange = np.where((x >= range[0]) & (x <= range[1]))
+        logger.debug("valsInRange %s" % valsInRange)
+        logger.debug("y[valuesInRange] %s" % y[0][valsInRange])
+        avgInRange = np.sum(y[0][valsInRange])/len(valsInRange[0])
+        logger.debug(METHOD_EXIT_STR % avgInRange)
+        return avgInRange
+
     def getCorrectedData(self, x, y):
         logger.debug(METHOD_ENTER_STR)
         preEdgeRange = self.rangeSelectionInfo.getPreEdgeRange()
         logger.debug("preEdge: %s" % preEdgeRange)
         postEdgeRange = self.rangeSelectionInfo.getPostEdgeRange()
         logger.debug("postEdge: %s" % postEdgeRange)
+        preEdgeAvg = self.getAverageFromRange(x, y,  preEdgeRange)
+        postEdgeAvg = self.getAverageFromRange(x, y, postEdgeRange)
         return self.subChoices.calcStepCorrectedData(y, \
-                                                 preEdge=preEdgeRange, \
-                                                 postEdge=postEdgeRange)
+                                                 preEdge=preEdgeAvg, \
+                                                 postEdge=postEdgeAvg)
 
     def getNodeForBrowserRow(self, row):
         logger.debug(METHOD_ENTER_STR % row)
