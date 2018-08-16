@@ -3,7 +3,8 @@
  See LICENSE file.
 '''
 from xcirculardichro.gui.choices.abstractchoices import AbstractChoices
-
+import logging
+logger = logging.getLogger(__name__)
 
 class IntermediateChoices(AbstractChoices):
     
@@ -17,6 +18,8 @@ class IntermediateChoices(AbstractChoices):
         super(IntermediateChoices, self).__init__(parent=parent)
     
     def calcStepCorrectedData(self, data, preEdge=None, postEdge=None):
+        logger.debug("preEdge: %s" % preEdge)
+        logger.debug("postEdge: %s" % postEdge)
         xas = data[0]
         xmcd = data[1]
         xasCor = (xas-preEdge)/(postEdge-preEdge)
