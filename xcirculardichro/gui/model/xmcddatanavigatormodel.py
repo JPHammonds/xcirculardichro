@@ -134,8 +134,7 @@ class XMCDDataNavigatorModel(qtCore.QAbstractItemModel):
         logger.debug("Done with endRemoveRows")
         firstIndex = self.index(0, 0)
         lastIndex = self.index(numRows-2,0)
-#         logger.debug("About to emit signal dataChanged")
-#         self.dataChanged.emit(firstIndex, lastIndex)
+        self.dataChanged.emit(firstIndex, lastIndex)
         logger.debug(METHOD_EXIT_STR)
         return True
         
