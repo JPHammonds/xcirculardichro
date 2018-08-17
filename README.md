@@ -74,3 +74,11 @@ Version 0.9 2018-04-16
     If we can deal with these more one at a time then it will hpefully be 
     more straightforward for the user.  Still need to go through more on 
     how this data will be processed.
+    
+ Version 0.9.1 2018-08-17
+ Fixes for things found in testing at the beamline:
+   - Add code to handle inverting intermediate data sets
+   - Add/fix code for close function to remove data sets
+   - Add reload function so that the spec file can be updated to bring in more data as acquisition continues.
+   - Clean up some of the Capture methods, especially the full normalized data
+   - It has been noticed that as data is reloaded more memory is used on each close.  Spent time looking at this but have not yet found good reason for this to keep happening.  Have communicated this as well to Pete to keep this in mind as spec2nexus develops.
