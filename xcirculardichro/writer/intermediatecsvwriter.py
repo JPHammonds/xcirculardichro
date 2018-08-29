@@ -93,7 +93,7 @@ class IntermediateCSVWriter(Writer):
             self.writeNormalizedNodeFromTwoStepNormalized(nodes, \
                                                       scansForNode, \
                                                       outFile)
-        elif scanType[0] == xcirculardichro.data.intermediatedatanode.DataSelectionTypes.FULL_NORMALIZED.name:
+        elif scanType[0] == xcirculardichro.data.intermediatedatanode.DataSelectionTypes.TWO_FIELD.name:
             self.writeNormalizedNodeFromOneNormaializeNode(nodes, \
                                                         scansForNode, \
                                                         outFile)

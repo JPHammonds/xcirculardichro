@@ -54,11 +54,8 @@ class XMCDMainWindow(qtWidgets.QMainWindow):
         self._dataNavigator.model().dataChanged.connect(self.handleNavigatorDataChanged)
         self._dataSelections.dataSelectionsChanged.connect(self.handleDataSelectionsChanged)
         self._dataSelections.plotOptionChanged.connect(self.updatePlotData)
-#         self._plotWidget.leftSelectionChanged[str].connect(self.handleLeftDataSelectionChanged)
-#         self._plotWidget.rightSelectionChanged[str].connect(self.handleRightDataSelectionChanged)
         self._dataSelections.pointSelectionAxisChanged[int].connect(self._plotWidget.setRangeSelectionAxis)
         self._dataSelections.pointSelectionTypeChanged[int].connect(self._plotWidget.setRangeSelectionType)
-#         self._dataSelections.pointSelectionReloadPicks.connect(self.handlePointSelectionReloadPicks)
         self._dataSelections.rangeValuesChanged.connect(self.handleEdgeRangeValuesChanged)
         logger.debug(METHOD_EXIT_STR)
         
@@ -108,8 +105,8 @@ class XMCDMainWindow(qtWidgets.QMainWindow):
         self.captureCurrentCorrectedAction = qtWidgets.QAction("Capture Current Corrected", self)
         self.captureCurrentCorrectedAction.triggered.connect(self.captureCurrentCorrected)
         
-        self.captureCurrentFullNormalizedAction = qtWidgets.QAction("Capture Current Full Normalized", self)
-        self.captureCurrentFullNormalizedAction.triggered.connect(self.captureCurrentFullNormalized)
+        self.captureTwoFieldNormalizedAction = qtWidgets.QAction("Capture Two Field Normalized", self)
+        self.captureTwoFieldNormalizedAction.triggered.connect(self.captureTwoFieldNormalized)
         
         self.reloadSpecFileAction = qtWidgets.QAction("Reload Spec File", self)
         self.reloadSpecFileAction.triggered.connect(self.reloadSpecFile)
@@ -138,7 +135,7 @@ class XMCDMainWindow(qtWidgets.QMainWindow):
         dataMenu.addAction(self.captureCurrentAction)
         dataMenu.addAction(self.captureCurrentAverageAction)
         dataMenu.addAction(self.captureCurrentCorrectedAction)
-        dataMenu.addAction(self.captureCurrentFullNormalizedAction)
+        dataMenu.addAction(self.captureTwoFieldNormalizedAction)
         dataMenu.addSeparator()
         dataMenu.addAction(self.reloadSpecFileAction)
         dataMenu.addSeparator()
@@ -154,12 +151,12 @@ class XMCDMainWindow(qtWidgets.QMainWindow):
         self.captureCurrentAction.setEnabled(True)
         self.captureCurrentAverageAction.setEnabled(True)
         self.captureCurrentCorrectedAction.setEnabled(True)
-        self.captureCurrentFullNormalizedAction.setEnabled(True)
+        self.captureTwoFieldNormalizedAction.setEnabled(True)
         try:
             if self._dataSelections.getSelectedScans() is None:
                 self.captureCurrentAction.setEnabled(False)
                 self.captureCurrentAverageAction.setEnabled(False)
-                self.captureCurrentFullNormalizedAction.setEnabled(False)
+                self.captureTwoFieldNormalizedAction.setEnabled(False)
                 self.removeSelectedAction.setEnabled(False)
             elif not self._dataSelections.isMultipleScansSelected():
                 self.captureCurrentAverageAction.setEnabled(False)
@@ -167,7 +164,7 @@ class XMCDMainWindow(qtWidgets.QMainWindow):
                 self.captureCurrentAction.setEnabled(False)
                 self.captureCurrentAverageAction.setEnabled(False)
                 self.captureCurrentCorrectedAction.setEnabled(False)
-                self.captureCurrentFullNormalizedAction.setEnabled(False)
+                self.captureTwoFieldNormalizedAction.setEnabled(False)
         except NotImplementedError:
             self.captureCurrentAction.setEnabled(False)
             self.captureCurrentAverageAction.setEnabled(False)
@@ -246,11 +243,11 @@ class XMCDMainWindow(qtWidgets.QMainWindow):
                                                     option=DataSelectionTypes.STEP_NORMALIZED)
         
     @qtCore.pyqtSlot() 
-    def captureCurrentFullNormalized(self):
+    def captureTwoFieldNormalized(self):
         logger.debug(METHOD_ENTER_STR)
         dataSelection = self._dataSelections._selectionWidget
         self._dataNavigator.addIntermediateDataNode(dataSelection, \
-                                                    option=DataSelectionTypes.FULL_NORMALIZED)
+                                                    option=DataSelectionTypes.TWO_FIELD)
         
     @qtCore.pyqtSlot()
     def closeFile(self):
@@ -455,7 +452,6 @@ class XMCDMainWindow(qtWidgets.QMainWindow):
         for scan in selectedScans:
             data[scan] = []
             dataOut[scan] = []
-#             thisScan = self._dataNavigator.model().getTopDataSelectedNodes()[0]._specDataFile.scans[scan]
             node = self._dataSelections.getNodeContainingScan(scan)
             logger.debug("Scans in node %s: %s" % (node, node.scans))
             thisScan = node.scans[scan]

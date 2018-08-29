@@ -46,8 +46,8 @@ class IntermediateDataNode(FileDataNode):
             self.insertAveragedData(selectedNodes, dataSelection)
         elif option == DataSelectionTypes.STEP_NORMALIZED:
             self.insertStepNormalizedData(selectedNodes, dataSelection)
-        elif option == DataSelectionTypes.FULL_NORMALIZED:
-            self.insertFullNormalizedData(selectedNodes, dataSelection)
+        elif option == DataSelectionTypes.TWO_FIELD:
+            self.insertTwoFieldNormalizedData(selectedNodes, dataSelection)
     
 
     def getAverageData(self, dataSelection):
@@ -203,7 +203,7 @@ class IntermediateDataNode(FileDataNode):
                      correctedData, 
                      counterNames)
             
-    def insertFullNormalizedData(self, selectedNodes, dataSelection):
+    def insertTwoFieldNormalizedData(self, selectedNodes, dataSelection):
         logger.debug(METHOD_ENTER_STR )
         logger.debug("SelectedNodes %s" % selectedNodes)
         logger.debug("dataSelection %s" % dataSelection)
