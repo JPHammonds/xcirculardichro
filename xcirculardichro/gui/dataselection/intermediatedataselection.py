@@ -43,12 +43,6 @@ class IntermediateDataSelection(AbstractSelectionDisplay):
         self.rangeSelectionInfo.grabRangeFromSelection.connect(self.setDefSelectedScansRange)
         self.rangeSelectionInfo.dataRangeChanged.connect(self.handleEdgeRangeChanged)
         
-    def isMultipleScansSelected(self):
-        if len(self.selectedScans) > 1:
-            return True
-        else: 
-            return False
-        
     def calcPlotData(self, data):
         retData = []
         for index in range(len(data)):
@@ -164,6 +158,23 @@ class IntermediateDataSelection(AbstractSelectionDisplay):
         logger.debug("Data to invert %s" % node.scans[scanNo].data['XMCD'])
         node.setInvertScanData(scanNo, invertedValue)
         self.dataSelectionsChanged.emit()
+        
+    def isGoodForTwoField(self):
+        logger.debug(METHOD_ENTER_STR)
+        retVal = False
+        logger.debug("selectedScans %s" % self.selectedScans)
+        if (len(self.selectedScans) != 2):
+            retVal = False
+        else:
+            retVal = True
+        logger.debug(METHOD_EXIT_STR % retVal)
+        return retVal
+    
+    def isMultipleScansSelected(self):
+        if len(self.selectedScans) > 1:
+            return True
+        else: 
+            return False
         
     def plotIndividualData(self):
         return self.subChoices.plotIndividualData()

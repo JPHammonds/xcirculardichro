@@ -1,3 +1,4 @@
+#-*- coding: UTF-8 -*-
 '''
  Copyright (c) 2017, UChicago Argonne, LLC
  See LICENSE file.
@@ -17,7 +18,8 @@ from xcirculardichro import METHOD_ENTER_STR,\
 from xcirculardichro.gui.dataselection import RangeSelectionInfo
 from xcirculardichro.gui.dataselection import SelectionTypeNames
 from xcirculardichro.gui.dataselection import AbstractSelectionDisplay
-from xcirculardichro.gui.choices import ChoiceHolder
+from xcirculardichro.gui.choices import ChoiceHolder, lockinxmcdchoices
+from xcirculardichro.gui.choices.choiceholder import QXSCAN
     
 
 logger = logging.getLogger(__name__)
@@ -251,8 +253,21 @@ class SpecDisplay(AbstractSelectionDisplay):
                     
         
         logger.debug("newScanType %s" % newScanType)
-        
-        self.subChoices.setChoiceWidgetByScanType(newScanType)
+        moddedScanType = newScanType
+        # For qxscan must catch if this is lockin type or a generic data 
+        # type.  If the generic type add _GENERIC to string fed to
+        # setChoiceByWidgetType
+        if newScanType == QXSCAN:
+            counters = specFile.scans[str(newScan)].L
+            #get last 3 counters
+            lastCounters = counters[-2:]
+            logger.debug("LastCounters %s" % lastCounters)
+            if (lastCounters[0] == lockinxmcdchoices.DEFAULT_SELECTIONS[0][1]) and \
+                (lastCounters[1] == lockinxmcdchoices.DEFAULT_SELECTIONS[0][2]):
+                moddedScanType = newScanType 
+            else:
+                moddedScanType = QXSCAN + "_GENERIC"
+        self.subChoices.setChoiceWidgetByScanType(moddedScanType)
         self.subChoices.setDefaultSelectionsFromCounterNames(
             specFile.scans[str(newScan)].L)
         self.counterSelector.counterModel. \
@@ -316,6 +331,10 @@ class SpecDisplay(AbstractSelectionDisplay):
         logger.debug(METHOD_EXIT_STR % retValue)
         return retValue
         
+    def isGoodForTwoField(self):
+        logger.debug(METHOD_ENTER_STR % False)
+        return False
+
     def isMultipleScansSelected(self):
         logger.debug(METHOD_ENTER_STR % self.selectedNodes)
         if len(self.selectedScans) > 1:

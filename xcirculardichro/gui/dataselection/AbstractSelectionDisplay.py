@@ -58,10 +58,20 @@ class AbstractSelectionDisplay(QtWidgets.QSplitter):
         return retValue
         
     @abstractmethod
-    def isMultipleScansSelected(self):
+    def isGoodForTwoField(self):    
+        '''
+        Return if this data is good to allow calculation of two 
+        field data.  This is to do final calculation using data from 
+        two different field directions.
+        '''
         logger.debug(METHOD_ENTER_STR)
         raise NotImplementedError(OVERRIDE_METHOD_STR)
         
+    @abstractmethod
+    def isMultipleScansSelected(self):
+        logger.debug(METHOD_ENTER_STR)
+        raise NotImplementedError(OVERRIDE_METHOD_STR)
+    
     @abstractmethod
     def calcPlotData(self, data):
         raise NotImplementedError(OVERRIDE_METHOD_STR)

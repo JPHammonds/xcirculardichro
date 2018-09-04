@@ -46,9 +46,14 @@ class DummySelectionDisplay(AbstractSelectionDisplay):
     def getSelectedScans(self):
         logger.debug(METHOD_ENTER_STR % self.selectedScans)
         return None
-        
+    
+    def isGoodForTwoField(self):
+        logger.debug(METHOD_ENTER_STR % False)
+        return False
+            
     def isMultipleScansSelected(self):
         logger.debug(METHOD_ENTER_STR % DUMMY_STR)
+        return False
 
     def plotAverageData(self):
         logger.debug(METHOD_ENTER_STR % DUMMY_STR)

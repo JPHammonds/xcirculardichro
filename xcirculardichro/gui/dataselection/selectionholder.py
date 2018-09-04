@@ -1,3 +1,4 @@
+#-*- coding: UTF-8 -*-
 '''
  Copyright (c) 2017, UChicago Argonne, LLC
  See LICENSE file.
@@ -119,6 +120,13 @@ class SelectionHolder(qtWidgets.QWidget):
                         
                 
 
+    def isGoodForTwoField(self):
+        logger.debug(METHOD_ENTER_STR)
+        retValue = False
+        retValue = self._selectionWidget.isGoodForTwoField()
+        logger.debug(METHOD_EXIT_STR % retValue)
+        return retValue
+        
     def isMultipleScansSelected(self):
         logger.debug(METHOD_ENTER_STR)
         return self._selectionWidget.isMultipleScansSelected()
