@@ -333,7 +333,7 @@ class XMCDMainWindow(qtWidgets.QMainWindow):
             if fileName != "":
                 writerClass = self._dataSelections.getWriterForSelection()
                 writer = writerClass(str(fileName), \
-                                               selectionWidget=self._dataSelections)
+                                     selectionWidget=self._dataSelections)
                 
                 selectedScans = self._dataSelections.getSelectedScans()
                 writer.writeNodes(selectedScans)
@@ -354,7 +354,8 @@ class XMCDMainWindow(qtWidgets.QMainWindow):
         specScan = firstNode.scans[selectedScans[0]]
         parameters = specScan.positioner.keys()
         logger.debug("Parameters %s" % parameters)
-        self.positionersToDisplay = PositionerSelector.getPositionSelectorModalDialog(specScan.positioner)
+        self.positionersToDisplay = \
+            PositionerSelector.getPositionSelectorModalDialog(specScan.positioner)
         logger.debug("Positioners %s" % self.positionersToDisplay)
         self._dataSelections.setPostionersToDisplay(self.positionersToDisplay)
         
@@ -369,12 +370,14 @@ class XMCDMainWindow(qtWidgets.QMainWindow):
         '''
         logger.debug(METHOD_ENTER_STR)
         selectedScans = self._dataSelections.getSelectedScans()
-        firstNode = self._dataSelections.getNodeContainingScan(selectedScans[0])
+        firstNode = \
+            self._dataSelections.getNodeContainingScan(selectedScans[0])
         specScan = firstNode.scans[selectedScans[0]]
         parameters = specScan.X.keys()
         logger.debug("Parameters %s" % parameters)
         try:
-            self.tempParamsToDisplay = PositionerSelector.getPositionSelectorModalDialog(specScan.X)
+            self.tempParamsToDisplay = \
+                PositionerSelector.getPositionSelectorModalDialog(specScan.X)
         except :
             warningMessage = "No user parameters were found for the " \
                     + "selected scans.  Either no #X lines were found in "\
@@ -403,7 +406,8 @@ class XMCDMainWindow(qtWidgets.QMainWindow):
         parameters = specScan.U.keys()
         logger.debug("Parameters %s" % parameters)
         try:
-            self.userParamsToDisplay = PositionerSelector.getPositionSelectorModalDialog(specScan.U)
+            self.userParamsToDisplay = \
+                PositionerSelector.getPositionSelectorModalDialog(specScan.U)
         except :
             warningMessage = "No user parameters were found for the " \
                     + "selected scans.  Either no #U lines were found in "\
@@ -429,7 +433,8 @@ class XMCDMainWindow(qtWidgets.QMainWindow):
             self.updatePlotDataSingle(counters, counterNames)
         else:
             self.updatePlotDataMultiple(counters, counterNames)
-        preEdgeRange, postEdgeRange = self._dataSelections.getSelectedEdgeRangeData()
+        preEdgeRange, postEdgeRange = \
+            self._dataSelections.getSelectedEdgeRangeData()
         self._plotWidget.applyRangeSelection(preEdgeRange, postEdgeRange)
             
     def updatePlotDataMultiple(self, counters, counterNames, 
@@ -457,7 +462,8 @@ class XMCDMainWindow(qtWidgets.QMainWindow):
             thisScan = node.scans[scan]
             for counter in counterNames:
                 try:
-                    logger.debug("Type of data %s" % type(thisScan.data[counter][:]))
+                    logger.debug("Type of data %s" % \
+                                 type(thisScan.data[counter][:]))
                     data[scan].append(thisScan.data[counter][:])
                 except KeyError as ie:
                     logger.exception("Tried to load data which does" +
@@ -466,7 +472,8 @@ class XMCDMainWindow(qtWidgets.QMainWindow):
                                      "may not have the selected counters " +
                                      "Scan %s \n %s" % (str(scan), str(ie)))
             try:
-                dataOut[scan] = self._dataSelections.calcPlotData(data[scan])
+                dataOut[scan] = \
+                    self._dataSelections.calcPlotData(data[scan])
                 logger.debug("Type for data out %s" % type(dataOut[scan]))
             except IndexError:
                 qtWidgets.QMessageBox.warning(self, "No Data Warning", 
@@ -476,7 +483,8 @@ class XMCDMainWindow(qtWidgets.QMainWindow):
             axisLabelIndex = self._dataSelections.getPlotAxisLabelsIndex()
             if self._dataSelections.plotIndividualData():
                 for index in countIndex:
-                    dataLabel = "%s - Scan %s" % (plotAxisLabels[index], scan) 
+                    dataLabel = "%s - Scan %s" % \
+                                (plotAxisLabels[index], scan) 
                     if axisLabelIndex[index] == 1:
                         self._plotWidget.plotAx1(dataOut[scan][0], 
                                                 dataOut[scan][index], 
