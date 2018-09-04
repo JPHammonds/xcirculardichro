@@ -15,6 +15,13 @@ PLOT_CHOICES = ["XAS/XMCD", ]
 DEFAULT_SELECTIONS = [["Energy", "Lock DC", "LockACfix"],]
 
 class LockinXMCDChoices(AbstractChoices):
+    '''
+    Provide options and calculations for "Lockin" XMCD data.  This type 
+    of data XAS and XMCD are collected directly.  This is for data 
+    collected as is done for 4-id-d.  The data is in the last couple 
+    columns of data with a scan type of qxscan and typically the last
+    couple columns are "Lock DC" and "LockACFix"
+    '''
     COUNTER_OPTS = ["Energy","XAS", "XMCD"]
 
     def __init__(self, parent=None):
@@ -36,7 +43,11 @@ class LockinXMCDChoices(AbstractChoices):
         self.plotSelections = DEFAULT_SELECTIONS
 
     def calcPlotData(self, data):
-        logger.debug(data)
+        '''
+        Not much calculation done here.  This returns 3 selected columns
+        for E, XAS and XMCD
+        '''
+        logger.debug(METHOD_ENTER_STR % data)
         energy = np.array(data[0])
         xas = np.array(data[1])
         xmcd = np.array(data[2])
@@ -47,6 +58,11 @@ class LockinXMCDChoices(AbstractChoices):
         return retData
 
     def calcCorrectedData(self, data, preEdge=None, postEdge=None):
+        '''
+        Perform edge correction of the data.  For XAS subtract pre-edge
+        plateau value.  After shifting XAS, divide XAS and XMCD by the 
+        difference in post-edge and pre-edge plateau values.
+        '''
         xas = data[0]
         xmcd = data[1]
         xasCor = (xas-preEdge)/(postEdge-preEdge)
@@ -54,27 +70,47 @@ class LockinXMCDChoices(AbstractChoices):
         return [xasCor, xmcdCor]
 
     def getPlotAxisLabels(self):
+        '''
+        Return plot axis labels
+        '''
         labels = ["Energy",]
         labels.extend(str(self.plotSelector.currentText()).split('/'))
         return labels
     
     def getPlotSelections(self):
+        '''
+        Return a list of plot types
+        '''
         selections = self.plotSelections[0]
         logger.debug("selections %s " % selections )
         return selections
         
     @qtCore.pyqtSlot(int)
     def plotCorrectedData(self):
+        '''
+        Return whether or not to plot corrected data/
+        '''
         return True
+    
 
     def setPlotSelections(self, selections):
+        '''
+        Set the list of plot selections
+        '''
         self.plotSelections[0] = selections
         
     @qtCore.pyqtSlot(int)
     def plotSelectorChanged(self, newType):
+        '''
+        Emit a signal when plot type changes
+        '''
         self.plotTypeChanged[int].emit(newType)
         
     def getPlotAxisLabelsIndex(self):
+        '''
+        Return indexes to which axis the data should be plotted.  This
+        allows plotting data (XAS vs XMCD, etc) on different axis scales.
+        '''
         plotTypes = self.plotSelector.currentText().split("/")
         axisIndex = []
         axisIndex.append(0)    #x axis, kQTExifUserDataFlashEnergy
