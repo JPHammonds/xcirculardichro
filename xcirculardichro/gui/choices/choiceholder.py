@@ -10,15 +10,18 @@ import logging
 from xcirculardichro.gui.choices.nonlockinxmcdchoices import \
     NonLockinXMCDChoices
 from xcirculardichro.gui.choices.lockinxmcdchoices import LockinXMCDChoices
+from xcirculardichro.gui.choices.escanchoices import EScanChoices
 from xcirculardichro import METHOD_ENTER_STR
 from xcirculardichro.gui.choices.multinonlockinxmcdchoices import \
     MultiNonLockinXMCDChoices
+from xcirculardichro.gui.choices.qxscangeneric import QXScanGenericChoices
 logger = logging.getLogger(__name__)
 QXDICHRO = 'qxdichro'
 QXSCAN = 'qxscan'
 TEMPDICHRO = 'tempdichro'
 KEPDICHRO = 'kepdichro'
 XMCDVSE = 'XMCDvsE'
+ESCAN = "Escan"
 
 class ChoiceHolder(qtWidgets.QDialog):
     
@@ -110,9 +113,12 @@ class ChoiceHolder(qtWidgets.QDialog):
         elif typeName == QXSCAN:
             logger.debug("setting choice to lockin")
             self.setChoiceWidget(LockinXMCDChoices())
-        elif typeName == XMCDVSE:
+        elif typeName == QXSCAN + "_GENERIC":
             logger.debug("setting choice to lockin")
-            self.setChoiceWidget(MultiNonLockinXMCDChoices())
+            self.setChoiceWidget(QXScanGenericChoices())
+        elif typeName == ESCAN:
+            logger.debug("setting choice to EScan")
+            self.setChoiceWidget(EScanChoices())
         else:
             logger.debug("setting choice to other")
             self.setChoiceWidget(UndefinedChoices())
