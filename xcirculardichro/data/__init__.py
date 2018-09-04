@@ -6,7 +6,7 @@ SELECTED_NODES = 'selectedNodes'
 DATA_SELECTION = 'dataSelection' 
 
 class DataSelectionTypes(Enum):
-    RAW, AVERAGED, STEP_NORMALIZED, FULL_NORMALIZED = range(4)
+    RAW, AVERAGED, STEP_NORMALIZED, TWO_FIELD = range(4)
 
 from .datanode import DataNode
 from .filedatanode import FileDataNode
