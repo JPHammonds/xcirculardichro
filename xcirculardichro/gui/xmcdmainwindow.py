@@ -160,6 +160,10 @@ class XMCDMainWindow(qtWidgets.QMainWindow):
                 self.removeSelectedAction.setEnabled(False)
             elif not self._dataSelections.isMultipleScansSelected():
                 self.captureCurrentAverageAction.setEnabled(False)
+            if not self._dataSelections.isGoodForTwoField():
+                self.captureTwoFieldNormalizedAction.setEnabled(False)
+            else:
+                self.captureTwoFieldNormalizedAction.setEnabled(True)
             if not self._dataSelections.hasValidRangeSelectionInfo():
                 self.captureCurrentAction.setEnabled(False)
                 self.captureCurrentAverageAction.setEnabled(False)
