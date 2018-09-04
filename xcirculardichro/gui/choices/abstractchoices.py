@@ -1,8 +1,10 @@
+#-*- coding: UTF-8 -*-
 '''
  Copyright (c) 2017, UChicago Argonne, LLC
  See LICENSE file.
 '''
 
+from abc import abstractmethod
 import PyQt5.QtWidgets as qtWidgets
 import PyQt5.QtCore as qtCore
 import logging
@@ -82,7 +84,14 @@ class AbstractChoices(qtWidgets.QDialog):
         logger.debug(METHOD_ENTER_STR)
         self.plotOptionChanged.emit()
         
-        
+    @abstractmethod
+    def getPlotAxisLabels(self):
+        '''
+        Return a list of Axis labels for plotting
+        '''
+        raise Exception("Abstract method called")
+
+    @abstractmethod
     def getPlotAxisLabelsIndex(self):
         raise Exception("Abstract method called")
     
