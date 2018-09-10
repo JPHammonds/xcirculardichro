@@ -37,8 +37,8 @@ if os.path.exists(logConfigFile):
     try:
         logging.config.fileConfig(logConfigFile, disable_existing_loggers=False)
         print("Success Openning logfile")
-    except (NoSectionError,TypeError):
-        print ("In Exception to load dictConfig package %s" % LOGGER_NAME)
+    except (NoSectionError,TypeError) as ex:
+        print ("In Exception to load dictConfig package %s\n %s" % (LOGGER_NAME, ex))
         logging.config.dictConfig(LOGGER_DEFAULT)
     except KeyError as ex:
         print ("logfile %s was missing or had errant sections %s" %(logConfigFile, ex.args))
@@ -46,4 +46,4 @@ if os.path.exists(logConfigFile):
 else:
     logging.config.dictConfig(LOGGER_DEFAULT)
         
-logger = logging.getLogger(LOGGER_NAME)
+#logger = logging.getLogger(LOGGER_NAME)
