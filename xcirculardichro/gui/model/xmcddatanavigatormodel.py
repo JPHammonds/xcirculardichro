@@ -3,8 +3,6 @@
  See LICENSE file.
 '''
 import logging
-import PyQt5.QtWidgets as qtWidgets
-import PyQt5.QtGui as qtGui
 import PyQt5.QtCore as qtCore
 from xcirculardichro import METHOD_ENTER_STR, METHOD_EXIT_STR
 from platform import node
