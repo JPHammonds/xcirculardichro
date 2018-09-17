@@ -82,3 +82,9 @@ Version 0.9 2018-04-16
    - Add reload function so that the spec file can be updated to bring in more data as acquisition continues.
    - Clean up some of the Capture methods, especially the full normalized data
    - It has been noticed that as data is reloaded more memory is used on each close.  Spent time looking at this but have not yet found good reason for this to keep happening.  Have communicated this as well to Pete to keep this in mind as spec2nexus develops.
+   
+   Version 0.9.2 2018-09-17
+   Change name for "Full Normalized" to "Two Field"
+   Do more catches to check when we have the right scans selected to enable 
+   capture menu items.
+   Change some garbage collection to speed things up.
