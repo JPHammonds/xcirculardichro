@@ -30,8 +30,9 @@ class SpecScanNode(ScanDataNode):
         logger.debug(METHOD_ENTER_STR % dir(self._specScan))
         dataKeys = list(self._specScan.data.keys())
         for key in dataKeys:
+            logger.debug("self.data[%s] %s" % (key, self.data[key]))
             self.data[key] = None
-        gc.collect()
+        #gc.collect()
         self.data = {}
         self._specScan = None
-        gc.collect()
+        #gc.collect()

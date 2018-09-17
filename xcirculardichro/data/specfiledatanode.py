@@ -59,17 +59,19 @@ class SpecFileDataNode(FileDataNode):
         for scan in self._specDataFile.scans:
             scan = None
         self._specDataFile = None
-        gc.collect()
+        gc.collect
         logger.debug("Load current data in the file")
         self._specDataFile = SpecDataFile(filename)
         self.loadScans()
+        gc.collect()
 
     def removeSpecScan(self, scan):
         logger.debug("scan children %s" % self._children)
         for child in self._children:
-            logger.debug("child._specScan %s,scan %s" % (child._specScan.__class__, self.scans[scan].__class__))
             if child._specScan == self.scans[scan]:
-                logger.debug("scan to remove %s" % self.scans[scan].__class__)
+                logger.debug("child._specScan %s,scan %s" % (child._specScan, self.scans[scan].__class__))
+                logger.debug("scan to remove %s" % self.scans[scan].scanNum)
                 child.removeData()
                 self.removeChild(child)
         self.scans[scan] = None
+        #gc.collect()
