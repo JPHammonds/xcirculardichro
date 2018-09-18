@@ -88,3 +88,6 @@ Version 0.9 2018-04-16
    Do more catches to check when we have the right scans selected to enable 
    capture menu items.
    Change some garbage collection to speed things up.
+   
+   Version 0.9.3 2018-09-18
+   Change a missed text reference from Full Normalized To TwoField.
