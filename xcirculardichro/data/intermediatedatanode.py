@@ -15,7 +15,8 @@ logger = logging.getLogger(__name__)
 class IntermediateDataNode(FileDataNode):
     
 
-    def __init__(self, dataInfo, parent=None, option=DataSelectionTypes.RAW):
+    def __init__(self, dataInfo, parent=None, \
+                 option=DataSelectionTypes.RAW):
 #         plotAxisLabels = self._dataSelections.getPlotAxisLabels()
 #         plotAxisLabelsIndex = self._dataSelections.getPlotAxisLabelsIndex()
         selectedNodes = dataInfo[SELECTED_NODES]
@@ -34,7 +35,8 @@ class IntermediateDataNode(FileDataNode):
             for scan in set(nodesForScan).intersection(selectedScans):
                 newNodeName += "- " + scan + ", "
 
-        super(IntermediateDataNode, self).__init__(newNodeName, parent=parent)
+        super(IntermediateDataNode, self).__init__(newNodeName, \
+                                                   parent=parent)
         self._dataColumns = [[]]
         self._dataNames = []
 #         scanNodes = node.getScanNodes()
@@ -47,7 +49,8 @@ class IntermediateDataNode(FileDataNode):
         elif option == DataSelectionTypes.STEP_NORMALIZED:
             self.insertStepNormalizedData(selectedNodes, dataSelection)
         elif option == DataSelectionTypes.TWO_FIELD:
-            self.insertTwoFieldNormalizedData(selectedNodes, dataSelection)
+            self.insertTwoFieldNormalizedData(selectedNodes, \
+                                              dataSelection)
     
 
     def getAverageData(self, dataSelection):
@@ -67,17 +70,22 @@ class IntermediateDataNode(FileDataNode):
             dataOut[selectedScan] = {}
         
         for selectedScan in currentSelectedScans:
-            logger.debug("Adding scan %s type %s" % (selectedScan, type(selectedScan)))
+            logger.debug("Adding scan %s type %s" % (selectedScan, \
+                                                     type(selectedScan)))
             node = dataSelection.getNodeContainingScan(selectedScan)
             scans[selectedScan] = node.scans[selectedScan]
             for counter in counterNames:
                 try:
                     data[selectedScan].append(scans[selectedScan].data[counter][:])
                 except KeyError as ie:
-                    logger.exception("Tried to read data which does not have " + "counter %s. scan: %s Exception %s ", (counter, scans[selectedScan], ie))
+                    logger.exception("Tried to read data which does " + \
+                                     "not have " + "counter %s. " + \
+                                     "scan: %s Exception %s ", \
+                                     (counter, scans[selectedScan], ie))
             
             try:
-                dataOut[selectedScan] = dataSelection.calcPlotData(data[selectedScan])
+                dataOut[selectedScan] = \
+                    dataSelection.calcPlotData(data[selectedScan])
             except IndexError:
                 logger.warning("No data warning", "No data Was selected")
             countIndex = range(1, len(dataOut[selectedScan]))
@@ -85,21 +93,38 @@ class IntermediateDataNode(FileDataNode):
             indices = range(len(dataOut[selectedScan]))
             logger.debug("Indices: %s " % indices)
             for index in indices:
-                logger.debug("dataOut[%s]: %s, index: %s" % (selectedScan, dataOut[selectedScan], index))
+                logger.debug("dataOut[%s]: %s, index: %s" % \
+                             (selectedScan, dataOut[selectedScan], \
+                              index))
                 if index == 0:
                     dataSum[index] = dataOut[selectedScan][index][:]
                 else:
                     try:
                         if selectedScan == currentSelectedScans[0]:
-                            logger.debug("Adding index %s for scan %s" % (index, selectedScan))
-                            dataSum[index] = dataOut[selectedScan][index][:]
+                            logger.debug("Adding index %s for scan %s" % \
+                                         (index, selectedScan))
+                            dataSum[index] = \
+                                dataOut[selectedScan][index][:]
                         else:
-                            logger.debug("Summing index %s for scan %s" % (index, selectedScan))
-                            dataSum[index] += dataOut[selectedScan][index][:]
+                            logger.debug("Summing index %s for scan %s" % \
+                                         (index, selectedScan))
+                            dataSum[index] += \
+                                dataOut[selectedScan][index][:]
                     except ValueError as ve:
-                        logger.warning("Data Error", "Trouble mixing data " + "from differnet scans" + "Common Cause is scans " + "have different number " + "of data points\n %s, " + " data[%] %s\n dataSum %s" % (str(ve), selectedScan, dataOut[selectedScan], dataSum))
+                        logger.warning("Data Error", \
+                                       "Trouble mixing data " + \
+                                       "from differnet scans" + \
+                                       "Common Cause is scans " + 
+                                       "have different number " + 
+                                       "of data points\n %s, " + \
+                                       " data[%] %s\n dataSum %s" % \
+                                       (str(ve), selectedScan, \
+                                        dataOut[selectedScan], dataSum))
                     except KeyError as ke:
-                        logger.warning("KeyError %s, data[%s] %s\n dataSum %s" % (str(ke), selectedScan, dataOut[selectedScan], dataSum))
+                        logger.warning("KeyError %s, data[%s] %s\n " + \
+                                       "dataSum %s" % \
+                                       (str(ke), selectedScan, \
+                                        dataOut[selectedScan], dataSum))
         
         for index in indices:
             if index == 0: #X Axis
@@ -145,21 +170,25 @@ class IntermediateDataNode(FileDataNode):
             for selectedScan in dataSelection.getSelectedScans():
                 data = []
                 logger.debug("Available Scans %s" % node.scans)
-                logger.debug("Adding Scan %s type %s" % (selectedScan, type(selectedScan)))
+                logger.debug("Adding Scan %s type %s" % (selectedScan, \
+                                                         type(selectedScan)))
                 scan = node.scans[selectedScan]
-                self.scans[selectedScan] = IntermediateScanNode(str(scan.scanNum), parent=self)
-                counters, counterNames = dataSelection.getSelectedCounterInfo()
+                self.scans[selectedScan] = \
+                    IntermediateScanNode(str(scan.scanNum), parent=self)
+                counters, counterNames = \
+                    dataSelection.getSelectedCounterInfo()
                 logger.debug("counters %s", counters)
                 logger.debug("counterNames %s", counterNames)
                 for counter in counterNames:
                     try:
                         data.append(node.scans[selectedScan].data[counter])
                     except KeyError as ie:
-                        logger.exception("Tried to load data which does" + 
-                                         " not have counters selected." + 
-                                         "Multiple scans are selected and some" + 
-                                         "may not have the selected counters " + 
-                                         "Scan %s \n %s" % 
+                        logger.exception("Tried to load data which " + 
+                                         "does not have counters " + 
+                                         "selected.  Multiple scans " +
+                                         "are selected and some" + 
+                                         "may not have the selected " + 
+                                         "counters Scan %s \n %s" % 
                                          (str(selectedScan), str(ie)))
                 
                 
@@ -167,10 +196,17 @@ class IntermediateDataNode(FileDataNode):
                     logger.debug("scan %s data %s" % (selectedScan, data))
                     dataOut = dataSelection.calcPlotData(data)
                 except IndexError:
-                    qtWidgets.QMessageBox.warning(self, "No Data Warning", "No Data WasSelected")
+                    qtWidgets.QMessageBox.warning(self, \
+                                                  "No Data Warning", \
+                                                  "No Data WasSelected")
                 axisLabels = dataSelection.getPlotAxisLabels()
                 axisLabelIndex = dataSelection.getPlotAxisLabelsIndex()
-                self.scans[selectedScan].addData(scan.scanNum, scan.scanCmd, axisLabels, axisLabelIndex, dataOut, counterNames)
+                self.scans[selectedScan].addData(scan.scanNum, \
+                                                 scan.scanCmd, \
+                                                 axisLabels, \
+                                                 axisLabelIndex, \
+                                                 dataOut, \
+                                                 counterNames)
 
     def getWriterClass(self):
         '''
@@ -181,13 +217,18 @@ class IntermediateDataNode(FileDataNode):
     def insertStepNormalizedData(self, selectedNodes, dataSelection):
         logger.debug(METHOD_ENTER_STR % selectedNodes)
         dataAverage = self.getAverageData(dataSelection)
-        correctedData = dataSelection.getCorrectedData(dataAverage[0], dataAverage[1:])
+        correctedData = dataSelection.getCorrectedData(dataAverage[0], \
+                                                       dataAverage[1:])
         counters, counterNames = dataSelection.getSelectedCounterInfo()
         currentSelectedScans = dataSelection.getSelectedScans()
         logger.debug("Average Data %s" % dataAverage)
         logger.debug("CorrectedData %s" % correctedData) 
-        self.scans["%s %s" % (DataSelectionTypes.STEP_NORMALIZED.name, ''.join('{0} '.format(k) for k in currentSelectedScans))] = \
-            IntermediateScanNode("%s %s" % (DataSelectionTypes.STEP_NORMALIZED.name, ''.join('{0} '.format(k) for k in currentSelectedScans)), 
+        self.scans["%s %s" % (DataSelectionTypes.STEP_NORMALIZED.name, \
+                              ''.join('{0} '.format(k) for \
+                                      k in currentSelectedScans))] = \
+            IntermediateScanNode("%s %s" % (DataSelectionTypes.STEP_NORMALIZED.name, \
+                                            ''.join('{0} '.format(k) \
+                                                    for k in currentSelectedScans)), 
                                  parent=self)
         axisLabels = dataSelection.getPlotAxisLabels()
         axisLabelIndex = dataSelection.getPlotAxisLabelsIndex()
@@ -195,8 +236,12 @@ class IntermediateDataNode(FileDataNode):
         logger.debug("axisLabelsIndex %s" % axisLabelIndex)
         logger.debug("counterNames %s" % counterNames )
         correctedData.insert(0, dataAverage[0])
-        self.scans["%s %s" % (DataSelectionTypes.STEP_NORMALIZED.name, ''.join('{0} '.format(k) for k in currentSelectedScans))] \
-            .addData("%s %s" % (DataSelectionTypes.STEP_NORMALIZED.name, ''.join('{0} '.format(k) for k in currentSelectedScans)), 
+        self.scans["%s %s" % (DataSelectionTypes.STEP_NORMALIZED.name, \
+                              ''.join('{0} '.format(k) \
+                                      for k in currentSelectedScans))] \
+            .addData("%s %s" % (DataSelectionTypes.STEP_NORMALIZED.name, \
+                                ''.join('{0} '.format(k) \
+                                        for k in currentSelectedScans)), 
                      "shared", 
                      axisLabels, 
                      axisLabelIndex, 
@@ -222,18 +267,25 @@ class IntermediateDataNode(FileDataNode):
                     logger.debug (thisScan.data)
                     data[scan] = thisScan.data
             logger.debug("data %s" % data)
-            counters, counterNames = dataSelection.getSelectedCounterInfo()
-            normalizedXAS = (data[selectedScans[0]]['XAS'] + data[selectedScans[1]]['XAS'])/2
-            normalizedXMCD = (data[selectedScans[0]]['XMCD'] - data[selectedScans[1]]['XMCD'])                                              
+            counters, counterNames = \
+                dataSelection.getSelectedCounterInfo()
+            normalizedXAS = (data[selectedScans[0]]['XAS'] + \
+                             data[selectedScans[1]]['XAS'])/2
+            normalizedXMCD = (data[selectedScans[0]]['XMCD'] - \
+                              data[selectedScans[1]]['XMCD'])                                              
             dataLabels = list(data[selectedScans[0]].keys())
             logger.debug("Data Labels %s" % dataLabels)
-            self.scans['Full Normalized'] = IntermediateScanNode("Full Normalized", parent = self)
-            self.scans['Full Normalized'].addData("Full Normalized",
-                                                  "shared",
-                                                  dataLabels,
-                                                  [1,2,1,2],
-                                                  [data[selectedScans[0]]['Energy'], normalizedXAS, normalizedXMCD],
-                                                  counterNames)
+            self.scans[DataSelectionTypes.TWO_FIELD.name] = \
+                IntermediateScanNode(DataSelectionTypes.TWO_FIELD.name, \
+                                     parent = self)
+            self.scans[DataSelectionTypes.TWO_FIELD.name].\
+                addData(DataSelectionTypes.TWO_FIELD.name,
+                        "shared",
+                        dataLabels,
+                        [1,2,1,2],
+                        [data[selectedScans[0]]['Energy'], \
+                         normalizedXAS, normalizedXMCD],
+                        counterNames)
         else:
             logger.warning("You have elected to display/save " + \
                            "Normalized Data.  This requires 2 " + \
