@@ -7,7 +7,7 @@ from setuptools import find_packages
 import xcirculardichro
 PACKAGE_NAME = 'xcirculardichro'
 setup(name=PACKAGE_NAME,
-      version='0.9.3',
+      version='0.9.4',
       description='Library to provide PyQt5 widgets to display spec file information read using ' +
                    'spec2nexus.spec file library',
       author = 'John Hammonds',
@@ -22,7 +22,9 @@ setup(name=PACKAGE_NAME,
       python_requires = ">=3.5, <4",
       license = 'See LICENSE File',
       platforms = 'any',
-      scripts = ['Scripts/xcirculardichro',
+      scripts = ['Scripts/plotxmcd',
+                 'Scripts/plotxmcd.bat',
+                 'Scripts/xcirculardichro',
                  'Scripts/xcirculardichro.bat']
       
 )

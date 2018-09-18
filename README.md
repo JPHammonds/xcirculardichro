@@ -90,4 +90,8 @@ Version 0.9 2018-04-16
    Change some garbage collection to speed things up.
    
    Version 0.9.3 2018-09-18
-   Change a missed text reference from Full Normalized To TwoField.
+   Change a missed text reference from Full Normalized To TwoField.   
+
+   Version 0.9.4 2018-09-18
+   Copy scritps xcirculardichro and xcirculardichro.bat to 
+   plotxmcd and plotxmcd.bat.  
